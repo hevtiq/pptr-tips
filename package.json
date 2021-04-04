@@ -1,0 +1,19 @@
+{
+  "name": "pptr-tips",
+  "version": "1.0.0",
+  "description": "Puppeteer Tips and Tricks",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Puppeteer",
+    "Tips",
+    "Tricks"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^8.0.0"
+  }
+}
