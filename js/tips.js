@@ -378,7 +378,7 @@ console.log(a);  // 1
 console.log(b);  // [2, 3]
 
 // bypass any indexes we want by putting a , without any variable declaration.
-const [,,c] = [5, 4, 6, 9, 7];
+const [, , c] = [5, 4, 6, 9, 7];
 console.log(c);  // 6
 
 // destructed the property data of the axios.get('/api/users/7')
@@ -387,4 +387,313 @@ console.log(c);  // 6
 const { data: [user] } = await axios.get('/api/user/7');
 console.log(user);  // { username: 'aho' }
 
+// fetch from the route /api/users/:userid
+const { data, status } = await axios.get('/api/user/7');
+console.log(data);  // [{ username: 'aho' }]
+console.log(status);  // 200
 
+const { data, status = 200 } = await axios.get('/api/user/7');
+const { data: users } = await axios.get('/api/user/7');
+console.log(users);  // [{ username: 'aho' }]
+
+
+const [a] = [1, 2, 3];
+console.log(a);  // 1
+
+
+const months = ['January', 'February', 'March', 'April'];
+const [first_day, second_day, third_day, fourth_day] = months;
+console.log(first_day, second_day, third_day, fourth_day);
+
+[first_day = 'jan', second_day = 'feb', third_day = 'march', fourth_day = 'april'] = ['January'];
+console.log(first_day, second_day, third_day, fourth_day);
+
+
+//  Remove duplicate elements in the array
+// Set is the data structure that elements in Set are always unique
+// by converting the original array to set we will remove all overlaps
+// only apply to arrays of primitive data types (Number, String, Null, Undefined, Symbol)
+const arr = [1, 1, 1, 2, 2, 2, 3, 5, 3, 2];
+const newArr = [...new Set(arr)];
+console.log(newArr); // [ 1, 2, 3, 5 ]
+
+
+// Remove the Falsy Values in an array.
+const arr = [
+    0,
+    false,
+    NaN,
+    undefined,
+    "",
+    null,
+    1,
+    true,
+    "Hello World",
+    { name: "value" },
+];
+const filteredArr = arr.filter(Boolean);
+console.log(filteredArr); // [ 1, true, 'Hello World', { name: 'value' } ]
+
+
+// shorthand
+const a = 1;
+const b = 2;
+
+// && will return the first FALSY value first found in the list
+// if all operands are true, will return the last operand.
+console.log(a && b); // 2
+console.log(0 && 1); // 0
+
+// || Will return the first TRUTHY value found in the list
+// if all operands are false, then return the last operand
+console.log(a || b); // 1
+console.log(0 || 1); // 1
+
+// Real Example
+const data = await fetch([api]);
+
+// LONG
+if (data) {
+    console.log(data.length);
+} else {
+    console.log(0);
+}
+
+// SHORT
+// ff the data.length is Truthy value, it will take the value of data.length, otherwise it will take the value 0.
+console.log((data && data.length) || 0);
+
+
+// check response from json/api
+// whenever one of the operators in the front mark || returns Falsy value, data will be assigned = []
+// make sure not errors occurs if data returns incorrectly or cannot get data.
+const response = {
+    message: "",
+    success: true,
+    result: {
+        name: "response-list",
+        list: [1, 2, 3, 4],
+    },
+};
+
+// get the value of result
+const result = (response && response.result) || "Default result";
+
+// OR Optional change
+const result = response?.result ?? "Default result";
+
+
+
+// get the value of an attribute that does not exist in the object does not use ||
+const unknownProperty = response && response.result && response.result.unknownProperty;
+
+// OR Optional change
+const unknownProperty = response?.result?.unknownProperty;
+
+
+
+// get the value of a non-existent attribute in the object used ||
+const unknownPropertyWithDefaultValue = (response && response.result && response.result.unknownProperty) || "Default Value";
+
+// OR Optional change
+const unknownPropertyWithDefaultValue = response?.result?.unknownProperty ?? "Default Value";
+
+console.log(result); // { name: 'response-list', list: [ 1, 2, 3, 4 ] }
+console.log(unknownProperty); // undefined
+console.log(unknownPropertyWithDefaultValue); // "Default Value"
+
+
+// About ?? and //
+// - || returns the first truthy value
+// - ?? returns the first defined value
+let height = 0;
+
+alert(height || 100); // 100
+alert(height ?? 100); // 0
+
+
+// Convert string to number
+const strInt = "10";
+const number = +strInt;
+console.log("number", number); // 10
+console.log("typeof number", typeof number); // number
+
+// Convert boolean to number
+console.log(+true);  // Return: 1
+console.log(+false); // Return: 0​
+
+// Convert string to number with ~ (bitwise NOT operator)
+// ~n = - n - 1    =>   ~15 = -16
+// ~~n = -(-n-1)-1 = n    =>    ~~10 = 10
+// ~true = -2
+// ~false = -1
+const strInt = "10";
+const number = ~~strInt;
+console.log("number", number); // 10
+console.log("typeof number", typeof number); // number
+
+// real example
+const strArr = ["10", "Str", (x = 23), "false", "10.6"];
+
+strArr.forEach((item) => console.log(+item)); // 10, NaN, 23, NaN,10.6
+strArr.forEach((item) => console.log(~~item)); // 10, 0, 23, 0,10
+
+const tf = (strArr.map(item => (+item))).map(item => isNaN(item));
+// [false, true, false, true, false]
+
+// method to find index of all item occurrences of element in array
+function getAllIndexes(arr, val) {
+    let ret = [], idx;
+    for (idx = 0; idx < arr.length; idx++)
+        if (arr[idx] === val)
+            ret.push(idx);
+    return ret;
+}
+
+const idxNaN = getAllIndexes(tf, true);
+const idxNumber = getAllIndexes(tf, false);
+console.log(idxNaN);  // [1, 3]
+console.log(idxNumber);  // [0, 2, 4]
+
+let newArr = (strArr.map(item => (+item)));
+console.log(newArr);  // [10, NaN, 23, NaN, 10.6]
+
+idxNaN.map(item => newArr[item] = 0);
+console.log(newArr);  // [10, 0, 23, 0, 10.6]
+
+
+// Random in array
+const initialArr = [1, 2, 3, 4, 5];
+const shuffledArr = initialArr.sort(() => 0.5 - Math.random());
+console.log(shuffledArr); //  [ 1, 5, 2, 3, 4 ]
+
+
+// use variables as objects of Object
+const propertyName = "prop";
+
+const object = {
+    [propertyName]: "Value",
+};
+
+console.log("object", object); // object { prop: 'Value' }
+
+
+// convert Array to Object
+const arr = [1, 2, 3, 4, 5, 6];
+
+// Solution1
+const obj = { ...arr };
+
+// Solution2
+const obj = Object.assign({}, arr);
+
+// Solution3
+const obj = {};
+for (let i = 0; i < arr.length; i++) {
+    obj[i] = arr[i];
+}
+
+// Solution4
+// create a prototype method
+Array.prototype.toObject = function () {
+    const obj = {};
+
+    // copy array elements to th object
+    for (let i = 0; i < this.length; i++) {
+        obj[i] = this[i];
+    }
+
+    return obj;
+};
+
+// convert array to object
+const newObj = arr.toObject();
+
+console.log(obj); // { '0': 1, '1': 2, '2': 3, '3': 4, '4': 5, '5': 6 }
+
+
+// convert Object to Array
+const numbers = {
+    one: 1,
+    two: 2,
+};
+
+// Solution1 - ES5
+let keys = [];
+for (let number in numbers) {
+    if (numbers.hasOwnProperty(number)) {
+        keys.push(number);
+    }
+}
+keys; // [ 'one', 'two' ]
+
+// Solution2 - ES6
+// Initialize an object
+const employees = {
+    boss: 'Michael',
+    secretary: 'Pam',
+    sales: 'Jim',
+    accountant: 'Oscar'
+};
+
+// Get the keys of the object
+const keys = Object.keys(employees);
+const values = Object.values(employees);
+const entries = Object.entries(employees);
+
+console.log(keys, values, entries);
+// ["boss", "secretary", "sales", "accountant"]
+// ["Michael", "Pam", "Jim", "Oscar"]
+// [Array(2), Array(2), Array(2), Array(2)]
+
+
+// search an object from an array
+function findObjectFromArray(key, arr) {
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].name === key) {
+            return arr[i];
+        }
+    }
+}
+
+const arr = [
+    { name: "string 1", value: "this", other: "that" },
+    { name: "string 2", value: "this", other: "that" }
+];
+
+const ret = findObjectFromArray("string 1", arr);
+
+
+// merge two arrays as key value pairs javascript
+const columns = ["Date", "blog", "name", "Location", "rank"];
+const rows = ["2019", "javascript", "anonystick", "Vietnam", "150000"];
+const result = rows.reduce(function (ret, arr, idx) {
+    ret[columns[idx]] = arr;
+    return ret;
+}, {})
+console.log(result);
+// {
+//     Date: "2019",
+//     blog: "javascript",
+//     name: "anonystick",
+//     Location: "Vietnam",
+//     rank: "150000"
+// }
+
+// merge array object javascript
+const arr1 = [{name: "lang", value: "English"},{name: "age", value: "18"}];
+const arr2 = [{name : "child", value: '5'}, {name: "lang", value: "German"}];
+// merge arr2 to arr1
+Array.prototype.push.apply(arr1,arr2);
+// [{"name":"lang","value":"English"},
+// {"name":"age","value":"18"},
+// {"name":"child","value":"5"},
+// {"name":"lang","value":"German"}]
+
+
+// merge array javascript es6
+const array1 = [1, 2];
+const array2 = [3, 4, 5];
+const array3 = [6,7,8]
+const arr = [...array1, ...array2, ...array3]
+// [1, 2, 3, 4, 5, 6, 7, 8]
