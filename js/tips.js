@@ -681,10 +681,10 @@ console.log(result);
 // }
 
 // merge array object javascript
-const arr1 = [{name: "lang", value: "English"},{name: "age", value: "18"}];
-const arr2 = [{name : "child", value: '5'}, {name: "lang", value: "German"}];
+const arr1 = [{ name: "lang", value: "English" }, { name: "age", value: "18" }];
+const arr2 = [{ name: "child", value: '5' }, { name: "lang", value: "German" }];
 // merge arr2 to arr1
-Array.prototype.push.apply(arr1,arr2);
+Array.prototype.push.apply(arr1, arr2);
 // [{"name":"lang","value":"English"},
 // {"name":"age","value":"18"},
 // {"name":"child","value":"5"},
@@ -694,6 +694,549 @@ Array.prototype.push.apply(arr1,arr2);
 // merge array javascript es6
 const array1 = [1, 2];
 const array2 = [3, 4, 5];
-const array3 = [6,7,8]
+const array3 = [6, 7, 8]
 const arr = [...array1, ...array2, ...array3]
 // [1, 2, 3, 4, 5, 6, 7, 8]
+
+
+// load 100,000 items
+{/* <ul id="root"></ul> */ }
+function createOneHundredThousandData() {
+    let arr = [];
+    for (let i = 0; i < 100000; i++) {
+        arr.push({
+            imgUrl: 'https://cf.shopee.vn/file/2c1e846120cefebd49e8ba45acd2d100',
+            key: i
+        })
+    }
+    return arr;
+}
+var beginTime = performance.now();
+console.log('Begin', beginTime);
+/ * console.time ('start testing test') * /
+
+let h = [];
+let data = createOneHundredThousandData()
+// Get the first 100 items
+let firstScreenData = data.splice(0, 100); // Use splice
+for (let i = 0; i < 100; i++) {
+    let li = document.createElement('li');
+    let img = document.createElement('img');
+    img.src = firstScreenData[i].imgUrl;
+    li.appendChild(img);
+    let text = document.createTextNode(firstScreenData[i].key);
+    li.appendChild(text);
+    document.getElementById('root').appendChild(li);
+}
+
+// setTimeout callback will be executed
+setTimeout(() => {
+    function renderHundred(n) {
+        // console.log('n=',n);
+        // Every time I display 100 items
+        let partialData = data.splice(0, 100);
+        for (let i = 0; i < 100 && partialData.length > 0; i++) {
+            let li = document.createElement('li');
+            let img = document.createElement('img');
+            img.src = partialData[i].imgUrl;
+            li.appendChild(img);
+            let text = document.createTextNode(partialData[i].key);
+            // console.log('partialData[i].key',partialData[i].key);
+            li.appendChild(text);
+            document.getElementById('root').appendChild(li);
+        }
+        if (n) {
+            setTimeout(() => {
+                renderHundred(n - 1);
+            }, 50)
+        }
+    }
+    renderHundred(999);  // running 1000 new loop each loop is 100 items understand no
+}, 1000);
+
+
+//document.getElementById('root').innerHTML = h.join('');
+document.addEventListener('DOMContentLoaded', function () {
+    var endTime = performance.now();
+    console.log('DOMContentLoaded endTime', endTime);
+    var total = ((endTime - beginTime) / 1000).toFixed(5);
+    console.log('DOMContentLoaded Render 100000 Items takes off ' + total + ' second');
+    / * console.timeEnd ('start testing test') * /
+});
+window.onload = function () {
+    var endTime = performance.now();
+    console.log('window.onload endTime', endTime);
+    var total = ((endTime - beginTime) / 1000).toFixed(5);
+    console.log('Window.onload Render 100000 Items taken out ' + total + ' second');
+}
+
+
+// Do not use negative conditions.
+const isEmailVerified = (email) => {
+    // implementation
+}
+
+if (isEmailVerified(email)) {
+    // do something...
+}
+
+if (isVerified) {
+    // do something...
+}
+
+
+// For Multiple Conditions, use Array.includes
+// NOT
+const checkCarModel = (model) => {
+    if (model === 'vinfast fadil' || model === 'Hyundai Accent') {
+        console.log('model valid');
+    }
+}
+
+checkCarModel('vinfast fadil'); // outputs 'model valid'
+
+// DO
+const checkCarModel = (model) => {
+    const models = ['vinfast fadil', 'Hyundai Accent'];
+
+    if (models.includes(model)) {
+        console.log('model valid');
+    }
+}
+
+checkCarModel('vinfast fadil'); // outputs 'model valid'
+
+
+// No need to check long line when using if ... else
+const checkModel = (car) => {
+    let result; // First define a returned result.
+
+    // check if car exists
+    if (car) {
+
+        // check if car model exists
+        if (car.model) {
+
+            // check if car year exists
+            if (car.year) {
+                result = `Car model: ${car.model}; Manufacturing year: ${car.year};`;
+            } else {
+                result = 'No car year';
+            }
+
+        } else {
+            result = 'No car model'
+        }
+
+    } else {
+        result = 'No car';
+    }
+
+    return result; // our single return statement
+}
+
+console.log(checkModel()); // outputs 'No car'
+console.log(checkModel({ year: 1988 })); // outputs 'No car model'
+console.log(checkModel({ model: 'ford' })); // outputs 'No car year'
+console.log(checkModel({ model: 'ford', year: 1988 })); // outputs 'Car model: ford; Manufacturing year: 1988;'
+
+
+// DO
+const checkModel = ({ model, year } = {}) => {
+    if (!model && !year) return 'No car';
+    if (!model) return 'No car model';
+    if (!year) return 'No car year';
+
+    // here we are free to do whatever we want with the model or year
+    // we made sure that they exist
+    // no more checks required
+
+    // doSomething(model);
+    // doSomethingElse(year);
+
+    return `Car model: ${model}; Manufacturing year: ${year};`;
+}
+
+console.log(checkModel()); // outputs 'No car'
+console.log(checkModel({ year: 1988 })); // outputs 'No car model'
+console.log(checkModel({ model: 'ford' })); // outputs 'No car year'
+console.log(checkModel({ model: 'ford', year: 1988 })); // outputs 'Car model: ford; Manufacturing year: 1988;'
+
+
+// Use Indexing or Maps Instead of switch Statement
+// NOT
+const getCarsByState = (state) => {
+    switch (state) {
+        case 'usa':
+            return ['Ford', 'Dodge'];
+        case 'france':
+            return ['Renault', 'Peugeot'];
+        case 'italy':
+            return ['Fiat'];
+        default:
+            return [];
+    }
+}
+
+console.log(getCarsByState()); // outputs []
+console.log(getCarsByState('usa')); // outputs ['Ford', 'Dodge']
+console.log(getCarsByState('italy')); // outputs ['Fiat']
+
+// ĐO
+const carState = {
+    usa: ['Ford', 'Dodge'],
+    france: ['Renault', 'Peugeot'],
+    italy: ['Fiat']
+};
+
+const getCarsByState = (state) => {
+    return carState[state] || [];
+}
+
+console.log(getCarsByState()); // outputs []
+console.log(getCarsByState('usa')); // outputs ['Ford', 'Dodge']
+console.log(getCarsByState('france')); // outputs ['Renault', 'Peugeot']
+
+
+// Memoization - Boost your Code Performance
+// https://devinduct.com/blogpost/60/memoization-boost-your-code-performance
+const fibonnaci = (n) => {
+    if (n < 2) return 1;
+    return fibonnaci(n - 1) + fibonnaci(n - 2);
+}
+
+console.time("First run");
+fibonnaci(42);
+console.timeEnd("First run");
+
+console.time("Second run");
+fibonnaci(42);
+console.timeEnd("Second run");
+
+// First run: 2853.337890625ms
+// Second run: 2854.5107421875ms
+
+/**
+ * memoize() method to cache/memoize function
+ * @param {*} func function need to memoize
+ * @returns wrapper function handling the cache logic
+ */
+const memoize = (func) => {
+    // defines a local cache (Map object)
+    const cache = new Map();
+
+    // returns wrapper function
+    return (...args) => {
+        const key = args.join('-');
+
+        // If cache no value with that key
+        if (!cache.has(key)) {
+            // stores the value to cache
+            cache.set(key, func(args))
+        }
+
+        // returns the value from the cache
+        return cache.get(key);
+    }
+}
+
+
+const fibonnaciMemo = memoize(fibonnaci);
+
+console.time("First run");
+fibonnaciMemo(42);
+console.timeEnd("First run");
+
+console.time("Second run");
+fibonnaciMemo(42);
+console.timeEnd("Second run");
+
+console.time("Third run");
+fibonnaciMemo(42);
+console.timeEnd("Third run");
+
+// First run: 2858.337158203125ms
+// Second run: 0.005859375ms
+// Third run: 0.003173828125ms
+
+
+// Try-Catch-Finally
+// invoke method to open file
+openFile();
+
+try {
+    // try to write file
+    writeFile(Data);
+} catch (e) {
+    // handle if catch any error occurs
+    handleError(e);
+} finally {
+    // close file if no error occurs
+    closeFile();
+}
+
+
+// Higher-order function
+const persons = [
+    { name: 'Peter', age: 16 },
+    { name: 'Mark', age: 18 },
+    { name: 'John', age: 27 },
+    { name: 'Jane', age: 14 },
+    { name: 'Tony', age: 24 },
+];
+// NOT
+const fullAge = [];
+for (let i = 0; i < persons.length; i++) {
+    if (persons[i].age >= 18) {
+        fullAge.push(persons[i]);
+    }
+}
+// DO
+const fullAge = persons.filter(person => person.age >= 18);
+console.log(fullAge);
+
+
+
+const birthYear = [1975, 1997, 2002, 1995, 1985];
+// NOT
+const ages = [];
+for (let i = 0; i < birthYear.length; i++) {
+    let age = 2018 - birthYear[i];
+    ages.push(age);
+}
+// DO
+const ages = birthYear.map(year => 2018 - year);
+// prints [ 43, 21, 16, 23, 33 ]
+console.log(ages);
+
+
+const arr1 = [1, 2, 3];
+// NOT
+const arr2 = [];
+for (let i = 0; i < arr1.length; i++) {
+    arr2.push(arr1[i] * 2);
+}
+// DO
+const arr2 = arr1.map(function (item) {
+    return item * 2;
+});
+// prints [ 2, 4, 6 ]
+console.log(arr2);
+
+
+
+const arr = [5, 7, 1, 8, 4];
+// NOT
+let sum = 0;
+for (let i = 0; i < arr.length; i++) {
+    sum = sum + arr[i];
+}
+// DO
+const sum = arr.reduce(function (accumulator, currentValue) {
+    return accumulator + currentValue;
+}, 10);
+// prints 25
+console.log(sum);
+
+
+// Creating Our own Higher-Order Function
+const strArray = ['JavaScript', 'Python', 'PHP', 'Java', 'C'];
+function mapForEach(arr, fn) {
+    const newArray = [];
+    for (let i = 0; i < arr.length; i++) {
+        newArray.push(
+            fn(arr[i])
+        );
+    }
+    return newArray;
+}
+const lenArray = mapForEach(strArray, function (item) {
+    return item.length;
+});
+// prints [ 10, 6, 3, 4, 1 ]
+console.log(lenArray);
+
+
+
+// https://www.freecodecamp.org/news/a-quick-intro-to-higher-order-functions-in-javascript-1a014f89c6b/
+users = [
+    {
+        name: 'Yazeed',
+        age: 25
+    },
+    {
+        name: 'Sam',
+        age: 30
+    },
+    {
+        name: 'Bill',
+        age: 20
+    }
+];
+
+getName = (user) => user.name;
+
+// NOT
+usernames = [];
+for (let i = 0; i < users.length; i++) {
+    const name = getName(users[i]);
+    usernames.push(name);
+}
+// DO
+usernames = users.map(getName);
+
+console.log(usernames);
+// ["Yazeed", "Sam", "Bill"]
+
+
+startsWithB = (string) => string.toLowerCase().startsWith('b');
+
+// NOT
+namesStartingWithB = [];
+for (let i = 0; i < users.length; i++) {
+    if (startsWithB(users[i].name)) {
+        namesStartingWithB.push(users[i]);
+    }
+}
+// DO
+namesStartingWithB = users.filter((user) => startsWithB(user.name));
+
+console.log(namesStartingWithB);
+// [{ "name": "Bill", "age": 20 }]
+
+
+// NOT
+total = 0;
+for (let i = 0; i < users.length; i++) {
+    total += users[i].age;
+}
+// DO
+totalAge = users.reduce((total, user) => user.age + total, 0);
+
+console.log(total);
+// 75
+
+
+// Functions Operate on Data Strings Are Data
+sayHi = (name) => `Hi, ${name}!`;
+result = sayHi('User');
+
+console.log(result); // 'Hi, User!'
+
+// Numbers Are Data
+double = (x) => x * 2;
+result = double(4);
+
+console.log(result); // 8
+
+// Booleans Are Data
+getClearance = (allowed) => (allowed ? 'Access granted' : 'Access denied');
+
+result1 = getClearance(true);
+result2 = getClearance(false);
+
+console.log(result1); // 'Access granted'
+console.log(result2); // 'Access denied'
+
+
+// Objects Are Data
+getFirstName = (obj) => obj.firstName;
+
+result = getFirstName({
+    firstName: 'Yazeed'
+});
+
+console.log(result); // 'Yazeed'
+
+
+// Arrays Are Data
+len = (array) => array.length;
+result = len([1, 2, 3]);
+
+console.log(result); // 3
+
+
+// Functions as Arguments
+isEven = (num) => num % 2 === 0;
+result = [1, 2, 3, 4].filter(isEven);
+
+console.log(result); // [2, 4]
+
+// Returning Functions
+add = (x) => (y) => x + y;
+result = add(10)(20);
+// OR
+add10 = add(10);
+result = add10(20);
+console.log(result); // 30
+
+
+// create filter function
+function filtering(arr, test) {
+    const passed = [];
+    for (let element of arr) {
+        if (test(element)) {
+            passed.push(element);
+        };
+    };
+    return passed;
+};
+function isSuperNumber(num) {
+    return num >= 10;
+};
+filtering([1, 5, 11, 3, 22], isSuperNumber);  // [11, 22]
+
+
+// create map function
+function mapping(arr, transform) {
+    const mapped = [];
+    for (let element of arr) {
+        mapped.push(transform(element));
+    };
+    return mapped;
+}
+function addTwo(num) {
+    return num + 2;
+};
+mapping([1, 2, 3], addTwo);  // [3, 4, 5]
+
+
+// create reduce function
+function reducing(reducer, initial, arr) {
+    let acc = initial;
+    for (element of arr) {
+        acc = reducer(acc, element);
+    };
+    return acc;
+};
+function accum(acc, curr) {
+    return acc + curr;
+};
+reducing(accum, 0, [1, 2, 3]);  // 6
+
+
+function prefixWordWithUnderscore(word) {
+    return `_${word}`
+}
+
+const words = ['coffee', 'apple', 'orange', 'phone', 'starbucks']
+const prefixedWords = words.map(prefixWordWithUnderscore)
+
+// result: ["_coffee", "_apple", "_orange", "_phone", "_starbucks"]
+
+
+function utilizePrefixer(prefix) {
+    return function (word) {
+        return `${prefix}${word}`
+    }
+}
+
+const withMoneySign = utilizePrefixer('$')
+const withCompanyName = utilizePrefixer('Fandango')
+const tenDollars = withMoneySign('9.99')
+const formHeader = withCompanyName(
+    ' is the company you will be applying for today',
+)
+
+console.log(tenDollars)
+console.log(formHeader)
