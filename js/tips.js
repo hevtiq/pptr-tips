@@ -1240,3 +1240,867 @@ const formHeader = withCompanyName(
 
 console.log(tenDollars)
 console.log(formHeader)
+
+
+// Higher Order Function
+// https://anonystick.com/blog-developer/higher-order-functions-in-javascript-201905107183914
+var grades = [
+    { name: 'John', grade: 8, sex: 'M' },
+    { name: 'Sarah', grade: 12, sex: 'F' },
+    { name: 'Bob', grade: 16, sex: 'M' },
+    { name: 'Johnny', grade: 2, sex: 'M' },
+    { name: 'Ethan', grade: 4, sex: 'M' },
+    { name: 'Paula', grade: 18, sex: 'F' },
+    { name: 'Donald', grade: 5, sex: 'M' },
+    { name: 'Jennifer', grade: 13, sex: 'F' },
+    { name: 'Courtney', grade: 15, sex: 'F' },
+    { name: 'Jane', grade: 9, sex: 'F' }
+]
+
+// A1 - Find the average ranking of the whole class
+let averageClass = grades.reduce(function (acc, curr) {
+    return acc + curr.grade;
+}, 0) / grades.length;
+console.log(averageClass);  // 10.2
+
+
+// A2 - Find the average ranking of the male in the class
+// find male item in Object
+let findNam = grades.filter(function (student) {
+    return student.sex === 'M';
+})
+// then run this function
+
+let averageNam = findNam.reduce(function (acc, curr) {
+    return acc + curr.grade;
+}, 0) / findNam.length;
+console.log(averageNam);  // 7
+
+
+// A3 - Find the highest ranking of men in the class
+let gradeMaxNam = Math.max.apply(Math, findNam.map(function (o) { return o.grade }));
+console.log(gradeMaxNam);
+
+
+// A4 - Find the lowest ranking of the whole class
+let gradeMinClass = Math.min.apply(Math, grades.map(function (o) { return o.grade }));
+console.log(gradeMinClass);
+
+
+// DO
+let isBoy = student => student.sex === 'M'
+
+let isGirl = student => student.sex === 'F'
+
+let getBoys = grades => (
+    grades.filter(isBoy)
+)
+
+let getGirls = grades => (
+    grades.filter(isGirl)
+)
+
+let average = grades => (
+    grades.reduce((acc, curr) => (
+        acc + curr.grade
+    ), 0) / grades.length
+)
+
+let maxGrade = grades => (
+    Math.max(...grades.map(student => student.grade))
+)
+
+let minGrade = grades => (
+    Math.min(...grades.map(student => student.grade))
+)
+
+let classroomAverage = average(grades) // 10.2
+let boysAverage = average(getBoys(grades)) // 7
+let girlsAverage = average(getGirls(grades)) // 13.4
+let highestGrade = maxGrade(grades) // 18
+let lowestGrade = minGrade(grades) // 2
+let highestBoysGrade = maxGrade(getBoys(grades)) // 16
+let lowestBoysGrade = minGrade(getBoys(grades)) // 2
+let highestGirlsGrade = maxGrade(getGirls(grades)) // 18
+let lowestGirlsGrade = minGrade(getGirls(grades)) // 9
+
+
+
+// 1 - GET HTTP calls
+// fetch need two promises to take data
+fetch('https://jsonplaceholder.typicode.com/todos/1')
+    .then(response => response.json())
+    .then(json => console.log(json))
+
+// axios only one promise to take data
+axios.get("https://jsonplaceholder.typicode.com/todos/1")
+    .then(response => console.log("response", response.data))
+
+// {
+//   "userId": 1,
+//   "id": 1,
+//   "title": "delectus aut autem",
+//   "completed": false
+// }
+
+
+
+// 2 - POST HTTP calls
+// fetch nên convert data to JSON.stringify() (object to string)
+fetch("https://jsonplaceholder.typicode.com/posts", {
+    method: "POST",
+    body: JSON.stringify({
+        title: "Title of post",
+        body: "Post Body"
+    })
+})
+    .then(res => {
+        if (!response.ok) throw Error(response.statusText);
+        return response.json();
+    })
+    .then(data => console.log(data))
+    .catch(error => console.log(error));
+
+// axios
+axios
+    .post("https://jsonplaceholder.typicode.com/posts", {
+        title: "Title of post",
+        body: "Body of post"
+    })
+    .then(response => console.log(response.data))
+    .catch(error => console.log(error));
+
+
+// 3 - Error handling
+// fetch need check response.ok
+fetch("https://jsonplaceholder.typicode.com/todos/100000")
+    .then(response => {
+        if (!response.ok) throw Error(response.statusText);
+        return response.json();
+    })
+    .then(data => console.log("data", data))
+    .catch(error => {
+        console.log("error", error);
+    });
+// error Error: Not Found
+
+
+axios
+    .get("https://jsonplaceholder.typicode.com/todos/100000")
+    .then(response => {
+        console.log("response", response);
+    })
+    .catch(error => {
+        console.log("error", error);
+    });
+// error Error: Not Found
+
+
+// 4 - Simultaneous requests (performance code)
+// fetch
+Promise.all([
+    fetch('https://api.github.com/users/anonystick'),
+    fetch('https://api.github.com/users/anonystick')
+])
+    .then(async ([res1, res2]) => {
+        const a = await res1.json();
+        const b = await res2.json();
+        console.log(a.login + ' has ' + a.public_repos + ' public repos on GitHub');
+        console.log(b.login + ' has ' + b.public_repos + ' public repos on GitHub');
+    })
+    .catch(error => {
+        console.log(error);
+    });
+
+axios.all([
+    axios.get('https://api.github.com/users/anonystick'),
+    axios.get('https://api.github.com/users/anonystick')
+])
+    .then(axios.spread((obj1, obj2) => {
+        // Both requests are now complete
+        console.log(obj1.data.login + ' has ' + obj1.data.public_repos + ' public repos on GitHub');
+        console.log(obj2.data.login + ' has ' + obj2.data.public_repos + ' public repos on GitHub');
+    }));
+
+
+// 5 - Upload
+const config = {
+    onUploadProgress: event => console.log(event.loaded)
+};
+axios.put("/api", data, config);
+
+
+
+// Adapter pattern
+// new interface
+
+function AdvancedShipping() {
+    this.login = function (credentials) { /* ... */ };
+    this.setStart = function (start) { /* ... */ };
+    this.setDestination = function (destination) { /* ... */ };
+    this.calculate = function (weight) { return "$39.50"; };
+}
+
+// adapter interface
+
+function ShippingAdapter(credentials) {
+    var shipping = new AdvancedShipping();
+
+    shipping.login(credentials);
+
+    return {
+        request: function (zipStart, zipEnd, weight) {
+            shipping.setStart(zipStart);
+            shipping.setDestination(zipEnd);
+            return shipping.calculate(weight);
+        }
+    };
+}
+
+// log helper
+
+var log = (function () {
+    var log = "";
+
+    return {
+        add: function (msg) { log += msg + "\n"; },
+        show: function () { alert(log); log = ""; }
+    }
+})();
+
+
+// use adapter pattern
+function run() {
+    var shipping = new Shipping();
+    var credentials = { token: "30a8-6ee1" };
+    var adapter = new ShippingAdapter(credentials);
+
+    // original shipping object and interface
+
+    var cost = shipping.request("78701", "10010", "2 lbs");
+    log.add("Old cost: " + cost);
+
+    // new shipping object with adapted interface
+
+    cost = adapter.request("78701", "10010", "2 lbs");
+
+    log.add("New cost: " + cost);
+    log.show();
+}
+
+
+
+
+// Prototype Pattern
+var myCat = {
+    name: "Ford Escort",
+    brake: function () {
+        console.log("Stop! I am applying brakes");
+    },
+    panic: function () {
+        console.log("wait. how do you stop that thing?")
+    }
+};
+
+// use object create to instance a new car
+var yourCar = object.create(myCar);
+
+//You can now see that one is a prototype of the other
+console.log(yourCar.name);
+
+
+
+// Module Design Pattern
+function AnimalContainer() {
+
+    const container = [];
+
+    function addAnimal(name) {
+        container.push(name);
+    }
+
+    function getAllAnimals() {
+        return container;
+    }
+
+    function removeAnimal(name) {
+        const index = container.indexOf(name);
+        if (index < 1) {
+            throw new Error('Animal not found in container');
+        }
+        container.splice(index, 1)
+    }
+
+    return {
+        add: addAnimal,
+        get: getAllAnimals,
+        remove: removeAnimal
+    }
+}
+
+const container = AnimalContainer();
+container.add('Hen');
+container.add('Goat');
+container.add('Sheep');
+
+console.log(container.get()) //Array(3) ["Hen", "Goat", "Sheep"]
+container.remove('Sheep')
+console.log(container.get()); //Array(2) ["Hen", "Goat"]
+
+
+
+// Singleton Pattern
+function DatabaseConnection() {
+
+    let databaseInstance = null;
+
+    // tracks the number of instances created at a certain time
+    let count = 0;
+
+    function init() {
+        console.log(`Opening database #${count + 1}`);
+        //now perform operation
+    }
+    function createInstance() {
+        if (databaseInstance == null) {
+            databaseInstance = init();
+        }
+        return databaseInstance;
+    }
+    function closeInstance() {
+        console.log('closing database');
+        databaseInstance = null;
+    }
+    return {
+        open: createInstance,
+        close: closeInstance
+    }
+}
+
+const database = DatabaseConnection();
+database.open(); //Open database #1
+database.open(); //Open database #1
+database.open(); //Open database #1
+database.close(); //close database
+
+
+
+// Factory Pattern.
+// Dealer A
+
+DealerA = {};
+
+DealerA.title = function title() {
+    return "Dealer A";
+};
+
+DealerA.pay = function pay(amount) {
+    console.log(
+        `set up configuration using username: ${this.username} and password: ${this.password
+        }`
+    );
+    return `Payment for service ${amount} is successful using ${this.title()}`;
+};
+
+//Dealer B
+
+DealerB = {};
+DealerB.title = function title() {
+    return "Dealer B";
+};
+
+DealerB.pay = function pay(amount) {
+    console.log(
+        `set up configuration using username: ${this.username}
+and password: ${this.password}`
+    );
+    return `Payment for service ${amount} is successful using ${this.title()}`;
+};
+
+//@param {*} DealerOption
+//@param {*} config
+
+function DealerFactory(DealerOption, config = {}) {
+    const dealer = Object.create(dealerOption);
+    Object.assign(dealer, config);
+    return dealer;
+}
+
+const dealerFactory = DealerFactory(DealerA, {
+    username: "user",
+    password: "pass"
+});
+console.log(dealerFactory.title());
+console.log(dealerFactory.pay(12));
+
+const dealerFactory2 = DealerFactory(DealerB, {
+    username: "user2",
+    password: "pass2"
+});
+console.log(dealerFactory2.title());
+console.log(dealerFactory2.pay(50));
+
+
+
+// RULES JS
+// BAD
+if (val == 2);
+// GOOD
+if (val === 2);
+
+// BAD
+var myVar = 10;
+// GOOD
+let myVar = 10;
+
+// BAD
+let VAT_PERCENT = 20;
+// GOOD
+const VAT_PERCENT = 20;
+
+// BAD
+const VAT_PERCENT = 20;
+let amount = 10
+return addVat(amount, VAT_PERCENT)
+// GOOD
+const VAT_PERCENT = 20;
+let amount = 10;
+return addVat(amount, VAT_PERCENT);
+
+// BAD
+let fullName = firstName + " " + lastName;
+// GOOD
+let fullName = `${firstName} ${lastName}`;
+
+// BAD
+var multiply = function (a, b) {
+    return a * b;
+};
+// GOOD
+const multiply = (a, b) => { return a * b };
+
+// BAD
+if (valid)
+    doSomething();
+if (amount > 100)
+    doSomething();
+else if (amount > 200)
+    doSomethingElse();
+// GOOD
+if (valid) {
+    doSomething();
+}
+if (amount > 100) {
+    doSomething();
+}
+else if (amount > 200) {
+    doSomethingElse();
+}
+
+
+// BAD
+if (myNumber > 0) {
+    if (myNumber > 100) {
+        if (!hasDiscountAlready) {
+            return addDiscountPercent(0);
+        } else {
+            return addDiscountPercent(10);
+        }
+    } else if (myNumber > 50) {
+        if (hasDiscountAlready) {
+            return addDiscountPercent(5);
+        }
+    } else {
+        if (!hasDiscountAlready) {
+            return addDiscountPercent(0);
+        } else {
+            return addDiscountPercent(1);
+        }
+    }
+} else {
+    error();
+}
+// GOOD
+if (myNumber <= 0) {
+    return error;
+}
+if (!hasDiscountAlready) {
+    return addDiscountPercent(0);
+}
+if (myNumber > 100) {
+    return addDiscountPercent(10);
+}
+if (myNumber > 50) {
+    return addDiscountPercent(5);
+}
+return addDiscountPercent(1);
+
+
+// BAD
+const myFnc = (a, b) => {
+    return a + b;
+}
+
+// GOOD
+const myFnc = (a = 0, b = 0) => {
+    return a + b;
+}
+
+
+// Async map JavaScript
+function main() {
+    return Promise.all([1, 2, 3, 4].map((value) => asyncThing(value)));
+}
+
+main()
+    .then(values => values.map((value) => value * 2))
+    .then(v => console.log(v))
+    .catch(err => console.error(err));
+
+// Async filter JavaScript
+function asyncThing(value) {
+    return new Promise((resolve) => {
+        setTimeout(() => resolve(value), 100);
+    });
+}
+async function main() {
+
+    const arrTem = await Promise.all(await asyncThing([1, 2, 3, 4]));
+
+    return arrTem.filter((value) => {
+        return value % 2 === 0;
+    });
+}
+main()
+    .then(v => console.log(v))
+    .catch(err => console.error(err));
+
+
+// Async Reduce JavaScript
+function asyncThing(value) {
+    return new Promise((resolve) => {
+        setTimeout(() => resolve(value), 100);
+    });
+}
+
+async function main() {
+    return [1, 2, 3, 4].reduce(async (acc, value) => {
+        return await acc + await asyncThing(value);
+    }, Promise.resolve(0));
+}
+
+main()
+    .then(v => console.log(v))
+    .catch(err => console.error(err));
+
+
+
+
+// Connect node js with Oracle
+// $ npm install oracledb
+
+const oracledb = require('oracledb')
+const config = {
+    user: '',
+    password: '',
+    connectString: 'localhost:1521/orcl'
+}
+
+async function getEmployee(empId) {
+    let conn
+
+    try {
+        conn = await oracledb.getConnection(config)
+
+        const result = await conn.execute(
+            'select * from employees where employee_id = :id',
+            [empId]
+        )
+
+        console.log(result.rows[0])
+    } catch (err) {
+        console.log('Ouch!', err)
+    } finally {
+        if (conn) { // conn assignment worked, need to close
+            await conn.close()
+        }
+    }
+}
+
+getEmployee(101)
+
+
+
+// Connect Mongodb nodejs
+// $ npm install mongodb
+var MongoClient = require('mongodb').MongoClient
+
+MongoClient.connect('mongodb://localhost:27017/animals', function (err, db) {
+    if (err) throw err
+
+    db.collection('mammals').find().toArray(function (err, result) {
+        if (err) throw err
+
+        console.log(result)
+    })
+})
+
+var MongoClient = require('mongodb').MongoClient
+
+MongoClient.connect('mongodb://localhost:27017/animals', function (err, client) {
+    if (err) throw err
+
+    var db = client.db('animals')
+
+    db.collection('mammals').find().toArray(function (err, result) {
+        if (err) throw err
+
+        console.log(result)
+    })
+})
+
+
+// Connect Mysql nodejs
+// $ npm install mysql
+var mysql = require('mysql')
+var connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'dbuser',
+    password: 's3kreee7',
+    database: 'my_db'
+})
+
+connection.connect()
+
+connection.query('SELECT 1 + 1 AS solution', function (err, rows, fields) {
+    if (err) throw err
+
+    console.log('The solution is: ', rows[0].solution)
+})
+
+connection.end()
+
+
+// Connect Elasticsearch Nodejs
+// $ npm install elasticsearch
+var elasticsearch = require('elasticsearch')
+var client = elasticsearch.Client({
+    host: 'localhost:9200'
+})
+
+client.search({
+    index: 'books',
+    type: 'book',
+    body: {
+        query: {
+            multi_match: {
+                query: 'express js',
+                fields: ['title', 'description']
+            }
+        }
+    }
+}).then(function (response) {
+    var hits = response.hits.hits
+}, function (error) {
+    console.trace(error.message)
+})
+
+
+// Connect SQLite Nodejs
+// $ npm install sqlite3
+var sqlite3 = require('sqlite3').verbose()
+var db = new sqlite3.Database(':memory:')
+
+db.serialize(function () {
+    db.run('CREATE TABLE lorem (info TEXT)')
+    var stmt = db.prepare('INSERT INTO lorem VALUES (?)')
+
+    for (var i = 0; i < 10; i++) {
+        stmt.run('Ipsum ' + i)
+    }
+
+    stmt.finalize()
+
+    db.each('SELECT rowid AS id, info FROM lorem', function (err, row) {
+        console.log(row.id + ': ' + row.info)
+    })
+})
+
+db.close()
+
+
+// Connect SQL Server Nodejs
+// $ npm install tedious
+var Connection = require('tedious').Connection
+var Request = require('tedious').Request
+
+var config = {
+    server: 'localhost',
+    authentication: {
+        type: 'default',
+        options: {
+            userName: 'your_username', // update me
+            password: 'your_password' // update me
+        }
+    }
+}
+
+var connection = new Connection(config)
+
+connection.on('connect', function (err) {
+    if (err) {
+        console.log(err)
+    } else {
+        executeStatement()
+    }
+})
+
+function executeStatement() {
+    request = new Request("select 123, 'hello world'", function (err, rowCount) {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log(rowCount + ' rows')
+        }
+        connection.close()
+    })
+
+    request.on('row', function (columns) {
+        columns.forEach(function (column) {
+            if (column.value === null) {
+                console.log('NULL')
+            } else {
+                console.log(column.value)
+            }
+        })
+    })
+
+    connection.execSql(request)
+}
+
+
+// Connect Redis Nodejs
+// $ npm install redis
+var redis = require('redis')
+var client = redis.createClient()
+
+client.on('error', function (err) {
+    console.log('Error ' + err)
+})
+
+client.set('string key', 'string val', redis.print)
+client.hset('hash key', 'hashtest 1', 'some value', redis.print)
+client.hset(['hash key', 'hashtest 2', 'some other value'], redis.print)
+
+client.hkeys('hash key', function (err, replies) {
+    console.log(replies.length + ' replies:')
+
+    replies.forEach(function (reply, i) {
+        console.log('    ' + i + ': ' + reply)
+    })
+
+    client.quit()
+})
+
+
+// Connect PostgreSQL Nodejs
+// $ npm install pg-promise
+var pgp = require('pg-promise')(/* options */)
+var db = pgp('postgres://username:password@host:port/database')
+
+db.one('SELECT $1 AS value', 123)
+    .then(function (data) {
+        console.log('DATA:', data.value)
+    })
+    .catch(function (error) {
+        console.log('ERROR:', error)
+    })
+
+// Connect Neo4j Nodejs
+// $ npm install apoc
+var apoc = require('apoc')
+
+apoc.query('match (n) return n').exec().then(
+    function (response) {
+        console.log(response)
+    },
+    function (fail) {
+        console.log(fail)
+    }
+)
+
+
+// Connect LevelDB Nodejs
+var levelup = require('levelup')
+var db = levelup('./mydb')
+
+db.put('name', 'LevelUP', function (err) {
+    if (err) return console.log('Ooops!', err)
+
+    db.get('name', function (err, value) {
+        if (err) return console.log('Ooops!', err)
+
+        console.log('name=' + value)
+    })
+})
+
+
+// Connect CouchDB
+// $ npm install nano
+var nano = require('nano')('http://localhost:5984')
+nano.db.create('books')
+var books = nano.db.use('books')
+
+// Insert a book document in the books database
+books.insert({ name: 'The Art of war' }, null, function (err, body) {
+    if (err) {
+        console.log(err)
+    } else {
+        console.log(body)
+    }
+})
+
+// Get a list of all books
+books.list(function (err, body) {
+    if (err) {
+        console.log(err)
+    } else {
+        console.log(body.rows)
+    }
+})
+
+
+// Connect Couchbase
+var couchbase = require('couchbase')
+var bucket = (new couchbase.Cluster('http://localhost:8091')).openBucket('bucketName')
+
+// add a document to a bucket
+bucket.insert('document-key', { name: 'Matt', shoeSize: 13 }, function (err, result) {
+    if (err) {
+        console.log(err)
+    } else {
+        console.log(result)
+    }
+})
+
+// get all documents with shoe size 13
+var n1ql = 'SELECT d.* FROM `bucketName` d WHERE shoeSize = $1'
+var query = N1qlQuery.fromString(n1ql)
+bucket.query(query, [13], function (err, result) {
+    if (err) {
+        console.log(err)
+    } else {
+        console.log(result)
+    }
+})
+
+
+// Connect Cassandra
+// $ npm install cassandra-driver
+var cassandra = require('cassandra-driver')
+var client = new cassandra.Client({ contactPoints: ['localhost'] })
+
+client.execute('select key from system.local', function (err, result) {
+    if (err) throw err
+    console.log(result.rows[0])
+})
