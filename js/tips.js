@@ -4114,14 +4114,14 @@ const arr = [
 ];
 
 // Limit()
-console.log(JSON.stringify(arr.limit(2))) ;
+console.log(JSON.stringify(arr.limit(2)));
 // [
 //     {"id":1,"name":"king"},
 //     {"id":2,"name":"master"}
 // ]
 
 // Skip()
-console.log(JSON.stringify(arr.skip(2))) ;
+console.log(JSON.stringify(arr.skip(2)));
 // [
 //     {"id":3,"name":"lisa"},
 //     {"id":4,"name":"ion"},
@@ -4147,3 +4147,167 @@ console.log(JSON.stringify(arr.skip(2).limit(2)));
 //     {"id":3,"name":"lisa"},
 //     {"id":4,"name":"ion"}
 // ]
+
+// Javascript performance - remove Duplicates from an Array
+
+//  #1 Set
+const array = [1, 1, 1, 3, 3, 2, 2];
+const unique = [...new Set(array)];
+
+// #2 Reduce
+const array = [1, 1, 1, 3, 3, 2, 2];
+const unique = array.reduce((result, element) => {
+    return result.includes(element) ? result : [...result, element];
+}, []);
+
+// #3 filter
+const array = [1, 1, 1, 3, 3, 2, 2];
+const unique = array.filter((element, index) => {
+    return array.indexOf(element) === index;
+});
+console.log(unique); //return [1, 3, 2]
+
+// #4 indexOf
+// Defining function to get unique values from an array
+function getUnique(array) {
+    var uniqueArray = [];
+
+    // Loop through array values
+    for (i = 0; i < array.length; i++) {
+        if (uniqueArray.indexOf(array[i]) === -1) {
+            uniqueArray.push(array[i]);
+        }
+    }
+    return uniqueArray;
+}
+
+var uniqueNames = getUnique(array);
+console.log(uniqueNames); //return [1, 3, 2]
+
+// #5 forEach
+const array = [1, 1, 1, 3, 3, 2, 2];
+function removeDups(names) {
+    let unique = {};
+    names.forEach(function (i) {
+        if (!unique[i]) {
+            unique[i] = true;
+        }
+    });
+    return Object.keys(unique);
+}
+
+console.log(removeDups(array));
+
+
+// Async/Await
+async function fetchOwners(catIDs) {
+    const ownerPromises = catIDs.map(async id => {
+        const cat = await fetchCat(id);
+        const owner = await fetchOwner(cat.ownerID);
+        return owner;
+    });
+    const owners = await Promise.all(ownerPromises);
+    return owners;
+};
+
+async function getBooksAndAuthor(authorId) {
+    const bookPromise = bookModel.fetchAll();
+    const authorPromise = authorModel.fetch(authorId);
+    const book = await bookPromise;
+    const author = await authorPromise;
+    return {
+        author,
+        books: books.filter(book => book.authorId === authorId),
+    };
+};
+
+
+// Get Query String Parameters
+// URL "?post=1234&amp;action=edit"
+
+var urlParams = new URLSearchParams(window.location.search);
+
+console.log(urlParams.has('post')); // true
+console.log(urlParams.get('action')); // "edit"
+console.log(urlParams.getAll('action')); // ["edit"]
+console.log(urlParams.toString()); // "?post=1234&amp;action=edit"
+console.log(urlParams.append('active', '1')); // "?post=1234&amp;action=edit&amp;active=1"
+
+
+// Image optimization
+// 1 - lazy load image
+
+// <img data-src="https://avatars0.githubusercontent.com/xxxxxxxx">
+const img = document.querySelector('img')
+img.src = img.dataset.src
+
+// responsive image
+// <picture>
+// 	<source srcset="banner_w1000.jpg" media="(min-width: 801px)">
+// 	<source srcset="banner_w800.jpg" media="(max-width: 800px)">
+// 	<img src="banner_w800.jpg" alt="">
+// </picture>
+//
+// @media (min-width: 769px) {
+// 	.bg {
+// 		background-image: url(bg1080.jpg);
+// 	}
+// }
+// @media (max-width: 768px) {
+// 	.bg {
+// 		background-image: url(bg768.jpg);
+// 	}
+// }
+
+// 3 - change size of the image
+// image1: thumb image, image2: original image
+
+// 4 - reduce image quatility by pts or webpack
+// image-webpack-loader
+// npm i -D image-webpack-loader
+// {
+//     test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+//         use: [
+//             {
+//                 loader: 'url-loader',
+//                 options: {
+//                     limit: 10000, /* If less than 10000 bytes automatically switch back to base64 */
+//                     name: utils.assetsPath('img/[name].[hash:7].[ext]')
+//                 }
+//             },
+//             /* Auto compression images */
+//             {
+//                 loader: 'image-webpack-loader',
+//                 options: {
+//                     bypassOnDebug: true,
+//                 }
+//             }
+//         ]
+// }
+
+// 5 - Use Webp
+// https://caniuse.com/webp
+// https://css-tricks.com/using-webp-images/
+// <picture>
+//     <source srcset="
+//         /uploads/img_small.webp 1x,
+//         /uploads/img_big.webp 2x" type="image/webp">
+//     <source srcset="
+//         /uploads/img_small.jpg 1x, 
+//         /uploads/img_big.jpg 2x" type="image/jpeg">
+//     <img src="/uploads/img_small.jpg">
+// </picture>
+
+// Use polyfill to support IE or Babeljs
+
+const contacts = ['Brooke', 'Becca', 'Nathan', 'Adam', 'Michael']
+if (contacts.includes('Rachel')) {
+    console.log('You have a Rachel!')
+};
+
+// Output IE: Uncaught TypeError: contacts.includes is not a function
+if (!Array.prototype.includes) {
+    Array.prototype.includes = function includes(searchElement) {
+        return this.indexOf(searchElement) !== -1
+    }
+};
