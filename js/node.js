@@ -1029,10 +1029,150 @@ rl.on('close', function (line) {
     console.log('Total lines : ' + line_no);
 });
 
+
+/*
+    Works with Image Jimp in Nodejs
+    - Installation jimp: npm install --save jimp
+    @jimp/jpeg
+    @jimp/png
+    @jimp/gif
+*/
+// =====================================================================
+Jimp.read('http://www.example.com/path/to/lenna.jpg')
+    .then(image => {
+        // Do stuff with the image.
+    })
+    .catch(err => {
+        // Handle an exception.
+    });
+
+// Resizing
+// resize( w, h[, mode] )
+// =====================================================================
+const Jimp = require('jimp');
+async function resize() {
+    // Read the image.
+    const image = await Jimp.read('https://images.pexels.com/photos/298842/pexels-photo-298842.jpeg');
+    // Resize the image to width 150 and heigth 150.
+    await image.resize(150, 150);
+    // Save and overwrite the image
+    await image.writeAsync(`test/${Date.now()}_150x150.png`);
+}
+resize();
+
+// Crop
+// crop( x, y, w, h)
+// =====================================================================
+async function crop() {
+    // Read the image.
+    const image = await Jimp.read('https://images.pexels.com/photos/298842/pexels-photo-298842.jpeg');
+    await image.crop(500, 500, 150, 150);
+    // Save and overwrite the image
+    await image.writeAsync(`test/${Date.now()}_crop_150x150.png`);
+}
+crop()
+
+// Rotate
+// rotate( deg[, mode] );
+// =====================================================================
+async function rotate() {
+    // Read the image.
+    const image = await Jimp.read('https://images.pexels.com/photos/298842/pexels-photo-298842.jpeg');
+    await image.rotate(45);
+    // Save and overwrite the image
+    await image.writeAsync(`test/${Date.now()}_rotate_150x150.png`);
+}
+rotate()
+
+// Flip
+// image.flip( horz, vert )
+// =====================================================================
+async function flip() {
+    // Read the image.
+    const image = await Jimp.read('https://images.pexels.com/photos/298842/pexels-photo-298842.jpeg');
+    await image.flip(true, false);
+    // Save and overwrite the image
+    await image.writeAsync(`test/${Date.now()}_flip_150x150.png`);
+    console.log("flipped")
+}
+flip()
+
+// Opacity
+// opacity( f );
+// =====================================================================
+async function opacity() {
+    // Read the image.
+    const image = await Jimp.read('https://images.pexels.com/photos/298842/pexels-photo-298842.jpeg');
+    await image.opacity(.5);
+    // Save and overwrite the image
+    await image.writeAsync(`test/${Date.now()}_opacity_150x150.png`);
+}
+opacity()
+
+// Grayscale
+// greyscale();
+// =====================================================================
+async function greyscale() {
+    // Read the image.
+    const image = await Jimp.read('https://images.pexels.com/photos/298842/pexels-photo-298842.jpeg');
+    await image.greyscale();
+    // Save and overwrite the image
+    await image.writeAsync(`test/${Date.now()}_greyscale_150x150.png`);
+}
+greyscale()
+
+// Blur
+// blur(r) // fast blur the image by r pixels
+// =====================================================================
+async function blur() {
+    // Read the image.
+    const image = await Jimp.read('https://images.pexels.com/photos/298842/pexels-photo-298842.jpeg');
+    await image.blur(20);
+    // Save and overwrite the image
+    await image.writeAsync(`test/${Date.now()}_blur_150x150.png`);
+}
+blur()
+
+// Add text to images
+// composite( src, x, y, [{ mode, opacitySource, opacityDest }] ); 
+// =====================================================================
+async function waterMark(waterMarkImage) {
+    let watermark = await Jimp.read(waterMarkImage);
+    watermark = watermark.resize(300, 300);
+    const image = await Jimp.read('https://images.pexels.com/photos/298842/pexels-photo-298842.jpeg');
+    watermark = await watermark
+    image.composite(watermark, 0, 0, {
+        mode: Jimp.BLEND_SOURCE_OVER,
+        opacityDest: 1,
+        opacitySource: 0.5
+    })
+    await image.writeAsync(`test/${Date.now()}_waterMark_150x150.png`);
+}
+waterMark('https://destatic.blob.core.windows.net/images/nodejs-logo.png');
+
+// Text overlay
+// =====================================================================
+async function textOverlay() {
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK);
+    const image = await Jimp.read(1000, 1000, 0x0000ffff);
+
+    image.print(font, 10, 10, 'Hello World!');
+}
+
+textOverlay();
+
 // =====================================================================
 
-
 // =====================================================================
 
 // =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+
 

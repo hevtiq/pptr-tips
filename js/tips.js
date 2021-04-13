@@ -4311,3 +4311,369 @@ if (!Array.prototype.includes) {
         return this.indexOf(searchElement) !== -1
     }
 };
+
+
+// Promise all javascript
+function sleep(second) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve('request done! ' + Math.random());
+        }, second);
+    })
+};
+
+async function correctDemo() {
+    let p1 = sleep(1000); // gọi món
+    let p2 = sleep(1000); // nhậu
+    let p3 = sleep(1000); // Tính tiền
+    await Promise.all([p1, p2, p3]);
+    console.log('Nhậu anh em ơi....');
+};
+
+correctDemo();
+
+// serial Promise
+function wait(waitTime) {
+    return new Promise(resolve => setTimeout(() => {
+        console.log(`waited ${waitTime} ms`)
+        resolve()
+    }, waitTime));
+}
+
+async function serial() {
+    console.time('serial promise');
+    await wait(1000);
+    await wait(1000);
+    await wait(1000);
+    console.timeEnd('serial promise');
+}
+
+// Parallel Promise
+function wait(waitTime) {
+    return new Promise(resolve => setTimeout(() => {
+        console.log(`waited ${waitTime} ms`)
+        resolve()
+    }, waitTime));
+}
+
+async function parallel() {
+    console.time('parallel promise');
+    await Promise.all([
+        wait(1000),
+        wait(1000),
+        wait(1000)
+    ])
+    console.timeEnd('parallel promise');
+}
+
+async function test() {
+    await serial();  // 3s
+    await parallel();  // 1s
+}
+
+test();
+
+
+// Check Adblock
+let adBlockEnabled = false;
+const ad = document.createElement('div');
+ad.innerHTML = ' ';
+ad.className = 'adsbox';
+document.body.appendChild(ad);
+window.setTimeout(function () {
+    if (ad.offsetHeight === 0) {
+        adblockEnabled = true;
+    };
+    ad.remove();
+    console.log('Blocking ads? ', adblockEnabled);
+}, 100);
+
+if (adblockEnabled) {
+    // insert yourself ad
+};
+
+
+/*
+    Promise.all
+    - help Async Operations on levelup because it helps us controls a group
+    promises.
+    - helps us improve Performance as Send Mail series.
+    - Fulfilled – promise resolved successfully.
+    - Rejected – promise failed.
+    - Pending – promise is waiting to return Fulfilled or Rejected.
+    - Settled – next status
+*/
+Promise.all([Promise1, Promise2, Promise3])
+    .then((result) => {
+        console.log(result)
+    })
+    .catch(error => console.log(`Error in promises ${error}`))
+
+
+// Promise.all and map()
+// promise will resolves duration t milisecond
+const timeOut = (t) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve(`Completed in ${t}`)
+        }, t)
+    })
+}
+
+// with duration t
+const durations = [1000, 2000, 3000]
+
+// array to populate all promises
+const promises = [];
+
+durations.map((duration) => {
+    // two events here
+    // 1. invoke async function (timeout())
+    // 2. push promises timeout() to an array for promise.all resolve
+    promises.push(timeOut(duration))
+})
+
+console.log(promises);
+// [ Promise { "pending" }, Promise { "pending" } ...]
+
+// Promise.all will wait for all promises resolved
+Promise.all(promises)
+    .then(response => console.log(response))
+//["Completed in 1000", "Completed in 2000", "Completed in 3000"]
+
+
+// Real Case: promise.all to send 50000 email marketing
+// NOT => overload
+for (let i = 0; i < 50000; i += 1) {
+    sendMailForUser(user[i]); // Async operation to send a email
+};
+
+// GOOD
+/*
+    - taken 100 email everytime
+    - send email and wait for all HTTP closing
+    - continue 100 next email
+*/
+const sendMailForUsers = async (users) => {
+    const usersLength = users.length;
+
+    for (let i = 0; i < usersLength; i += 100) {
+        const requests = users.slice(i, i + 100).map((user) => {
+            // send 100 emails
+            return triggerMailForUser(user)
+                // Async function to send the mail.
+                .catch(e => console.log(`Error in sending email for ${user} - ${e}`))
+        });
+
+        // requests is less than 100 for waiting promises
+        // Promise.all will wait for all promises complete to send 100 next email
+        await Promise.all(requests)
+            .catch(e => console.log(`Error in sending email for the batch ${i} - ${e}`))
+        // Catch the error.
+    };
+};
+
+sendMailForUsers(userLists);
+
+
+// Real Case: promise.all get API
+// Good when taken info from more api resources
+
+// Function to fetch Github info of a user.
+const fetchGithubInfo = async (url) => {
+    console.log(`Fetching ${url}`)
+    const githubInfo = await axios(url)
+    // API call to get user info from Github.
+    return {
+        name: githubInfo.data.name,
+        bio: githubInfo.data.bio,
+        repos: githubInfo.data.public_repos
+    }
+}
+
+// Iterates all users and returns their Github info.
+const fetchUserInfo = async (names) => {
+    const requests = names.map((name) => {
+        const url = `https://api.github.com/users/${name}`
+        return fetchGithubInfo(url)
+            // Async function that fetches the user info.
+            .then((a) => {
+                return a // Returns the user info.
+            })
+    })
+    return Promise.all(requests)
+    // Waiting for all the requests to get resolved.
+}
+
+
+fetchUserInfo(['sindresorhus', 'yyx990803', 'gaearon'])
+    .then(a => console.log(JSON.stringify(a)))
+
+/*
+Output:
+[{
+  "name": "Sindre Sorhus",
+  "bio": "Full-Time Open-Sourcerer ·· Maker ··",
+  "repos": 996
+}, {
+  "name": "Evan You",
+  "bio": "Creator of @vuejs, previously @meteor & @google",
+  "repos": 151
+}, {
+  "name": "Dan Abramov",
+  "bio": "Working on @reactjs. Co-author of .",
+  "repos": 232
+}]
+*/
+
+
+// AJAX basic structure $.ajax() function
+$.ajax({
+    data: someData,
+    dataType: 'json',
+    url: '/path/to/script',
+    success: function (data, textStatus, jqXHR) {
+        // When AJAX call is successfuly
+        console.log('AJAX call successful.');
+        console.log(data);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+        // When AJAX call has failed
+        console.log('AJAX call failed.');
+        console.log(textStatus + ': ' + errorThrown);
+    },
+    complete: function () {
+        // When AJAX call is complete, will fire upon success or when error is thrown
+        console.log('AJAX call completed');
+    }
+});
+
+// #Promises and deferred objects
+// .done() <=== .success()
+// .fail() <=== .error()
+// .always() <=== .complete()
+$.ajax({
+    data: someData,
+    dataType: 'json',
+    url: '/path/to/script'
+}).done(function (data) {
+    // If successful
+    console.log(data);
+}).fail(function (jqXHR, textStatus, errorThrown) {
+    // If fail
+    console.log(textStatus + ': ' + errorThrown);
+});
+
+// OR split code
+var ajaxCall = $.ajax({
+    context: $(element),
+    data: someData,
+    dataType: 'json',
+    url: '/path/to/script'
+});
+
+ajaxCall.done(function (data) {
+    console.log(data);
+});
+
+
+// Multiple Ajax will run parallel
+var a1 = $.ajax({ /*...*/ }),
+    a2 = $.ajax({ /*...*/ });
+
+$.when(a1, a2).done(function (r1, r2) {
+    // Each returned resolve has the following structure:
+    // [data, textStatus, jqXHR]
+    // e.g. To access returned data, access the array at index 0
+    console.log(r1[0]);
+    console.log(r2[0]);
+});
+
+// Multiple Ajax with order (serial) (ajax2 depend on ajax1 to get ID)
+var a1 = $.ajax({
+    url: '/path/to/file',
+    dataType: 'json'
+}),
+    a2 = a1.then(function (data) {
+        // .then() returns a new promise
+        return $.ajax({
+            url: '/path/to/another/file',
+            dataType: 'json',
+            data: data.sessionID
+        });
+    });
+
+a2.done(function (data) {
+    console.log(data);
+});
+
+
+// getCookie vs cookieStore
+
+/**
+ * Get the value of a cookie
+ * Source: https://gist.github.com/wpsmith/6cf23551dd140fb72ae7
+ * @param  {String} name  The name of the cookie
+ * @return {String}       The cookie value
+ */
+var getCookie = function (name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+};
+
+await cookieStore.get({ name: '_grid' });
+await cookieStore.get('_grid');
+await cookieStore.getAll({ domain: 'anonystick.com' });
+
+
+// Set Cookie passing Name, value, days in expire
+function cookie_set(name, value, expire_days) {
+    var cookie_name = name;
+    var expire_date = new Date();
+    expire_date.setDate(expire_date.getDate() + expire_days);
+    var cookie_value = escape(value) + ((expire_days === null) ? "" : "; expires=" + exdate.toUTCString() + "; path=/");
+    document.cookie = cookie_name + "=" + cookie_value;
+};
+
+await cookieStore.set({ name: 'anonystick', value: 'https://anonystick.com', domain: 'anonystick.com' });
+await cookieStore.get('anonystick');
+
+await cookieStore.set('anonystick', 'https://anonystick.com');
+await cookieStore.get('anonystick');
+
+// deleteCookie (only delete after time expires, not delete name directively)
+function clearCookie(name, domain, path) {
+    var domain = domain || document.domain;
+    var path = path || "/";
+    document.cookie = name + "=; expires=" + +new Date + "; domain=" + domain + "; path=" + path;
+};
+
+
+await cookieStore.set('anonystick_1', 'Dont reup');
+await cookieStore.get('anonystick_1');
+await cookieStore.delete({ name: 'anonystick_1' });
+await cookieStore.get('anonystick_1');  // null
+
+
+// addeventlistener cookie with cookieStore
+// OLD
+var checkCookie = function () {
+    var lastCookie = document.cookie; // 'static' memory between function calls
+    return function () {
+        var currentCookie = document.cookie;
+        if (currentCookie != lastCookie) {
+            // something useful like parse cookie, run a callback fn, etc.
+            lastCookie = currentCookie; // store latest cookie
+        }
+    };
+}();
+
+window.setInterval(checkCookie, 100); // run every 100 ms
+
+// NEW
+cookieStore.addEventListener('change', event => {
+    console.log(`Tracking events:::::`, event.changed, event.deleted);
+});
+await cookieStore.set('blog_name', 'anonystick.com');
+await cookieStore.delete('blog_name');
