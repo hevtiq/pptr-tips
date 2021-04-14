@@ -544,9 +544,9 @@ const tf = (strArr.map(item => (+item))).map(item => isNaN(item));
 // method to find index of all item occurrences of element in array
 function getAllIndexes(arr, val) {
     let ret = [], idx;
-    for (idx = 0; idx < arr.length; idx++)
-        if (arr[idx] === val)
-            ret.push(idx);
+    for (idx = 0; idx < arr.length; idx++);
+    if (arr[idx] === val);
+    ret.push(idx);
     return ret;
 }
 
@@ -707,7 +707,7 @@ function createOneHundredThousandData() {
         arr.push({
             imgUrl: 'https://cf.shopee.vn/file/2c1e846120cefebd49e8ba45acd2d100',
             key: i
-        })
+        });
     }
     return arr;
 }
@@ -748,7 +748,7 @@ setTimeout(() => {
         if (n) {
             setTimeout(() => {
                 renderHundred(n - 1);
-            }, 50)
+            }, 50);
         }
     }
     renderHundred(999);  // running 1000 new loop each loop is 100 items understand no
@@ -922,7 +922,7 @@ console.timeEnd("Second run");
  * @returns wrapper function handling the cache logic
  */
 const memoize = (func) => {
-    // defines a local cache (Map object)
+    // defines a local cache (Map object);
     const cache = new Map();
 
     // returns wrapper function
@@ -932,7 +932,7 @@ const memoize = (func) => {
         // If cache no value with that key
         if (!cache.has(key)) {
             // stores the value to cache
-            cache.set(key, func(args))
+            cache.set(key, func(args));
         }
 
         // returns the value from the cache
@@ -1045,7 +1045,7 @@ function mapForEach(arr, fn) {
     const newArray = [];
     for (let i = 0; i < arr.length; i++) {
         newArray.push(
-            fn(arr[i])
+            fn(arr[i]),
         );
     }
     return newArray;
@@ -1498,7 +1498,7 @@ var myCat = {
         console.log("Stop! I am applying brakes");
     },
     panic: function () {
-        console.log("wait. how do you stop that thing?")
+        console.log("wait. how do you stop that thing?");
     }
 };
 
@@ -1528,7 +1528,7 @@ function AnimalContainer() {
         if (index < 1) {
             throw new Error('Animal not found in container');
         }
-        container.splice(index, 1)
+        container.splice(index, 1);
     }
 
     return {
@@ -1680,12 +1680,12 @@ var multiply = function (a, b) {
 const multiply = (a, b) => { return a * b };
 
 // BAD
-if (valid)
-    doSomething();
+if (valid);
+doSomething();
 if (amount > 100)
     doSomething();
-else if (amount > 200)
-    doSomethingElse();
+else if (amount > 200);
+doSomethingElse();
 // GOOD
 if (valid) {
     doSomething();
@@ -1817,12 +1817,12 @@ async function getEmployee(empId) {
             [empId]
         )
 
-        console.log(result.rows[0])
+        console.log(result.rows[0]);
     } catch (err) {
-        console.log('Ouch!', err)
+        console.log('Ouch!', err);
     } finally {
         if (conn) { // conn assignment worked, need to close
-            await conn.close()
+            await conn.close();
         }
     }
 }
@@ -1841,7 +1841,7 @@ MongoClient.connect('mongodb://localhost:27017/animals', function (err, db) {
     db.collection('mammals').find().toArray(function (err, result) {
         if (err) throw err
 
-        console.log(result)
+        console.log(result);
     })
 })
 
@@ -1855,7 +1855,7 @@ MongoClient.connect('mongodb://localhost:27017/animals', function (err, client) 
     db.collection('mammals').find().toArray(function (err, result) {
         if (err) throw err
 
-        console.log(result)
+        console.log(result);
     })
 })
 
@@ -1912,17 +1912,17 @@ var sqlite3 = require('sqlite3').verbose()
 var db = new sqlite3.Database(':memory:')
 
 db.serialize(function () {
-    db.run('CREATE TABLE lorem (info TEXT)')
+    db.run('CREATE TABLE lorem (info TEXT)');
     var stmt = db.prepare('INSERT INTO lorem VALUES (?)')
 
     for (var i = 0; i < 10; i++) {
-        stmt.run('Ipsum ' + i)
+        stmt.run('Ipsum ' + i);
     }
 
     stmt.finalize()
 
     db.each('SELECT rowid AS id, info FROM lorem', function (err, row) {
-        console.log(row.id + ': ' + row.info)
+        console.log(row.id + ': ' + row.info);
     })
 })
 
@@ -1949,30 +1949,30 @@ var connection = new Connection(config)
 
 connection.on('connect', function (err) {
     if (err) {
-        console.log(err)
+        console.log(err);
     } else {
-        executeStatement()
+        executeStatement();
     }
 })
 
 function executeStatement() {
     request = new Request("select 123, 'hello world'", function (err, rowCount) {
         if (err) {
-            console.log(err)
+            console.log(err);
         } else {
-            console.log(rowCount + ' rows')
+            console.log(rowCount + ' rows');
         }
-        connection.close()
+        connection.close();
     })
 
     request.on('row', function (columns) {
         columns.forEach(function (column) {
             if (column.value === null) {
-                console.log('NULL')
+                console.log('NULL');
             } else {
-                console.log(column.value)
+                console.log(column.value);
             }
-        })
+        });
     })
 
     connection.execSql(request)
@@ -1996,7 +1996,7 @@ client.hkeys('hash key', function (err, replies) {
     console.log(replies.length + ' replies:')
 
     replies.forEach(function (reply, i) {
-        console.log('    ' + i + ': ' + reply)
+        console.log('    ' + i + ': ' + reply);
     })
 
     client.quit()
@@ -2010,10 +2010,10 @@ var db = pgp('postgres://username:password@host:port/database')
 
 db.one('SELECT $1 AS value', 123)
     .then(function (data) {
-        console.log('DATA:', data.value)
+        console.log('DATA:', data.value);
     })
     .catch(function (error) {
-        console.log('ERROR:', error)
+        console.log('ERROR:', error);
     })
 
 // Connect Neo4j Nodejs
@@ -2022,10 +2022,10 @@ var apoc = require('apoc')
 
 apoc.query('match (n) return n').exec().then(
     function (response) {
-        console.log(response)
+        console.log(response);
     },
     function (fail) {
-        console.log(fail)
+        console.log(fail);
     }
 )
 
@@ -2040,7 +2040,7 @@ db.put('name', 'LevelUP', function (err) {
     db.get('name', function (err, value) {
         if (err) return console.log('Ooops!', err)
 
-        console.log('name=' + value)
+        console.log('name=' + value);
     })
 })
 
@@ -2054,18 +2054,18 @@ var books = nano.db.use('books')
 // Insert a book document in the books database
 books.insert({ name: 'The Art of war' }, null, function (err, body) {
     if (err) {
-        console.log(err)
+        console.log(err);
     } else {
-        console.log(body)
+        console.log(body);
     }
 })
 
 // Get a list of all books
 books.list(function (err, body) {
     if (err) {
-        console.log(err)
+        console.log(err);
     } else {
-        console.log(body.rows)
+        console.log(body.rows);
     }
 })
 
@@ -2077,9 +2077,9 @@ var bucket = (new couchbase.Cluster('http://localhost:8091')).openBucket('bucket
 // add a document to a bucket
 bucket.insert('document-key', { name: 'Matt', shoeSize: 13 }, function (err, result) {
     if (err) {
-        console.log(err)
+        console.log(err);
     } else {
-        console.log(result)
+        console.log(result);
     }
 })
 
@@ -2088,9 +2088,9 @@ var n1ql = 'SELECT d.* FROM `bucketName` d WHERE shoeSize = $1'
 var query = N1qlQuery.fromString(n1ql)
 bucket.query(query, [13], function (err, result) {
     if (err) {
-        console.log(err)
+        console.log(err);
     } else {
-        console.log(result)
+        console.log(result);
     }
 })
 
@@ -2250,7 +2250,7 @@ function Fill(arr = [], val = "", start = 0, end = arr.length) {
     return [
         ...arr.slice(0, start),
         ...arr.slice(start, end).reduce((t, v) => (t.push(val || v), t), []),
-        ...arr.slice(end, arr.length)
+        ...arr.slice(end, arr.length),
     ];
 }
 const arr = [0, 1, 2, 3, 4, 5, 6];
@@ -2471,7 +2471,7 @@ Array.prototype.groupBy = function (prop) {
     return this.reduce(function (groups, item) {
         const val = item[prop]
         groups[val] = groups[val] || []
-        groups[val].push(item)
+        groups[val].push(item);
         return groups
     }, {})
 }
@@ -2657,14 +2657,14 @@ function runPromiseInSequence(arr, input) {
 // promise function 1
 function p1(a) {
     return new Promise((resolve, reject) => {
-        resolve(a * 5)
+        resolve(a * 5);
     })
 }
 
 // promise function 2
 function p2(a) {
     return new Promise((resolve, reject) => {
-        resolve(a * 2)
+        resolve(a * 2);
     })
 }
 
@@ -2676,7 +2676,7 @@ function f3(a) {
 // promise function 4
 function p4(a) {
     return new Promise((resolve, reject) => {
-        resolve(a * 4)
+        resolve(a * 4);
     })
 }
 
@@ -3013,7 +3013,7 @@ async function check(req, res) {
 fn1 = () => {
     return new Promise((resolve, reject) => {
         setTimeout(function () {
-            resolve("something")
+            resolve("something");
         }, 10);
     })
 
@@ -3023,7 +3023,7 @@ fn2 = () => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             resolve("from b");
-        })
+        });
     })
 }
 
@@ -3290,17 +3290,17 @@ getFirstUserData();
 // Multiple async functions in series
 const promiseToDoSomething = () => {
     return new Promise(resolve => {
-        setTimeout(() => resolve('I did something'), 10000)
+        setTimeout(() => resolve('I did something'), 10000);
     })
 }
 
 const watchOverSomeoneDoingSomething = async () => {
-    const something = await promiseToDoSomething()
+    const something = await promiseToDoSomething();
     return something + '\nand I watched'
 }
 
 const watchOverSomeoneWatchingSomeoneDoingSomething = async () => {
-    const something = await watchOverSomeoneDoingSomething()
+    const something = await watchOverSomeoneDoingSomething();
     return something + '\nand I watched as well'
 }
 
@@ -3647,7 +3647,7 @@ function getArticlesPage() {
 };
 
 function initLoad() {
-    // loading.show()
+    // loading.show();
     Promise.all([
         getDetailPage().catch(err => err),
         getInfoPage().catch(err => err),
@@ -3913,8 +3913,8 @@ const a = {}
 
 function isEmpty(obj) {
     for (var key in obj) {
-        if (obj.hasOwnProperty(key))
-            return false;
+        if (obj.hasOwnProperty(key));
+        return false;
     }
     return true;
 };
@@ -4007,14 +4007,14 @@ console.log(list.findAndRemove(2));
 Array.prototype.getIndexes = function (test) {
     if (typeof (test) === "function") {
         return this.reduce((indices, element, index) => {
-            if (test(element)) indices.push(index)
+            if (test(element)) indices.push(index);
             return indices
-        }, [])
+        }, []);
     } else {
         return this.reduce((indices, element, index) => {
-            if (element === test) indices.push(index)
+            if (element === test) indices.push(index);
             return indices
-        }, [])
+        }, []);
     }
 };
 
@@ -4034,15 +4034,15 @@ Array.prototype.distinct = function (selector) {
     }
 
     if (typeof (selector) !== 'function') {
-        throw new Error(`Expecting selector to be a function, but received ${typeof (selector)} instead.`)
+        throw new Error(`Expecting selector to be a function, but received ${typeof (selector)} instead.`);
     }
 
-    let found = new Set()
+    let found = new Set();
     return this.filter(element => {
         if (found.has(selector(element))) {
             return false
         } else {
-            found.add(selector(element))
+            found.add(selector(element));
             return true
         }
     })
@@ -4335,8 +4335,8 @@ correctDemo();
 // serial Promise
 function wait(waitTime) {
     return new Promise(resolve => setTimeout(() => {
-        console.log(`waited ${waitTime} ms`)
-        resolve()
+        console.log(`waited ${waitTime} ms`);
+        resolve();
     }, waitTime));
 }
 
@@ -4351,8 +4351,8 @@ async function serial() {
 // Parallel Promise
 function wait(waitTime) {
     return new Promise(resolve => setTimeout(() => {
-        console.log(`waited ${waitTime} ms`)
-        resolve()
+        console.log(`waited ${waitTime} ms`);
+        resolve();
     }, waitTime));
 }
 
@@ -4361,8 +4361,8 @@ async function parallel() {
     await Promise.all([
         wait(1000),
         wait(1000),
-        wait(1000)
-    ])
+        wait(1000),
+    ]);
     console.timeEnd('parallel promise');
 }
 
@@ -4405,7 +4405,7 @@ if (adblockEnabled) {
 */
 Promise.all([Promise1, Promise2, Promise3])
     .then((result) => {
-        console.log(result)
+        console.log(result);
     })
     .catch(error => console.log(`Error in promises ${error}`))
 
@@ -4415,8 +4415,8 @@ Promise.all([Promise1, Promise2, Promise3])
 const timeOut = (t) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            resolve(`Completed in ${t}`)
-        }, t)
+            resolve(`Completed in ${t}`);
+        }, t);
     })
 }
 
@@ -4428,7 +4428,7 @@ const promises = [];
 
 durations.map((duration) => {
     // two events here
-    // 1. invoke async function (timeout())
+    // 1. invoke async function (timeout());
     // 2. push promises timeout() to an array for promise.all resolve
     promises.push(timeOut(duration))
 })
@@ -4462,13 +4462,13 @@ const sendMailForUsers = async (users) => {
             // send 100 emails
             return triggerMailForUser(user)
                 // Async function to send the mail.
-                .catch(e => console.log(`Error in sending email for ${user} - ${e}`))
+                .catch(e => console.log(`Error in sending email for ${user} - ${e}`));
         });
 
         // requests is less than 100 for waiting promises
         // Promise.all will wait for all promises complete to send 100 next email
         await Promise.all(requests)
-            .catch(e => console.log(`Error in sending email for the batch ${i} - ${e}`))
+            .catch(e => console.log(`Error in sending email for the batch ${i} - ${e}`));
         // Catch the error.
     };
 };
@@ -4481,8 +4481,8 @@ sendMailForUsers(userLists);
 
 // Function to fetch Github info of a user.
 const fetchGithubInfo = async (url) => {
-    console.log(`Fetching ${url}`)
-    const githubInfo = await axios(url)
+    console.log(`Fetching ${url}`);
+    const githubInfo = await axios(url);
     // API call to get user info from Github.
     return {
         name: githubInfo.data.name,
@@ -4499,9 +4499,9 @@ const fetchUserInfo = async (names) => {
             // Async function that fetches the user info.
             .then((a) => {
                 return a // Returns the user info.
-            })
-    })
-    return Promise.all(requests)
+            });
+    });
+    return Promise.all(requests);
     // Waiting for all the requests to get resolved.
 }
 
@@ -4677,3 +4677,704 @@ cookieStore.addEventListener('change', event => {
 });
 await cookieStore.set('blog_name', 'anonystick.com');
 await cookieStore.delete('blog_name');
+
+
+// Upload single image Cloudinary With Multer
+// Cloud name: xxx
+// API Key:xxx
+//  API Secret: xxx
+// $npm i cloudinary --save
+// ModelCloudinary.js
+var cloudinary = require('cloudinary').v2;
+//lấy trong https://cloudinary.com/console/welcome
+cloudinary.config({
+    cloud_name: 'xxxx',
+    api_key: 'xxxx',
+    api_secret: 'xxx'
+});
+
+var self = module.exports = {
+    uploadSingle: (file) => {
+        return new Promise(resolve => {
+            cloudinary.uploader.upload(file, {
+                folder: 'single'
+            })
+                .then(result => {
+                    if (result) {
+                        const fs = require('fs');
+                        fs.unlinkSync(file);
+                        resolve({
+                            url: result.secure_url
+                        });
+                    }
+                });
+        });
+    },
+    uploadMultiple: (file) => {
+        return new Promise(resolve => {
+            cloudinary.uploader.upload(file, {
+                folder: 'home'
+            })
+                .then(result => {
+                    if (result) {
+                        const fs = require('fs');
+                        fs.unlinkSync(file);
+                        resolve({
+                            url: result.secure_url,
+                            id: result.public_id,
+                            thumb1: self.reSizeImage(result.public_id, 200, 200),
+                            main: self.reSizeImage(result.public_id, 500, 500),
+                            thumb2: self.reSizeImage(result.public_id, 300, 300),
+                        });
+                    }
+                });
+        });
+    },
+    reSizeImage: (id, h, w) => {
+        return cloudinary.url(id, {
+            height: h,
+            width: w,
+            crop: 'scale',
+            format: 'jpg'
+        });
+    },
+}
+
+
+// Upload multiple images Cloudinary with Multer
+// controllerUpload.js
+'use strict';
+const cloudinary = require('./models/ModelCloudinary')
+var self = module.exports = {
+    uploadSingleFile: async (req, res) => {
+        //req.file.path chính là đường dẫn của file khi upload bằng multer
+        cloudinary.uploadSingle(req.file.path).then((result) => {
+            let imageDetails = {
+                imageName: req.body.imageName || '',
+                cloudImage: result.url,
+                imageId: result.id
+            }
+        });
+
+        res.json(req.file);
+    },
+    //up multiple files
+    uploadMultipleFiles: async (req, res) => {
+        //req.files chính là khi upload multiple images
+        let res_promises = req.files.map(file => new Promise((resolve, reject) => {
+            cloudinary.uploadMultiple(file.path).then((result) => {
+                resolve(result);
+            });
+        }));
+
+        // Promise.all get imgas
+        Promise.all(res_promises)
+            .then(async (arrImg) => {
+                //arrImg chính là array mà chúng ta đã upload
+                // các bạn có thể sử dụng arrImg để save vào database, hay hơn thì sử dụng mongodb
+                res.json(req.files);
+            })
+            .catch((error) => {
+                console.error('> Error>', error);
+            });
+    },
+};
+
+// Generating logs.
+// Set up our application to report and generate logs files about the user’s
+// requests. A middleware for generating request’s logs in the server.
+// npm install morgan--save
+var express = require("express");
+var cors = require("cors");
+var morgan = require("morgan");
+var app = express();
+
+app.use(morgan("common"));
+app.use(cors({
+    origin: ["http://localhost:3001"],
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+app.get("/", function (req, res) {
+    res.json({
+        status: "My API is alive!"
+    });
+});
+
+app.listen(3000, function () {
+    console.log("My API is running...");
+});
+
+module.exports = app;
+
+
+
+// middleware camelcase-keys
+// FE: input name="first-name"
+const camelcaseKeys = require('camelcase-keys');
+
+const camelcase = () => {
+    return function (req, res, next) {
+        req.body = camelcaseKeys(req.body, { deep: true });
+        req.params = camelcaseKeys(req.params);
+        req.query = camelcaseKeys(req.query);
+        next();
+    };
+};
+app.use(camelcase());
+
+// BE
+app.post('/example-camelcase', (req, res) => {
+    console.log(req.body);
+    res.status(200).json({ elements: req.body.firstName });
+});
+
+
+// middleware omit-empty
+const object = {
+    null: null,
+    undefined: undefined,
+    emptyString: '',
+    emptyArray: [],
+    emptyObject: {},
+    filled: 'yay'
+};
+
+console.log(omitEmpty(object));
+// {
+//   filled: 'yay' // nó chỉ lấy thằng này thôi
+// }
+
+
+fetch('/endpoint', {
+    method: 'post',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        name: 'Zell',
+        skills: ['coding', 'designing', 'writing']
+    }),
+});
+
+if (skills.length) {
+    //add database
+};
+
+// Cover: "Cannot read property 'length' of undefined "
+fetch('/endpoint', {
+    method: 'post',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        name: 'Zell'
+    }),
+});
+
+
+// middlewware omit-empty
+const omitEmpty = require('omit-empty');
+
+const removeEmptyProperties = () => {
+    return function (req, res, next) {
+        req.body = omitEmpty(req.body);
+        req.params = omitEmpty(req.params);
+        req.query = omitEmpty(req.query);
+        next();
+    };
+};
+app.use(removeEmptyProperties());
+
+app.post('/example-omitempty', (req, res) => {
+    const { skills } = req.body;
+
+    if (skills) {
+        // Add skills to database
+
+        return res.json('add database');
+    };
+    return res.json('skills not avaibale');
+});
+
+
+// Enabling CORS in the API
+// As we are developing an API that will serve data for any kind of client-side
+// applications, we need to enable the CORS’s middleware for the endpoints
+// become public. Meaning that some clients can make requests on our API.
+// npm install cors--save
+const express = require("express");
+const cors = require("cors");
+const app = express();
+
+const allowlist = ['http://example1.com', 'http://example2.com'];
+const corsOptionsDelegate = function (req, callback) {
+    const corsOptions;
+    if (allowlist.indexOf(req.header('Origin')) !== -1) {
+        // reflect (enable) the requested origin in the CORS response
+        corsOptions = { origin: true }
+    } else {
+        // disable CORS for this request
+        corsOptions = { origin: false };
+    };
+    // callback expects two parameters: error and options
+    callback(null, corsOptions);
+};
+
+/*
+    Cross-Origin Resource Sharing (CORS)
+    Now we have an API that will only allow client apps from the address:
+    http://localhost:3001/. This client application can only request via GET or
+    POST methods and use the headers: Content-Type and Authorization.
+*/
+app.use(cors({
+    origin: ["http://localhost:3001"],
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+app.get("/", function (req, res, next) {
+    res.json({
+        status: "My API is alive!",
+        msg: 'This is CORS-enabled for all origins!'
+    });
+});
+
+app.get('/products/:id', cors(corsOptionsDelegate), function (req, res, next) {
+    res.json({ msg: 'This is CORS-enabled for an allowed domain.' })
+})
+
+app.listen(3000, function () {
+    console.log("My API is running...");
+    console.log('CORS-enabled web server listening on port 3000')
+});
+
+module.exports = app;
+
+
+// Compacting requests using GZIP middleware.
+// To make requests lighter and load faster, let’s enable another middleware
+// which is going to be responsible for compacting the JSON responses and also
+// the static files which your application will serve to GZIP format
+// npm install compression--save
+// index.js
+var express = require("express");
+var cors = require("cors");
+var morgan = require("morgan");
+var compression = require("compression");
+var app = express();
+
+app.use(morgan("common"));
+app.use(cors({
+    origin: ["http://localhost:3001"],
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+app.use(compression());
+
+app.get("/", function (req, res) {
+    res.json({
+        status: "My API is alive!"
+    });
+});
+
+app.listen(3000, function () {
+    console.log("My API is running...");
+});
+
+module.exports = app;
+
+
+// Installing SSL support to use HTTPS
+// SSL (Secure Sockets Layer)
+// To implement an HTTPS protocol connection, it is necessary to buy a digital
+// certificate for production’s environment usage. Assuming you have one, put
+// two files (one file uses .key extension and the other is a .cert file) in the
+// project’s root. After that, let’s use the native https module to allow our
+// server to start using HTTPS protocol and the fs module to open and read the
+// certificate files: my-api.key and my-api.cert to be used as credential
+// parameters to start our server in HTTPS mode. To do this, we are going to
+// replace the function app.listen() to https.createServer(credentials,
+// app).listen() function.
+var express = require("express");
+var cors = require("cors");
+var morgan = require("morgan");
+var compression = require("compression");
+var fs = require("fs");
+var https = require("https");
+var app = express();
+
+app.use(morgan("common"));
+app.use(cors({
+    origin: ["http://localhost:3001"],
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+app.use(compression());
+
+app.get("/", function (req, res) {
+    res.json({
+        status: "My API is alive!"
+    });
+});
+
+var credentials = {
+    key: fs.readFileSync("my-api.key", "utf8"),
+    cert: fs.readFileSync("my-api.cert", "utf8")
+};
+https
+    .createServer(credentials, app)
+    .listen(3000, function () {
+        console.log("My API is running...");
+    });
+
+module.exports = app;
+
+
+// Armoring the API with Helmet
+// a security middleware that handles several kinds of attacks in the HTTP/HTTPS
+// protocols
+// Configures the Content Security Policy;
+// Removes the header X-Powered-By that informs the name and the version of a server;
+// Configures rules for HTTP Public Key Pinning;
+// Configures rules for HTTP Strict Transport Security;
+// Treats the header X-Download-Options for Internet Explorer 8+;
+// Disables the client-side caching;
+// Prevents sniffing attacks on the client Mime Type;
+// Prevents ClickJacking attacks;
+// Protects against XSS (Cross-Site Scripting) attacks.
+// npm install helmet--save
+var express = require("express");
+var cors = require("cors");
+var morgan = require("morgan");
+var compression = require("compression");
+var fs = require("fs");
+var https = require("https");
+var helmet = require("helmet");
+var app = express();
+
+app.use(morgan("common"));
+app.use(helmet());
+app.use(cors({
+    origin: ["http://localhost:3001"],
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+app.use(compression());
+
+app.get("/", function (req, res) {
+    res.json({
+        status: "My API is alive!"
+    });
+});
+
+var credentials = {
+    key: fs.readFileSync("my-api.key", "utf8"),
+    cert: fs.readFileSync("my-api.cert", "utf8")
+};
+https
+    .createServer(credentials, app)
+    .listen(3000, function () {
+        console.log("My API is running...");
+    });
+
+module.exports = app;
+
+
+// Rest parameter with Array
+const myArray = ["anonystick", "medium", "reddit"]
+const [firstName, ...restElements] = myArray;
+console.log(firstName); // anonystick
+console.log(restElements); // ["medium", "reddit"]
+
+
+// Rest parameter with Objects
+const blog = {
+    blog1: "anonystick",
+    blog2: "medium",
+    blog3: "reddit"
+}
+const { blog1, ...restBlog } = blog;
+console.log(blog1); // "anonystick"
+console.log(restBlog); // { blog2: "medium", blog3: "reddit" }
+
+
+// Rest parameter with function
+function func(firstBlog, ...rest) {
+    console.log(firstBlog); // 'anonystick'
+    console.log(rest); //["medium", "reddit"]
+}
+func("anonystick", "medium", "reddit");
+
+
+// Spread operator with Array
+const withoutAnonystick = ["medium", "Reddit"];
+const wholeBlog = ["Anonystick", ...withoutAnonystick]; //["Anonystick", "medium", "Reddit"]
+
+// Spread operator with Object
+const blog = {
+    blog2: "medium",
+    blog3: "reddit"
+}
+
+const extended = {
+    ...blog,
+    blog1: "anonystick",
+};
+
+console.log(extended);
+// {
+//   blog1: "anonystick",
+//   blog2: "medium",
+//   blog3: "reddit"
+// }
+
+
+// Spread operator with Object overwrite
+const blog = {
+    blog1: "web.dev",
+    blog2: "medium",
+    blog3: "reddit"
+}
+
+const extended = {
+    ...blog,
+    blog1: "anonystick",
+};
+
+console.log(extended);
+// {
+//     blog1: "anonystick",
+//     blog2: "medium",
+//     blog3: "reddit"
+// }
+
+
+// Convert value to string
+// ===================================================================
+// https://www.samanthaming.com/tidbits/62-5-ways-to-convert-value-to-string/
+const value = 12345;
+
+// Concat Empty String
+value + '';
+
+// Template Strings
+`${value}`;
+
+// JSON.stringify
+JSON.stringify(value);
+
+// toString()
+value.toString();
+
+// String() - best method can cover all cases
+String(value);
+
+// RESULT
+// '12345
+
+// Test data
+const string = "hello";
+const number = 123;
+const boolean = true;
+const array = [1, "2", 3];
+const object = { one: 1 };
+const symbolValue = Symbol('123');
+const undefinedValue = undefined;
+const nullValue = null;
+
+// #Concat Empty String
+string + ''; // 'hello'
+number + ''; // '123'
+boolean + ''; // 'true'
+array + ''; // '1,2,3'
+object + ''; // '[object Object]'
+undefinedValue + ''; // 'undefined'
+nullValue + ''; // 'null'
+
+// ⚠️
+symbolValue + ''; // ❌ TypeError
+
+// #Template String
+`${string}`; // 'hello'
+`${number}`; // '123'
+`${boolean}`; // 'true'
+`${array}`; // '1,2,3'
+`${object}`; // '[object Object]'
+`${undefinedValue}`; // 'undefined'
+`${nullValue}`; // 'null'
+
+// ⚠️
+`${symbolValue}`; // ❌ TypeError
+
+// TypeError: Cannot convert a Symbol value to a string
+
+
+// #JSON.stringify()
+// ⚠️
+JSON.stringify(string); // '"hello"'
+JSON.stringify(number); // '123'
+JSON.stringify(boolean); // 'true'
+JSON.stringify(array); // '[1,"2",3]'
+JSON.stringify(object); // '{"one":1}'
+JSON.stringify(nullValue); // 'null'
+JSON.stringify(symbolValue); // undefined
+JSON.stringify(undefinedValue); // undefined
+
+// #toString()
+string.toString(); // 'hello'
+number.toString(); // '123'
+boolean.toString(); // 'true'
+array.toString(); // '1,2,3'
+object.toString(); // '[object Object]'
+symbolValue.toString(); // 'Symbol(123)'
+
+// ⚠️
+undefinedValue.toString(); // ❌ TypeError
+nullValue.toString(); // ❌ TypeError
+
+// #String()
+String(string); // 'hello'
+String(number); // '123'
+String(boolean); // 'true'
+String(array); // '1,2,3'
+String(object); // '[object Object]'
+String(symbolValue); // 'Symbol(123)'
+String(undefinedValue); // 'undefined'
+String(nullValue); // 'null'
+
+
+// 2 Ways to Merge Arrays in JavaScript
+/*
+    I like using the Spread operator.
+    But if you need older browser support, you should use Concat.
+*/
+
+const cars = ['🚗', '🚙'];
+const trucks = ['🚚', '🚛'];
+
+// Method 1: Concat
+const combined1 = [].concat(cars, trucks);
+
+// Method 2: Spread
+const combined2 = [...cars, ...trucks];
+
+// Result
+// [ '🚗', '🚙', '🚚', '🚛' ]
+
+
+// Difference between Spread vs Concat
+// [1, 2, 3, 'random'];
+
+// A. Using Spread
+function combineArray(array1, array2) {
+    return [...array1, ...array2];
+}
+
+const isArray = [1, 2, 3];
+const notArray = 'random';
+
+combineArray(isArray, notArray);
+// 😱 [ 1, 2, 3, 'r', 'a', 'n', 'd', 'o', 'm' ]
+// If we spread our string, it will split the word into separate letters
+
+
+// B. Using Concat
+function combineArray(array1, array2) {
+    return [].concat(array1, array2);
+}
+
+const isArray = [1, 2, 3];
+const notArray = 'random';
+
+combineArray(isArray, notArray);
+// ✅  [ 1, 2, 3, 'random' ]
+
+
+// Converting Object to an Array
+const zoo = {
+    lion: '🦁',
+    panda: '🐼',
+};
+
+Object.keys(zoo);
+// ['lion', 'panda']
+
+Object.values(zoo);
+// ['🦁', '🐼']
+
+Object.entries(zoo);
+// [ ['lion', '🦁'], ['panda', '🐼'] ]
+
+// ES5
+var numbers = {
+    one: 1,
+    two: 2,
+};
+var keys = [];
+for (var number in numbers) {
+    if (numbers.hasOwnProperty(number)) {
+        keys.push(number);
+    }
+}
+keys; // [ 'one', 'two' ]
+
+// ES17
+const numbers = {
+    one: 1,
+    two: 2,
+};
+
+Object.keys(numbers);  // [ 'one', 'two' ]
+Object.values(numbers);  // [ 1, 2 ]
+Object.entries(numbers);  // [ ['one', 1], ['two', 2] ]
+
+// Object.entries + Destructuring
+const objectArray = Object.entries(numbers);
+objectArray.forEach(([key, value]) => {
+    console.log(key); // 'one', 'two'
+    console.log(value); // 1, 2
+});
+
+// Convert the array back to an object
+const array = [
+    ['one', 1],
+    ['two', 2],
+];
+
+Object.fromEntries(array);  // { one: 1, two: 2 }
+
+
+// ES6 Shorthand to Define Methods in Objects
+const Rain = {
+    // NOT:
+    // bringUmbrella: function() {}
+
+    // DO
+    bringUmbrella() {
+        return '☔️'
+    }
+}
+
+// String with Template Literals
+// Old way
+const multiLine1 = '1️⃣first \n2️⃣second';
+
+// ✅ ES6 way
+const multiLine2 = `1️⃣first
+2️⃣second`;
+
+/* RESULT
+1️⃣first
+2️⃣second
+*/
+
+const HTMLmarkup = `
+<article>
+    <h1>Code Tidbits</h1>
+</article>
+`;
+
+// HTML Markup using Handlebars.js
+<script id="entry-template" type="text/x-handlebars-template">
+    <article>
+        <h1>Code Tidbits</h1>
+    </article>
+</script>
