@@ -903,3 +903,200 @@ const colorize = (...args) => ({
 // console.log(colorize('Blog anonystick.com', JSON.stringify({data: 1})).red);
 // console.log(colorize('Blog anonystick.com', 'Developer js' ).bgCyan);
 // console.log(colorize(colorize('Blog anonystick.com').green, colorize('Developer js').magenta).bgWhite);
+
+
+
+const players = [
+    { name: "huynh duc", job: "programmer", age: "18", hobby: "study" },
+    { name: "van quyen", job: "student", age: "8", hobby: "study" },
+    { name: "cong vinh", job: "teacher", age: "28", hobby: "play" },
+    { name: "anh duc", job: "programmer", age: "19", hobby: "sleep" },
+    { name: "cong phuong", job: "cook", age: "38", hobby: "paintting" }
+];
+//===========================================================
+/**
+ * searchKeyValue() method to search with key and value
+ * @param {*} lists - search target
+ * @param {*} key - key for search
+ * @param {*} value - value for search
+ * @returns search results
+ */
+function searchKeyValue(lists, key, value) {
+    let res = lists.filter(item => item[key] == value);
+    return res;
+};
+
+// console.log(searchKeyValue(players, "job", "programmer"))
+
+
+
+//===========================================================
+/**
+ * searchKeyValues() method to search with key and multiple value
+ * @param {*} lists - search target
+ * @param {*} key - key for search
+ * @param {*} valueArr - array with more values
+ * @returns search results
+ */
+function searchKeyValues(lists, key, valueArr) {
+    let res = lists.filter(item => valueArr.find(i => i === item[key]))
+    return res;
+};
+
+// console.log(searchKeyValues(players, "job", ['programmer','student']))
+
+
+
+//===========================================================
+/**
+ * searchKeysValue() method to search with more keys value
+ * @param {*} lists - search target
+ * @param {*} filters - filters to search
+ * @returns search result
+ */
+function searchKeysValue(lists, filters) {
+    let key = Object.keys(filters);
+    return resArr = lists.filter(item => key.find(k => item[k] == filters[k]))
+};
+
+let filters = {
+    name: "huynh duc",
+    hobby: "paintting"
+};
+
+// console.log(searchKeysValue(players, filters))
+
+
+
+//===========================================================
+/**
+ * searchKeysValues() method to search with keys or values
+ * @param {*} lists - search target
+ * @param {*} filters - filters to search
+ * @returns search result
+ */
+function searchKeysValues(lists, filters) {
+    let resArr = [];
+    lists.filter((item) => {
+        for (let i in filters) {
+            for (let j of filters[i]) {
+                if (item[i] == j) {
+                    resArr.push(item);
+                };
+            };
+        };
+    });
+    return resArr;
+};
+
+let filters = {
+    age: [8, 18],
+    hobby: ["play", "sleep"],
+};
+
+// console.log(searchKeysValues(players, filters));
+
+
+
+//===========================================================
+/**
+ * byteSize() method to count string length with byte
+ * @param {*} str - target string
+ * @returns size of string
+ */
+const byteSize = str => new Blob([str]).size;
+
+// byteSize('😀'); // 4
+// byteSize('Hello World'); // 11
+
+
+
+//===========================================================
+/**
+ * capitalize() method to capitalize first char
+ * @param {*} param0 - first char in string
+ * @returns capitalized char
+ */
+const capitalize = ([first, ...rest]) =>
+    first.toUpperCase() + rest.join('');
+
+// capitalize('fooBar'); // 'FooBar'
+// capitalize('fooBar', true); // 'Foobar'
+
+
+
+//===========================================================
+/**
+ * capitalizeEveryWord() method to capitalize words
+ * @param {*} str - first string in word
+ * @returns - capitalized words
+ */
+const capitalizeEveryWord = str => str.replace(/\b[a-z]/g, char => char.toUpperCase());
+
+// capitalizeEveryWord('hello world!'); // 'Hello World!'
+
+
+
+//===========================================================
+/**
+ * deCapitalize() method to de-capitalize string
+ * @param {*} param0 - first char in string
+ * @returns de-capitalized string
+ */
+const deCapitalize = ([first, ...rest]) =>
+    first.toLowerCase() + rest.join('')
+
+// deCapitalize('FooBar'); // 'fooBar'
+// deCapitalize('FooBar'); // 'fooBar'
+
+
+
+//===========================================================
+/**
+ * splitLines() method to break line
+ * @param {*} str - target string
+ * @returns lines
+ */
+const splitLines = str => str.split(/\r?\n/);
+
+splitLines('This\nis a\nmultiline\nstring.\n');
+// ['This', 'is a', 'multiline', 'string.' , '']
+
+
+
+//===========================================================
+/**
+ * stripHTMLTags() method to remove html tags
+ * @param {*} str - html string
+ * @returns text
+ */
+const stripHTMLTags = str => str.replace(/<[^>]*>/g, '');
+
+// stripHTMLTags('<p><em>lorem</em> <strong>ipsum</strong></p>');
+// 'lorem ipsum'
+
+
+
+//===========================================================
+/**
+ * sortCharactersInString() method to sort char in string
+ * @param {*} str - target string
+ * @returns sorted character
+ */
+const sortCharactersInString = str => [...str].sort((a, b) => a.localeCompare(b)).join('');
+
+// sortCharactersInString('cabbage'); // 'aabbceg
+
+
+
+//===========================================================
+/**
+ * words() method to convert a string to an array
+ * @param {*} str - target string
+ * @param {*} pattern - regEx pattern
+ * @returns string array
+ */
+const words = (str, pattern = /[^a-zA-Z-]+/) => str.split(pattern).filter(Boolean);
+
+// words('I love javaScript!!'); // ["I", "love", "javaScript"]
+// words('python, javaScript & coffee'); // ["python", "javaScript", "coffee"]

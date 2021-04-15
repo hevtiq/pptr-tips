@@ -5378,3 +5378,94 @@ const HTMLmarkup = `
         <h1>Code Tidbits</h1>
     </article>
 </script>
+
+
+// For ... in
+for (let prop in ['a', 'b', 'c']);
+console.log(prop);            // 0, 1, 2 (array indexes)
+
+for (let prop in 'str');
+console.log(prop);            // 0, 1, 2 (string indexes)
+
+for (let prop in { a: 1, b: 2, c: 3 });
+console.log(prop);            // a, b, c (object property names)
+
+for (let prop in new Set(['a', 'b', 'a', 'd']));
+console.log(prop);            // undefined (no enumerable properties)
+
+
+// For ... of
+for (let val of ['a', 'b', 'c']);
+console.log(val);            // a, b, c (array values)
+
+for (let val of 'str');
+console.log(val);            // s, t, r (string characters)
+
+for (let val of { a: 1, b: 2, c: 3 });
+console.log(prop);           // TypeError (not iterable)
+
+for (let val of new Set(['a', 'b', 'a', 'd']));
+console.log(val);            // a, b, d (Set values)
+
+['a', 'b', 'c'].forEach(
+    val => console.log(val)     // a, b, c (array values)
+);
+
+['a', 'b', 'c'].forEach(
+    (val, i) => console.log(i)  // 0, 1, 2 (array indexes)
+);
+
+// Check user online hay offline
+window.addEventListener('load', function () {
+    var status = document.getElementById("status");
+    var log = document.getElementById("log");
+
+    function updateOnlineStatus(event) {
+        var condition = navigator.onLine ? "online" : "offline";
+
+        status.className = condition;
+        status.innerHTML = condition.toUpperCase();
+
+        log.insertAdjacentHTML("beforeend", "Event: " + event.type + "; Status: " + condition);
+    }
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+});
+
+/*
+#status {
+  position: fixed;
+  width: 100%;
+  font: bold 1em sans-serif;
+  color: #FFF;
+  padding: 0.5em;
+}
+
+#log {
+  padding: 2.5em 0.5em 0.5em;
+  font: 1em sans-serif;
+}
+
+.online {
+  background: green;
+}
+
+.offline {
+  background: red;
+}
+*/
+
+
+// Add to Favorites
+// <a href="javascript:window.external.AddFavorite('http://www.yoursite.com', 'Your Site Name')">Add to Favorites</a>
+
+// Break out of Frames
+// <body onLoad="if (self != top) top.location = self.location"></body>
+
+// Focus OnLoad
+// https://www.htmlgoodies.com/beyond/javascript/article.php/3887346/Top-10-JavaScript-Snippets-for-Common-Tasks.htm
+// <body OnLoad="document.nameform.user.focus();"></body>
+// <form name="nameform">
+// Name:  <input type=text name=user size=10>
+// </form>
