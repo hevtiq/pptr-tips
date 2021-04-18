@@ -1100,3 +1100,92 @@ const words = (str, pattern = /[^a-zA-Z-]+/) => str.split(pattern).filter(Boolea
 
 // words('I love javaScript!!'); // ["I", "love", "javaScript"]
 // words('python, javaScript & coffee'); // ["python", "javaScript", "coffee"]
+
+
+
+// Get Query String Parameters
+//===========================================================
+const urlParams = new URLSearchParams(window.location.search);
+
+// Assuming "?post=1234&amp;action=edit"
+// console.log(urlParams.has('post')); // true
+// console.log(urlParams.get('action')); // "edit"
+// console.log(urlParams.getAll('action')); // ["edit"]
+// console.log(urlParams.toString()); // "?post=1234&amp;action=edit"
+// console.log(urlParams.append('active', '1')); // "?post=1234&amp;action=edit&amp;active=1"
+
+
+
+//===========================================================
+/**
+ * readingTime() method to calculate reading time
+ */
+function readingTime() {
+    const text = document.getElementById("article").innerText;
+    const wpm = 200;  // words per minute
+    const words = text.trim().split(/\s+/).length;
+    const time = Math.ceil(words / wpm);
+    document.getElementById("time").innerText = time;
+}
+// readingTime();
+
+
+
+//===========================================================
+const alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const numbers = "0123456789";
+const symbols = "!@#$%^&*_-+=";
+/**
+ * generatePassword() method to generate password
+ * @param {*} length - length of password need to create
+ * @param {*} characters - chars
+ * @returns string
+ */
+const generatePassword = (length, characters) => {
+    let password = "";
+    for (let i = 0; i < length; i++) {
+        password += characters.charAt(
+            Math.floor(Math.random() * characters.length)
+        );
+    }
+    return password;
+};
+
+generatePassword(20, [alpha, numbers, symbols].join(''));
+// Output: "ImnWYLbAiGXe7&X55Umf"
+
+//===========================================================
+/**
+ * isString() method to check if a variable is a string
+ * @param {*} value - value need to check
+ * @returns true/false
+ */
+const isString = (value) => {
+    return typeof value === 'string' || value instanceof String;
+};
+
+
+
+//===========================================================
+/**
+ * isNumber() method to check if a variable is a number
+ * @param {*} value - value need to check
+ * @returns true/false
+ */
+const isNumber = (value) => {
+    return typeof value === 'number' && isFinite(value);
+};
+
+
+
+//===========================================================
+/**
+ * isArray() method to check if a variable is a array
+ * @param {*} value - value need to check
+ * @returns true/false
+ */
+const isArray = (value) => {
+    return value && typeof value === 'object' && value.constructor === Array;
+}
+// ES5 actually has a method for this (ie9+)
+Array.isArray(value);

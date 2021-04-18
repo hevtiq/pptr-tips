@@ -5469,3 +5469,1135 @@ window.addEventListener('load', function () {
 // <form name="nameform">
 // Name:  <input type=text name=user size=10>
 // </form>
+
+
+// settimer javascript
+/*
+    - khái niệm về luồng đơn(single thread) JS:
+        làm một việc trong một khoảng thời gian (timeout: default: 0)
+    - hàng đợi(queue) tác vụ:
+        tác vụ đồng bộ (sync), tác vụ không đồng bộ (async)
+    - vòng lặp sự kiện (event loop) là gì?
+    - câu lệnh nào sẽ được đặt trong hàng đợi tác vụ không đồng bộ (async queue)?
+    - khi nào câu lệnh được đặt trong hàng đợi tác vụ không đồng bộ (async queue)?
+*/
+// BAD
+for (var i = 0; i < 5; i++) {
+    setTimeout(function () {
+        console.log(i);
+    }, 1000);
+};
+// 4,4,4,4,4
+
+// Closure vs setTimeout
+// GOOD: use IIFE to resove Closure problems
+for (let i = 0; i < 5; i++) {
+    (function (arg) {
+        setTimeout(function () {
+            console.log(arg);
+        }, 1000 * i)
+    })(i);
+};
+// Output: 0 1 2 3 4
+
+// Promise vs setTimeout
+// GOOD: Can improve performance
+// create a array to populate promises
+const tasks = [];
+
+// create a promise function
+const output = (arg) => new Promise((resolve) => {
+    setTimeout(() => {
+        console.log(111, arg);
+        resolve();
+    }, 1000 * arg);
+});
+
+// create all Promises
+for (var i = 0; i < 5; i++) {
+    tasks.push(output(i));
+};
+
+Promise.all(tasks).then(() => {
+    setTimeout(() => {
+        console.log(222, i);
+    }, 1000)
+});
+// Output: 0 1 2 3 4 5
+
+
+// async await (ES7) vs setTimeout
+// GOOD
+const sleep = (timeoutMS) => new Promise((resolve) => {
+    setTimeout(resolve, timeoutMS);
+});
+
+; (async () => {
+    for (var i = 0; i < 5; i++) {
+        await sleep(1000);
+        console.log(111, i);  // 0 1 2 3 4
+    }
+
+    await sleep(1000);
+    console.log(222, i);  // 5
+})();
+
+
+/*
+    Performance JavaScript 3
+
+    Loop 10.000 items
+    For Loop, average loop time: ~10 microseconds
+    For-Of, average loop time: ~110 microseconds
+    ForEach, average loop time: ~77 microseconds
+    While, average loop time: ~11 microseconds
+    Reduce, average loop time: ~113 microseconds
+
+    Reduce & foreach, every run will invoke callback => slow
+
+    Copy 10.000 items
+    https://anonystick.com/blog-developer/14-cach-copy-array-trong-javascript-2020060454458739
+    Duplicate using Slice, average: ~367 microseconds
+    Duplicate using Map, average: ~469 microseconds
+    Duplicate using Spread, average: ~512 microseconds
+    Duplicate using Conct, average: ~366 microseconds
+    Duplicate using Array From, average: ~1,436 microseconds
+    Duplicate manually, average: ~412 microseconds
+
+    Iterating Objects 10.000 items
+    Object iterate For-In, average: ~240 microseconds
+    Object iterate Keys For Each, average: ~294 microseconds
+    Object iterate Entries For-Of, average: ~535 microseconds
+
+    ===> should use Higher order function will performance
+*/
+
+
+/*
+    FETCH API
+
+    GET Requests
+    - Easy: Get JSON from a URL
+    - Intermediate: Custom headers
+    - Advanced: CORS example
+
+    POST/PUT Requests
+    - Easy: Posting JSON
+    - Intermediate: Posting an HTML <form>
+    - Intermediate: Form encoded data
+    - Advanced: Uploading Files
+    - Advanced: Uploading Multiple Files
+
+    Bonus
+    - Dependant Fetch Requests
+    - Concurrent Downloads
+*/
+
+// Easy: Get JSON from a URL
+fetch('https://api.github.com/orgs/nodejs')
+    .then(response => response.json())
+    .then(data => {
+        console.log(data); // Prints result from `response.json()`
+    })
+    .catch(error => console.error(error));
+
+
+// Intermediate: Custom headers
+fetch('https://api.github.com/orgs/nodejs', {
+    headers: new Headers({
+        'User-agent': 'Mozilla/4.0 Custom User Agent'
+    })
+})
+    .then(response => response.json())  // https://developer.mozilla.org/en-US/docs/Web/API/Body/json
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => console.error(error));
+
+
+// Advanced: CORS example
+// CORS is primarily checked at the server - so make sure your configuration is
+// correct on the server-side.
+fetch('https://api.github.com/orgs/nodejs', {
+    credentials: 'include', // Useful for including session ID (and, IIRC, authorization headers)
+})
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => console.error(error));
+
+
+// Easy: Posting JSON
+postRequest('http://example.com/api/v1/users', { user: 'Dan' })
+    .then(data => console.log(data)) // print result from `response.json()`
+    .catch(error => console.error(error));  // catch error
+
+function postRequest(url, data) {
+    return fetch(url, {
+        credentials: 'same-origin', // 'include', default: 'omit'
+        method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
+        body: JSON.stringify(data), // Coordinate the body type with 'Content-Type'
+        headers: new Headers({
+            'Content-Type': 'application/json'
+        }),
+    })
+        .then(response => response.json());
+};
+
+
+// Intermediate: Form encoded data
+postFormData('http://example.com/api/v1/users', { user: 'Mary' })
+    .then(data => console.log(data))
+    .catch(error => console.error(error));
+
+function postFormData(url, data) {
+    return fetch(url, {
+        method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
+        body: new URLSearchParams(data),
+        headers: new Headers({
+            'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        })
+    })
+        .then(response => response.json())
+};
+
+
+// Advanced: Uploading files
+postFile('http://example.com/api/v1/users', 'input[type="file"].avatar')
+    .then(data => console.log(data))
+    .catch(error => console.error(error));
+
+function postFile(url, fileSelector) {
+    const formData = new FormData()
+    const fileField = document.querySelector(fileSelector)
+
+    formData.append('username', 'abc123')
+    formData.append('avatar', fileField.files[0])
+
+    return fetch(url, {
+        method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
+        body: formData  // Coordinate the body type with 'Content-Type'
+    })
+        .then(response => response.json());
+};
+
+
+// Advanced: Uploading multiple files
+// <input type='file' multiple class='files' name='files' />
+postFile('http://example.com/api/v1/users', 'input[type="file"].files')
+    .then(data => console.log(data))
+    .catch(error => console.error(error));
+
+function postFile(url, fileSelector) {
+    const formData = new FormData()
+    const fileFields = document.querySelectorAll(fileSelector)
+
+    // Add all files to formData
+    Array.prototype.forEach.call(fileFields.files, f => formData.append('files', f))
+    // Alternatively for PHP peeps, use `files[]` for the name to support arrays
+    // Array.prototype.forEach.call(fileFields.files, f => formData.append('files[]', f))
+
+    return fetch(url, {
+        method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
+        body: formData  // Coordinate the body type with 'Content-Type'
+    })
+        .then(response => response.json())
+};
+
+
+
+// 150 packages and resource Node.js
+// https://anonystick.com/blog-developer/tong-hop-150-packages-va-resource-nodejs-chat-luong-cao-cap-nhat-lien-tuc-2020102453282459
+
+
+// create sitemap
+// npm i sitemap --save
+// create route in nodejs with syntax
+sitemap: async (req, res) => {
+    const sm = require('sitemap');
+    var sitemap = sm.createSitemap({
+        hostname: 'http://example.com',
+        cacheTime: 600000,        // 600 sec - cache purge period
+        urls: [
+            { url: '/', changefreq: 'daily', priority: 0.3 },
+            { url: '/contact', changefreq: 'daily', priority: 0.3 },
+            { url: '/about', changefreq: 'daily', priority: 0.3 },
+        ]
+    })
+
+    sitemap.toXML(function (err, xml) {
+        if (err) {
+            return res.status(500).end();
+        }
+        res.header('Content-Type', 'application/xml');
+        res.send(xml);
+    })
+};
+
+// RUN: http://http://127.0.0.1/sitemap.xml
+/*
+xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+<url>
+http://example.com/
+<changefreq>daily</changefreq>
+<priority>0.3</priority>
+</url>
+<url>
+http://example.com/lien-he
+<changefreq>daily</changefreq>
+<priority>0.3</priority>
+</url>
+<url>
+http://example.com/gioi-thieu
+<changefreq>daily</changefreq>
+<priority>0.3</priority>
+</url>
+</urlset>
+*/
+
+
+/*
+    Javascript: IIFE (Immediately Invoked Function Expression)
+
+    - variable inside of IIFE is private, can access or change from outside
+    - shoud use 'use strict' to make sure not error type, scope
+    - IIFE is usefull if want to set vars to private, even embeded to other website.
+*/
+; (function () {
+    //code here
+})();
+
+; (function (window, name) {
+    //code here
+})(window, name);
+
+for (var i = 0; i < 10; i++) {
+    ; (function (i) {  // i here is private for IIFE
+        setTimeout(function () {
+            console.log(i);
+        });
+    })(i);  // i here is private for IIFE
+};
+// 0 1 2 3 4 5 6 7 8 9
+
+
+// Load a javascript file dynamically
+// Load a JavaScript file
+//===========================================================
+// Create new script element
+const script = document.createElement('script');
+script.src = '/path/to/js/file.js';
+
+// code run when file script loaded
+script.addEventListener('load', function () {
+    // The script is loaded completely
+    // Do something
+});
+
+// Append to the `head` element
+document.head.appendChild(script);
+
+
+// Load multiple JavaScript files in order
+//===========================================================
+// Load a script from given `url`
+const loadScript = function (url) {
+    return new Promise(function (resolve, reject) {
+        const script = document.createElement('script');
+        script.src = url;
+
+        script.addEventListener('load', function () {
+            // The script is loaded completely
+            resolve(true);
+        });
+
+        document.head.appendChild(script);
+    });
+};
+
+// Perform all promises in the order
+const waterfall = function (promises) {
+    return promises.reduce(
+        function (p, c) {
+            // Waiting for `p` completed
+            return p.then(function () {
+                // and then `c`
+                return c().then(function (result) {
+                    return true;
+                });
+            });
+        },
+        // The initial value passed to the reduce method
+        Promise.resolve([])
+    );
+};
+
+// Load an array of scripts in order
+const loadScriptsInOrder = function (arrayOfJs) {
+    const promises = arrayOfJs.map(function (url) {
+        return loadScript(url);
+    });
+    return waterfall(promises);
+}
+
+// invoke scripts order
+loadScriptsInOrder([
+    '/path/to/file.js',
+    '/path/to/another-file.js',
+    '/yet/another/file.js',
+]).then(function () {
+    // All scripts are loaded completely
+    // Do something
+});
+
+
+
+// OOP
+//===========================================================
+// OOP in before - OBJECT
+const user1 = { name: 'messi', age: 31, email: 'messi@gmail.com' };
+const user2 = { name: 'ronaldo', age: 32, email: 'ronaldo@gmail.com' };
+const user3 = { name: 'nani', age: 31, email: 'nani@gmail.com' };
+
+// OOP in ES5 - FUNCTION
+function User(name, age, emmail) {
+    this.name = name;
+    this.age = age;
+    this.email = email;
+};
+
+const user1 = new User('messi', 31, 'messi@gmail.com');
+const user2 = new User('ronaldo', 32, 'ronaldo@gmail.com');
+const user3 = new User('nani', 31, 'nani@gmail.com');
+
+// OOP in ES6 - CLASS (blueprint, template)
+class User {
+    constructor(name, age, emmail) {  // auto invoke when class instanced
+        this.name = name;
+        this.age = age;
+        this.email = email;
+    }
+}
+
+const user1 = new User('messi', 31, 'messi@gmail.com');
+const user2 = new User('ronaldo', 32, 'ronaldo@gmail.com');
+const user3 = new User('nani', 31, 'nani@gmail.com');
+
+
+// OOP in ES6 with static method
+class User {
+    constructor(name, age, email) {
+        [name];
+        [age];
+        [email];
+    }
+    increaseAge() {  // can invoke from instance class
+        this.age += 1;
+    }
+    static staticMethod() {  // can invoked from instance class
+        return 'Im a static method '
+    }
+}
+
+const user1 = new User('messi', 31, 'messi@gmail.com')
+user1.increaseAge()
+console.log(user1); // User {name: "messi", age: 32, email: "messi@gmail.com"}
+console.log(User.staticMethod());  // Im a static method
+console.log(user1.staticMethod());  // Uncaught TypeError: user1.staticMethod is not a function
+
+
+/*
+    Getter và Setter - tính đóng gói (encapsulation)
+
+    -object properties should not allow access or change directly from outner
+    - Với getter và setter, sẽ có nhiều quyền kiểm soát hơn đối với các object
+        properties sau khi khởi tạo với constructor.
+    - Các devjs có thể validation dữ liệu trong phương thức get và set trước khi
+        setting or getting giá trị.
+    - Chúng ta có thể thấy trong ví dụ trên có property name là _name nhưng
+        chúng ta đang sử dụng nó làm metup.name và nó hoạt động tốt vì các method
+        getter và setter.
+*/
+class Meetup {
+    constructor(name) {
+        this._name = name;
+    };
+    get name() {
+        // Validation can happen on data
+        return this._name;
+    }
+    set name(val) {
+        // Validation can happen on data
+        this._name = val;
+    }
+}
+let meetup = new Meetup('JS');
+console.log("meetup Name: " + meetup.name); // meetup Name: JS
+meetup.name = 'Angular';
+console.log("meetup Name: " + meetup.name); // meetup Name: Angular
+
+
+// Inheritance trong ES6
+class Meetup {
+}
+class techMeet extends Meetup {
+}
+class sportMeet extends Meetup {
+}
+
+let js = new techMeet();
+console.log(js instanceof techMeet);  // true
+console.log(js instanceof Meetup);    // true
+console.log(js instanceof Object);    // true
+
+
+// super() - I am parent
+class Meetup {
+    constructor() {
+        console.log("inside Meetup constructor");
+    }
+}
+class techMeet extends Meetup {
+    constructor() {
+        super();  // I'm parent of Meetup. Invoke parent constructor.
+        console.log("inside techMeet constructor");
+    }
+}
+let js = new techMeet();
+// inside Meetup constructor
+// inside techMeet constructor
+
+
+
+// =========================================================
+// check boolean (condition) and assign value
+// BAD
+if (a === 'a') {
+    b = true
+} else {
+    b = false
+}
+
+// GOOD
+b = a === 'a'
+
+// check if array length is not 0
+// BAD
+if (arr.length !== 0) {
+    // todo
+}
+
+// GOOD
+if (arr.length) {
+    // todo
+}
+
+// check if array length is 0
+// BAD
+if (arr.length === 0) {
+    // todo
+}
+
+// GOOD
+if (!arr.length) {
+    // todo
+}
+
+
+// assgin base on condition
+// BAD
+if (a === 'a') {
+    b = a
+} else {
+    b = c
+}
+
+// GOOD
+b = a === 'a' ? a : c
+
+
+// check condition with includes
+// BAD
+if (a === 1 || a === 2 || a === 3 || a === 4) {
+    // todo
+}
+
+// GOOD
+let arr = [1, 2, 3, 4]
+if (arr.includes(a)) {
+    // todo
+}
+
+
+// Check with function, avoid for loop
+// BAD
+let arr = [1, 3, 5, 7];
+function isHasNum(n) {
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === n) {
+            return true;
+        };
+    };
+    return false;
+};
+
+// GOOD
+let arr = [1, 3, 5, 7];
+let isHasNum = n => arr.some(num => num === n);
+
+// BEST
+let arr = [1, 3, 5, 7];
+let isHasNum = (n, arr) => arr.some(num => num === n);
+
+
+// forEach to loop through array (not create new array)
+// bad
+for (let i = 0; i < arr.length; i++) {
+    // BAD
+    arr[i].key = balabala
+}
+
+// GOOD
+arr.forEach(item => {
+    // todo
+    item.key = balabala
+})
+
+
+// filter() to filter data to new array
+// BAD
+let arr = [1, 3, 5, 7],
+    newArr = []
+for (let i = 0; i < arr.length; i++) {
+    if (arr[i] > 4) {
+        newArr.push(arr[i])
+    }
+}
+
+// GOOD
+let arr = [1, 3, 5, 7]
+let newArr = arr.filter(n => n > 4) // [5, 7]
+
+
+// map() to loop through items
+// bad
+let arr = [1, 3, 5, 7],
+    newArr = []
+for (let i = 0; i < arr.length; i++) {
+    newArr.push(arr[i] + 1)
+}
+
+// good
+let arr = [1, 3, 5, 7]
+let newArr = arr.map(n => n + 1) // [2, 4, 6, 8]
+
+
+// Object.values to get value to new array
+let obj = {
+    a: 1,
+    b: 2
+};
+
+// BAD
+let values = []
+for (key in obj) {
+    values.push(obj[key])
+}
+
+// GOOD
+let values = Object.values(obj) // [1, 2]
+
+
+// Object.keys to get keys to new array
+let obj = {
+    a: 1,
+    b: 2
+}
+// BAD
+let keys = []
+for (value in obj) {
+    keys.push(value)
+}
+
+// GOOD
+let keys = Object.keys(obj) // ['a', 'b']
+
+
+// Swap variables
+// BAD
+let a = 1,
+    b = 2
+let temp = a
+a = b
+b = temp
+
+// GOOD
+let a = 1,
+    b = 2
+    [b, a] = [a, b];
+
+
+// Destructuring objects
+// BAD
+function setForm(person) {
+    this.name = person.name;
+    this.age = person.age;
+}
+
+// GOOD
+function setForm({ name, age }) {
+    this.name = name;
+    this.age = age;
+}
+
+
+// Change vars name to simple
+// BAD
+function setForm(data) {
+    this.one = data.aaa_bbb_ccc_ddd
+    this.two = data.eee_fff_ggg
+}
+// GOOD
+function setForm({ aaa_bbb_ccc_ddd, eee_fff_ggg }) {
+    this.one = aaa_bbb_ccc_ddd
+    this.two = eee_fff_ggg
+}
+
+// BEST
+function setForm({ aaa_bbb_ccc_ddd: one, eee_fff_ggg: two }) {
+    this.one = one
+    this.two = two
+}
+
+
+// Set default value in destructuring
+// BAD
+function setForm({ name, age }) {
+    if (!age) age = 16;
+    this.name = name;
+    this.age = age;
+};
+
+// GOOD
+function setForm({ name, age = 16 }) {
+    this.name = name;
+    this.age = age;
+};
+
+
+// Use || operater to check default values
+let person = {
+    name: 'anonystick',
+    age: 38
+};
+
+let name = person.name || 'anonystick';
+
+
+// Use && to check object exist
+let person = {
+    name: 'anonystick',
+    age: 38,
+    children: {
+        name: 'anonystick'
+    }
+}
+
+let childrenName = person.children && person.children.name;
+// OR
+let childrenName = person?.children?.name;  // chaining operator
+
+
+// template literal
+let person = {
+    name: 'anonystick',
+    age: 18
+}
+// BAD
+function sayHi(obj) {
+    console.log('Hello::::' + person.name + ' ' + person.age);
+};
+
+// GOOD
+function sayHi(person) {
+    console.log(`Hello::::${person.name} ${person.age}`)
+};
+
+// BEST
+function sayHi({ name, age }) {
+    console.log(`Hello::::${name} ${age}`)
+};
+
+
+// arrow function
+let arr = [18, 19, 20, 21, 22];
+
+// BAD
+function findStudentByAge(arr, age) {
+    return arr.filter(function (num) {
+        return num === age
+    })
+}
+
+// GOOD
+let findStudentByAge = (arr, age) => arr.filter(num => num === age);
+
+
+// Load a css file dynamically
+// Create new link element
+const link = document.createElement('link');
+link.setAttribute('rel', 'stylesheet');
+link.setAttribute('href', '/path/to/js/file.css');
+
+// Append to the `head` element
+document.head.appendChild(link);
+
+
+// Loop over a nodelist
+// NodeList
+const elements = document.querySelectorAll('div');
+
+// 1. Use the ES6 spread operator
+[...elements].forEach(function (ele) {
+    // do something
+});
+
+// 2. Use the Array methods
+// `Array.from` is not supported on IE
+Array.from(elements).forEach(function (ele) {
+    // do something
+});
+
+// Or
+[].forEach.call(elements, function (ele) {
+    // do something
+});
+
+// Or
+[].slice.call(elements, 0).forEach(function (ele) {
+    // do something
+});
+
+
+// 3. Use the forEach method (problems with IE)
+elements.forEach(function (ele) {
+    // do something
+});
+
+
+/*
+    Closure
+
+    Closure là một chức năng có quyền truy cập vào phạm vi cha, ngay cả sau khi
+    scope đã đóng.
+
+    Scope chính là tuổi thọ của một biến trong javascript.
+*/
+function f1() {
+    let N = 0; // N (outner - parent) always set init when f1 run, means that N = 0;
+    console.log('f1', N);  // f1 0, run one time when result() invoke
+
+    // function inner with closure
+    function f2() {
+        N += 1; // N (inner - children)
+        console.log('f2', N);  // f2 run 3 times when result() invoke
+    }
+
+    return f2; // N parent => increase 1
+}
+
+const result = f1();  // result only reference to f1.
+
+// f1.f2.n not exit then get f1.n
+result();  // f1.n = 0, f1.f2.n = f1.f2.n (=>f1.n) + 1 = 1
+
+// f1.f2.n exit then taken f1.f2.n
+result(); // f1.n = 0, fi.f2.n = f1.f2.n + 1 = 1 + 1 = 2
+result(); // f1.n = 0, fi.f2.n = f1.f2.n + 1 = 2 + 1 = 3
+
+
+// More example closure
+const words = 'hi';  // make sure global scope
+function speak() {
+    console.log(words);  // words not exist in local then reference to global scope
+}
+speak(); // invoke speak fn: 'hi'
+console.log(words); // invoke log fn: 'hi'
+
+
+function speak() {
+    const words = 'hi';  // global scope
+
+    // return other fn
+    return function logIt() {
+        console.log(words);  // print words in local scope => global scope
+    }
+};
+
+const sayHello = speak();  // invoke and populate result returned
+sayHello;  // speak.words deleted, but speak.logIt.words (speak.words) exist
+//  function logIt() {
+//    console.log(words);
+//  }
+sayHello();  // hi. speak.logIt.words = hi
+
+
+/**
+ * method to get name of a person
+ * @param {*} name - person name
+ * @returns callback
+ */
+function person(name = '{name?}') {
+    /**
+     * method to get behavior of a person
+     * @param {*} animal - animal
+     * @returns string
+     */
+    const behavior = function (animal = '{animal?}') {
+        return `${name} likes ${animal}`;  // name.().name
+    };
+
+    return behavior;
+};
+
+const getJohn = person && person('John');
+const getCindy = person && person('Cindy');
+
+getJohn;
+// function (animal = '{animal}') {
+//     return `${name} likes ${animal}`;  // name.().name
+// }
+
+getJohn && getJohn('dogs');  // 'John likes dogs'
+getCindy && getCindy('cats');  // 'Cindy likes cats'
+
+
+// Closure to define private vars
+// class Product {
+//     constructor() {
+
+//         var name;
+
+//         this.setName = function (value) {
+//             name = value;
+//         };
+
+//         this.getName = function () {
+//             return name;
+//         };
+//     }
+// }
+function Product() {
+
+    var name;
+
+    this.setName = function (value) {
+        name = value;
+    };
+
+    this.getName = function () {
+        return name;
+    };
+}
+
+var p = new Product();
+p;  // Product {setName: ƒ, getName: ƒ}
+
+p.setName("anonystick.com");
+console.log(p.name); // undefined. p.name is private property, cant direct access
+console.log(p.getName()); // anonystick.com
+
+
+// Release memory in closure
+function fn() {
+    let a = "I'm a";
+    return function () {
+        console.log(a);  // memory problem
+    };
+};
+
+// Solution
+function fn(a) {
+    console.log(a)
+};
+
+for (var k = 0; k < 10; k++) {
+    fn(k);
+};
+
+fn = null
+
+
+
+// Javascript access CAMERA (front, back), capture in mobile
+// Check browser support API MediaStream or not?
+// https://anonystick.com/labs/camera
+if (
+    !"mediaDevices" in navigator ||
+    !"getUserMedia" in navigator.mediaDevices
+) {
+    document.write('Not support API camera');
+    return;
+};
+
+// Access camery with mediaDevices
+// ask user allow access camera or not. If reject will try/catch
+const videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+try {
+    videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = videoStream;
+} catch (error) {
+    console.log(error);
+};
+
+// Access camera before and after in mobile
+// by default, getUserMedia of devices will be invoke (front. faceingMode:"user")
+// to access from camera back
+const constraints = {
+    video: {
+        width: { /*...*/ },
+        height: { /*...*/ },
+        facingMode: "environment"
+    },
+};
+
+// Take a picture by javascript
+const canvas = document.querySelector("#canvas");
+canvas.width = video.videoWidth;
+canvas.height = video.videoHeight;
+canvas.getContext("2d").drawImage(video, 0, 0);
+
+
+(function () {
+    Math.randomInt = function (min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    };
+    Math.randomDec = function (min, max, decimals) {
+        return (Math.random() * (max - min) + min).toFixed(decimals || 2);
+    };
+    Math.randomList = function (list) {
+        return list[Math.randomInt(0, list.length)];
+    };
+})();
+
+Math.randomInt(0, 10);
+Math.randomDec(0, 10, 2);
+Math.randomList(['anonystick', 'JavaScript', 'es6']);
+
+// Event Handlers vs AddEventListener on Object
+// Event Handlers: invoke 2 times will run last event
+const button = document.querySelector(".btn");
+button.onclick = () => {
+    console.log("Hello anonystick!");
+};
+button.onclick = () => {
+    console.log("How are you?");
+};
+// "How are you?"
+
+// AddEventListener: invoke 2 times will run both events (RECOMMENDED)
+const button = document.querySelector(".btn");
+button.addEventListener("click", event => {
+    console.log("Hello anonystick!");
+});
+button.addEventListener("click", event => {
+    console.log("How are you?");
+});
+// "Hello anonystick!"
+// "How are you?"
+
+// Fix: Cannot read property 'addEventListener' of null
+var el = document.getElementById('btn');
+if (el) {
+    el.addEventListener('click', swapper, false);
+};
+
+// OR
+document.addEventListener('DOMContentLoaded', function () {
+    el.addEventListener('click', swapper, false);
+});
+
+
+/*
+    Design DB access 1.000.000 users
+
+    - current users: 100.000
+    - active user: 5000 / day
+    - insert record: 1000 / day
+    - requests: 10 request / 1s
+    - server: 32G/1600
+    - database type: mysql(main), mongodb (logs, sendMail, RabbitMQ).
+
+    NEXT
+    - current users: 10.000.000
+    - active user: 500.000 / day
+    - insert record: 250.000 / day => 250.000 x 30 = 7.500.000 record / month / 1 table
+    - requests: 10.000 request /1s => 20 servers + load balancing => 500 request/1s
+
+    - Problems 1: System slow when more users connect Mysql
+    - Problems 2: records over => access slow => voucher, deal hot event => server down.
+    - Disk IO, network bandwidth, CPU and consumption of Memory of your database
+    server will meet very high conditions.
+    - The total load of the server where the database is very heavy, or even
+    almost overloaded.
+    - In the peak period, the amount of data in a very large table and SQL
+    performance is not very good.
+
+    SOLUTION
+    - servers: 5, same data
+    - database: 1 bd / 1 server x 5. db_01, db_02..., db_05
+    - table: 1 table / 1 db / 1 server x 5. db_01_order...db_05_order
+
+    Clients: (need software mycat, hay sharding-jdbc or Shading mongodb)
+    - Server 01: db_01, db_01_order => 50.000 orders
+    - Server 02: db_02, db_02_order => 50.000 orders
+    - Server 03: db_03, db_03_order => 50.000 orders
+    - Server 04: db_04, db_04_order => 50.000 orders
+    - Server 05: db_05, db_05_order => 50.000 orders
+
+    Case: 500.000 record / 1 day inserted / 5 server
+    => 100.000 record / 1 table inserted / 1 server / 1 day
+
+    Case: 10.000 requests / 1s / 5 server
+    => 2.000 request / 1s / 1 server
+
+
+    Case: System load
+    - order + pay : 100ms
+    - discount order: 100ms
+    - add point when order success: 200ms (+/- point)
+    - send email sucess order: 200ms
+    ... ~10 steps => system slow
+    => Solution: async with Message Queue
+    (order -> pay success): 100ms -> Message Queue async (discount, point, send mail): 200ms
+
+    Message Queue: Queue with Message as MailBox, FIFO
+    - Message: Information sent (text, binary or JSON)
+    - Message Queue: Where to contain these messages, allowing producer and
+    consumer can be exchanged together
+    - Producer: Service created information, put information on Message Queue
+    - Consumer: Service Receive messages from Message Queue and handle a service
+    that can be both producer, making consumer
+    - Kafka, RabitMQ, Pulsar, ActiveMQ...
+    https://lcdung.top/message-queue-la-gi/
+
+    RabbitMQ: open-source, Erlang to emplement AMQP
+*/
+
+/*
+    Axios interceptors + fresh token in jwt
+*/
+
+
+/*
+    How do you check if a variable is a String in Javascript
+
+    A string is always a string so this one is easy. Except if called with new
+    (new String) type of will instead return “object”. So to also include those
+    strings instance of can be used.
+*/
+function isString(value) {
+    return typeof value === 'string' || value instanceof String;
+}
