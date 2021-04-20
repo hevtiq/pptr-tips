@@ -1432,6 +1432,100 @@ function getAccounts() {
 // Back-End: https://github.com/anonystick/demo-jwt-token
 // Client: https://github.com/anonystick/demo-jwt-token-client
 
+// 1 - Create users.json
+// users data when access to http://localhost:3000/api/users
+
+// [
+//     {
+//         "id": 1,
+//         "name": "anonystick"
+//     },
+//     {
+//         "id": 2,
+//         "name": "anonymous hackers"
+//     }
+// ]
+
+// 2 - package.json
+// npm i
+
+// {
+// "name": "demo-auth-jwt",
+// "version": "1.0.0",
+// "description": "",
+// "main": "index.js",
+// "scripts": {
+//   "start": "nodemon index.js",
+//   "test": "echo \"Error: no test specified\" && exit 1"
+// },
+// "keywords": [],
+// "author": "",
+// "license": "ISC",
+// "devDependencies": {
+//   "nodemon": "^1.19.1"
+// },
+// "dependencies": {
+//   "cookie-parser": "^1.4.4",
+//   "cors": "^2.8.5",
+//   "express": "^4.17.1",
+//   "jsonwebtoken": "^8.5.1"
+// }
+// }
+
+// 3 - index.js : simple restful api
+// role of app.post('/auth/login') is when the user confirms the pass and
+// email if successful, it will return to the user a token, and server will set
+// a Cookie in the client's browser.And this cookie in User will never be read
+// by JavaScript.It will be browser automatically sent when required.
+
+// When the User Login confirms
+app.post('/auth/login', (req, res) => {
+    try {
+        const email = req.body.email;
+        const password = req.body.password;
+        if (email !== 'anonystick@gmail.com' || password !== 'password') {
+            res.status(400);
+            throw new Error('invalid info');
+        };
+        const payload = {
+            email: email
+        };
+        const token = jwt.sign(payload, SECRET);
+        res.cookie('access_token', token, {
+            maxAge: 365 * 24 * 60 * 60 * 100, // Life time
+            httpOnly: true, // Only HTTP read token, javascript can't read
+            //secure: true; // SSL If yes, if you run localhost, please comment it
+        });
+        res.status(200).json({ ok: true });
+    } catch (err) {
+        throw err;
+    };
+});
+
+// create a service to allow user request to get user list
+app.use('/api/users', (req, res) => {
+    // when user invoke http://localhost:3000/api/users, by default browser
+    // will send request with cookie if client gives
+    const token = req.cookies.access_token;
+    try {
+        // verify token
+        const decoded = jwt.verify(token, SECRET);
+        res.status(200).json(users);
+    } catch (err) {
+        res.status(400);
+        throw err;
+    };
+});
+
+// package to protect token
+app.use(express.json()) // for parsing application/json
+app.use(cookieParser()) // cookie-parser dùng để đọc cookies của request:
+app.use(cors({
+    origin: ['http://127.0.0.1:5500'], // block all domain except this domain
+    credentials: true // to enable cookie HTTP via CORS
+}));
+
+
 // =====================================================================
 // =====================================================================
 // =====================================================================

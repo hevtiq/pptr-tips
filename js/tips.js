@@ -6588,7 +6588,321 @@ document.addEventListener('DOMContentLoaded', function () {
 
 /*
     Axios interceptors + fresh token in jwt
+
+    Interceptor can be understood as a grid wall blocking the Request, Response
+    of the app to enable checks, adding headers or changing the param of the
+    requests, response.It allows us to check the application token, Content-Type
+    or add the headers to the request.This allows us to make the most of the
+    header, body, param requests on the server to be the most reasonable, most
+    secure.
+
+    Code BE:
+    https://anonystick.com/blog-developer/json-web-token-jwt-thuc-hanh-su-dung-refresh-token-khi-token-het-han-voi-nodejs-va-express-js-2020071649665528
 */
+// ### create file script.js
+const btn_get_data_with_auto = document.getElementById('get-data-with-auto');
+const btn_get_data_without_auto = document.getElementById('get-data-without-auto');
+const btn_get_token = document.getElementById('get-token');
+const btn_results = document.getElementById('results');
+
+//get token o localStorage
+function getLocalToken() {
+    const token = window.localStorage.getItem('token')
+    console.log('token >>>', token);
+    return token
+}
+
+//get token o refreshToken
+function getLocalRefreshToken() {
+    const token = window.localStorage.getItem('refreshToken')
+    return token
+}
+
+
+//cau hinh axios
+const instance = axios.create({
+    baseURL: 'http://localhost:3000/',
+    timeout: 300000,
+    headers: {
+        'Content-Type': 'application/json',
+    }
+})
+
+instance.setToken = (token) => {
+    instance.defaults.headers['x-access-token'] = token
+    window.localStorage.setItem('token', token)
+}
+
+function getToken() {
+    return instance.post('/login', {
+        username: 'anonystick.com',
+        password: 'anonystick.com',
+    })
+}
+
+function refreshToken() {
+    return instance.post('/token', {
+        refreshToken: getLocalRefreshToken()
+    })
+}
+
+
+function getDataWithAuto() {
+    return instance.get('/users', {
+        params: {
+            auto: 'yes',
+        },
+        headers: {
+            'x-access-token': getLocalToken() // headers token
+        }
+
+    })
+}
+
+function getDataWithOutAuto() {
+    return instance.get('/users', {
+        params: {
+            auto: 'no'
+        },
+        headers: {
+            'x-access-token': getLocalToken() // headers token
+        }
+    })
+}
+
+// getToken();
+
+// response parse
+instance.interceptors.response.use((response) => {
+
+    const { code, auto } = response.data
+    if (code === 401) {
+        if (auto === 'yes') {
+
+            console.log('get new token using refresh token', getLocalRefreshToken())
+            return refreshToken().then(rs => {
+                console.log('get token refreshToken>>', rs.data)
+                const { token } = rs.data
+                instance.setToken(token);
+                const config = response.config
+                config.headers['x-access-token'] = token
+                config.baseURL = 'http://localhost:3000/'
+                return instance(config)
+
+            })
+        }
+    }
+    return response
+}, error => {
+    console.warn('Error status', error.response.status)
+    // return Promise.reject(error)
+    if (error.response) {
+        return parseError(error.response.data)
+    } else {
+        return Promise.reject(error)
+    }
+})
+
+
+//click login de lay token va refreshtoken
+
+btn_get_token.addEventListener('click', () => {
+    console.log('click get data');
+    getToken().then(res => {
+        const { status, token, refreshToken } = res.data
+        if (status === 'Logged in') {
+            window.localStorage.setItem('token', token)
+            window.localStorage.setItem('refreshToken', refreshToken)
+            return btn_results.textContent = `Token is ${token} \n and refreshToken is ${refreshToken}`
+            // console.log(res.data);
+        }
+    })
+
+
+})
+
+//click tu dong lay du lieu khi token het han
+btn_get_data_with_auto.addEventListener('click', () => {
+    console.log('click get data');
+    getDataWithAuto().then(res => {
+        const { code, message, elements } = res.data
+        return btn_results.textContent = JSON.stringify(elements)
+    })
+})
+
+//click lay du lieu nhung token het han thi thong bao
+btn_get_data_without_auto.addEventListener('click', () => {
+
+    getDataWithOutAuto().then(res => {
+        console.log('click get data btn_get_data_without_auto>>>', res.data);
+        const { code, message, elements } = res.data
+        if (code === 403) {
+            return btn_results.textContent = message
+        }
+        if (code === 401) {
+            return btn_results.textContent = message
+        }
+
+        return btn_results.textContent = JSON.stringify(elements)
+    })
+})
+
+// getToken();
+export default instance
+
+// index.html
+// <!DOCTYPE html>
+// <html>
+//   <head>
+//     <title>Get list Users</title>
+//     <link rel='stylesheet' href='/stylesheets/style.css' />
+//   </head>
+//   <body>
+//     <h1>Get list Users</h1>
+//     <p>Welcome to Admin</p>
+//     <button id="get-token">Get Token vs refreshToken</button>
+//     <button id="get-data-without-auto">Get Data chưa tự động khi token hết hạn</button>
+//     <button id="get-data-with-auto">Get Data tự động khi token hết hạn lấy lại token mới sử dụng refreshToken</button>
+//     <h3>Status: </h3><p id="results"></p>
+//     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+//     <script type="module" src="/javascripts/script.js"></script>
+//   </body>
+// </html>
+
+// Response from BE
+// {status: 'success', code: 401, auto: req.query.auto, "message": 'Unauthorized access.' }
+// Show this request Success or Error Message: If Success or Error returns the
+// right and wrong result?Code: 401, or 403 express access.As I'm here, the deal
+// with the back-end when code === 401 and auto = 'yes' so I understand that the
+// Token has expired to automatically refresh token.
+
+
+
+// speech to text (only chrome support now)
+// app.js
+class SpeechRecognitionApi {
+    constructor(options) {
+        // create a Speechrecognition instance
+        const SpeechToText = window.speechRecognition || window.webkitSpeechRecognition;
+        this.speechApi = new SpeechToText();
+
+        // set allow continue listen
+        this.speechApi.continuous = true;
+
+        // set disallow show temp result
+        this.speechApi.interimResults = false;
+
+        // set language
+        this.speechApi.interimResults = false;
+        recognition.lang = 'en-US';
+        // recognition.lang = 'vi-VN';
+        // recognition.lang = 'ja-JP';
+
+        // make sure exist output dom object
+        this.output = options.output ? options.output : document.createElement('div');
+        console.log(this.output);
+
+        // Handle results received after start or stop
+        this.speechApi.onresult = (event) => {
+            console.log(event);
+            var resultIndex = event.resultIndex;
+            var transcript = event.results[resultIndex][0].transcript;
+
+            console.log('transcript>>', transcript);
+            console.log(this.output);
+            this.output.textContent = transcript;
+        };
+    };
+
+    // method to start recognition
+    init() {
+        this.speechApi.start();
+    };
+
+    // method to stop recognition
+    stop() {
+        this.speechApi.stop();
+    };
+};
+
+// apply function when window loaded
+window.onload = function () {
+    // create a new speechRecognitionApi instance for .output DOM
+    var speech = new SpeechRecognitionApi({
+        output: document.querySelector('.output')
+    });
+
+    // add event init to .output DOM
+    document.querySelector('.btn-start').addEventListener('click', function () {
+        speech.init()
+    });
+
+    // add event stop to .output DOM
+    document.querySelector('.btn-stop').addEventListener('click', function () {
+        speech.stop()
+    });
+};
+
+// HTML
+// <!DOCTYPE html>
+// <html lang="en">
+// <head>
+//     <meta charset="UTF-8">
+//     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+//     <title>Anonystick - example speech to text javasctipt</title>
+// </head>
+// <body>
+//     <button class="btn-start">Start</button>
+//     <button class="btn-stop">Stop</button>
+//     <textarea class="output" cols="30" rows="10"></textarea>
+//     <script src="./app.js"></script>
+// </body>
+// </html>
+
+
+// Async and Defer
+// https://vi.rakko.tools/tools/124/
+// https://www.w3.org/TR/navigation-timing-2/
+// https://www.programmersought.com/article/33585819902/
+// https://www.mdeditor.tw/pl/pLSL
+// https://kaaes.github.io/timing/
+// https://speakerdeck.com/wpgr/measuring-frontend-performance-takis-bouyouris?slide=33
+// https://blog.logrocket.com/how-to-practically-use-performance-api-to-measure-performance/
+// https://nsirap.com/posts/001-web-porformance-api/
+// https://flaviocopes.com/javascript-async-defer/#no-defer-or-async-in-the-head
+// both async and defer is boolean
+// only active inside <head></head> tag.
+// not active inside <body></body> tag.
+// <script async src="script.js"></script>
+// <script defer src="script.js"></script>  => BEST PERFORMANCE
+// IE not support defer, async so should put it before </body>
+
+// No defer or async, in the head
+// 1. start parsing HTML
+// 2. ...wait...
+// 2.1 fetch script
+// 2.2 excute script
+// 3. resume parsing HTML
+// ==> ready/finish parsing
+
+// No defer or async, in the body
+// 1. parse HTML
+// ==> ready/finish parsing
+// 2. fetch script
+// 3. excute script
+
+// With async, in the head
+// 1. async start parsing HTML and fetch script
+// 2. ...wait...
+// 2.1 excute script
+// 3. resume parsing HTML
+// ==> ready/finish parsing
+
+// With defer, in the head
+// 1. async parse HTML and fetch script
+// ==> ready/finish parsing
+// 2 excute script
 
 
 /*
