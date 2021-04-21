@@ -6905,6 +6905,986 @@ window.onload = function () {
 // 2 excute script
 
 
+// Pipeline Operator
+const reverseWords =
+    str => str
+        .split(' ')
+        .reduce((revStr, word) => [word, ...revStr], [])
+        .join(' ');
+
+console.log(reverseWords('this is fun')); // Output: fun is this
+
+// OR
+const splitBySpace = str => str.split(' ');
+const reverseArray = arr => arr.reduce((acc, cur) => [cur, ...acc], []);
+const joinWithSpace = arr => arr.join(' ');
+
+const reverseWords =
+    str => joinWithSpace(
+        reverseArray(
+            splitBySpace(
+                str
+            )
+        )
+    );
+
+// OR
+const reverseWords = str => joinWithSpace(reverseArray(splitBySpace(str)));
+
+console.log(reverseWords('this is fun')); // Output: fun is this
+
+// Nullish coalescing Operator: || vs ??
+let firstName = null;
+let lastName = null;
+let nickName = "anonystick.com";
+
+// With ?? => return first value defined
+console.log(firstName ?? lastName ?? nickName ?? "Anonymous"); // anonystick.com
+
+//  With || => return an real value. Can not be distinguished false, 0, ", and null / undefined
+console.log(firstName || lastName || nickName || "Anonymous"); // anonystick.com
+
+let height = 0;
+alert(height || 100); // 100
+alert(height ?? 100); // 0
+
+// ?? Operator has a pretty low priority, should use with ()
+let height = null;
+let width = null;
+
+let area = (height ?? 100) * (width ?? 50);  // 5000
+let area = height ?? 100 * width ?? 50;  // 0
+
+
+// ES6 to ES11 concepts
+// ----------------------------------------------------------
+// ES6 (ECMAScript 2015)
+// 1. Arrow functions (=>)
+const test = {
+    name: 'test object',
+    createAnonFunction: function () {
+        // function return a function, closure.
+        return function () {
+            console.log(this.name);  // window.name => undefined
+            console.log(arguments);  // ().arguments => {}
+            console.log(this);  // window not global
+        };
+    },
+
+    createArrowFunction: function () {
+        // function return a function, closure.
+        return () => {
+            console.log(this.name);  // createArrowFunction.name??test.name => test object
+            console.log(arguments);  // createAnonFunction.().arguments => "hello", "world"
+            console.log(this);  // window or global => test (global)
+        };
+    }
+};
+
+const anon = test.createAnonFunction('hello', 'world');
+// undefined
+// {}
+
+const arrow = test.createArrowFunction('hello', 'world');
+// test object
+// { '0': 'hello', '1': 'world' }
+
+
+// 2. Classes
+'use strict'
+class Polygon {
+    constructor(height, width) {
+        this.h = height;
+        this.w = width;
+    };
+    test() {
+        console.log("The height of the polygon: ", this.h);
+        console.log("The width of the polygon: ", this.w);
+    };
+};
+
+// creating an instance
+var polyObj = new Polygon(10, 20);
+polyObj.test();
+
+
+// 3. Let and Const
+// Let - variable is available only in the block of code
+function calculate(x) {
+    var y = 0;
+    if (x > 10) { // let y is only available in this block of code
+        let y = 30;
+        return y;
+    }
+    return y;
+};
+
+
+// 4. Template strings
+const classes = `header ${isLargeScreen() ? '' :
+    (item.isCollapsed ? 'icon-expander' : 'icon-collapser')}`;
+
+
+// 5. Promises
+function getMoneyBack(money) {
+    return new Promise((resolve, reject) => {
+        if (typeof money !== 'number') {
+            reject(new Error('money is not a number'));
+        } else {
+            resolve(money);
+        };
+    });
+};
+
+getMoneyBack(1200).then((money) => {
+    console.log(money);
+});
+
+
+// ES7 (ECMAScript 2016)
+// ============================================================
+// 1. Array.prototype.includes
+// Before
+const numbers = [4, 8, 15, 16, 23, 42];
+
+if (numbers.indexOf(42) !== -1) {
+    // ...
+};
+
+// After
+const numbers = [4, 8, 15, 16, 23, 42];
+
+if (numbers.includes(42)) {
+    // ...
+};
+
+
+// 2. Exponentiation Operator
+// Old way
+const old = Math.pow(3, 7);
+// 2187
+
+// ✅ ES7 way
+const es7 = 3 ** 7;
+// 2187
+
+
+// ES8 (ECMAScript 2017)
+// ============================================================
+// 1. Object.values() and Object.entries()
+// Object.entries()
+const obj = { 0: 'adam', 1: 'billy', 2: 'chris' };
+console.log(Object.entries(obj)[1]);  // ["1", "billy"]
+
+// Object.values()
+var check = ['x', 'y', 'z'];
+console.log(Object.values(check));  // ["x", "y", "z"]
+
+// 2. String.prototype.padEnd() and String.prototype.padStart()
+// String.prototype.padStart()
+const str1 = '5';
+
+console.log(str1.padStart(2, '0'));
+// expected output: "05"
+
+const fullNumber = '2034399002125581';
+const last4Digits = fullNumber.slice(-4);
+const maskedNumber = last4Digits.padStart(fullNumber.length, '*');
+
+console.log(maskedNumber);
+// expected output: "************5581"
+
+// String.prototype.padEnd()
+const str1 = 'Breaded Mushrooms';
+
+console.log(str1.padEnd(25, '.'));
+// expected output: "Breaded Mushrooms........"
+
+const str2 = '123';
+
+console.log(str2.padEnd(5));
+// expected output: "123  "
+
+console.log(str2.padEnd(5, '0'));
+// expected output: "12300"
+
+
+// 3. Async function (async/await)
+function resolveAfter2Seconds() {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve('resolved');
+        }, 2000);
+    });
+}
+
+async function asyncCall() {
+    console.log('calling');
+    var result = await resolveAfter2Seconds();
+    console.log(result);
+    // expected output: 'resolved'
+}
+
+asyncCall();
+
+
+// ES9 (ECMAScript 2018)
+// ============================================================
+// 1. Asynchronous iteration
+for await (let book of books) {
+    console.log(book);
+};
+
+// 2. Rest operator
+const fruits = { orange: 1, apple: 10, banana: 4, }
+const { orange, ...rest } = fruits;
+console.log(rest); // { apple: 10, banana: 4 };
+
+// in the function
+function getFruits(apple, ...rest) {
+    return rest.banana;
+};
+
+// 3. Promise.prototype.finally
+let isLoading = true;
+
+fetch(myRequest).then(function (response) {
+    var contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+        return response.json();
+    }
+    throw new TypeError("Oops, we haven't got JSON!");
+})
+    .then(function (json) { /* process your JSON further */ })
+    .catch(function (error) { console.log(error); })
+    .finally(function () { isLoading = false; });
+
+
+// ES10 (ECMAScript 2019)
+// 1. Optional Catch Binding
+// Before
+try {
+    doSomethingThatMightThrow();
+} catch (exception) {
+    //     ^^^^^^^^^
+    // We must name the binding, even if we don’t use it!
+    handleException();
+};
+
+// After - In ES2019, catch can now be used without a parameter.
+try {
+    doSomethingThatMightThrow();
+} catch { // → No binding!
+    handleException();
+};
+
+
+// 2. Object.fromEntries()
+const entries = new Map([
+    ['foo', 'bar'],
+    ['baz', 42]
+]);
+
+const obj = Object.fromEntries(entries);
+
+console.log(obj);
+// expected output: Object { foo: "bar", baz: 42 }
+
+
+// 3. Array.flat()
+var arr1 = [1, 2, [3, 4]];
+arr1.flat();
+// [1, 2, 3, 4]
+
+var arr2 = [1, 2, [3, 4, [5, 6]]];
+arr2.flat();
+// [1, 2, 3, 4, [5, 6]]
+
+var arr3 = [1, 2, [3, 4, [5, 6]]];
+arr3.flat(2);
+// [1, 2, 3, 4, 5, 6]
+
+var arr4 = [1, 2, [3, 4, [5, 6, [7, 8, [9, 10]]]]];
+arr4.flat(Infinity);
+// [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+// 4. Array.flatMap()
+let arr1 = ["it's Sunny in", "", "California"];
+
+arr1.map(x => x.split(" "));
+// [["it's","Sunny","in"],[""],["California"]]
+
+arr1.flatMap(x => x.split(" "));
+// ["it's","Sunny","in", "", "California"]
+
+
+// 5-6. String.trimStart() & String.trimEnd()
+// String.trimStart()
+var greeting = '   Hello world!   ';
+
+console.log(greeting);
+// expected output: "   Hello world!   ";
+
+console.log(greeting.trimStart());
+// expected output: "Hello world!   ";
+
+
+// String.trimEnd()
+var greeting = '   Hello world!   ';
+
+console.log(greeting);
+// expected output: "   Hello world!   ";
+
+console.log(greeting.trimEnd());
+// expected output: "   Hello world!";
+
+
+// 7. Dynamic Import. ./utils.js
+// Default export
+export default () => {
+    console.log('Hi from the default export!');
+};
+
+// Named export `doStuff`
+export const doStuff = () => {
+    console.log('Doing stuff…');
+};
+
+// 8. globalThis Object
+const global = Function('return this')();
+
+const getGlobal = function () {
+    if (typeof self !== 'undefined') { return self; }
+    if (typeof window !== 'undefined') { return window; }
+    if (typeof global !== 'undefined') { return global; }
+    throw new Error('unable to locate global object');
+}
+
+const global = getGlobal(); // will return window object in the browser
+
+// array usage example
+const numbers = new global.Array(1, 2, 3);
+console.log(numbers); // outputs [1, 2, 3];
+
+
+// ES11 (ECMAScript 2019) - Stage 3
+// 1 - Optional Chaining ?.
+const player = {
+    details: {
+        name: {
+            firstName: "Quang",
+            lastName: "Hai",
+            age: 20
+        }
+    },
+    jobs: [
+        "dev js",
+        "dev php"
+    ]
+};
+
+const playerFirstName = player?.details?.name?.firstName;
+
+// 2 - Private fields #
+class Foo {
+    #b = 15;
+    a = 10;
+    get() {
+        return this.#b;
+    }
+
+    increment() {
+        ++this.#b;
+    }
+}
+const obj = new Foo();
+
+obj['#b']; // undefined
+obj.a = 10;
+obj.hasOwnProperty('#b'); // false
+
+
+// 3 - undefined javascript - Nullish Coalescing ??
+const player = input.player || 'Ronaldo Cr7';  // with input.player not falsy values
+const player = input.player ?? 'Ronaldo Cr7';  // with input.player is falsy values
+
+
+// Level Up Your Javascript Skills
+// 1 - Value vs. Reference Variable
+// primative type => every var is a address
+let var1 = 'x1';
+let var2 = 'x1';
+let var3 = var1;
+var3 = 'x2';
+var1 === var2; // true
+var3 === var1; // false
+
+// reference type => every var not a real address
+let var1 = { name: 'Jim' };
+let var2 = { name: 'Jim' };
+var1 === var2;  // false => reference type (not real address)
+var1.name === var2.name;  // true => primative type (real address)
+JSON.stringify(var1) === JSON.stringify(var2);  // true
+// "{"name":"Jim"}" = "{"name":"Jim"}"
+
+let var1 = ['K', 'M'];
+let var2 = ['K', 'M'];
+var1 === var2;  // false
+var1[1] === var2[1];  // true
+JSON.stringify(var1) === JSON.stringify(var2);  // true
+// "["K","M"]" = "["K","M"]"
+
+
+// 2 - Closures (can access to private variable)
+function newCounter() {
+    var count = 0;  // global private var. always = 0. primative type in reference type
+
+    return function () {
+        count += 1;  // local var. local??global??window value
+        return count;
+    }
+};
+
+var counter = newCounter();
+
+console.log(counter());
+// Output: 1. local= local??global(0) + 1, global=0, window = not defined
+
+console.log(counter());
+// Output: 2. local= local(1)??global(0) + 1 , global=0, window = not defined
+
+console.log(counter());
+// Output: 3. local= local(2)??global(0) + 1 , global=0, window = not defined
+
+
+// 3. Destructuring
+const obj = {
+    name: 'Joe',
+    food: 'cake'
+}
+const { name, food } = obj;
+console.log(name, food);
+// 'Joe' 'cake'
+
+// OR
+const obj = {
+    name: 'Joe',
+    food: 'cake'
+};
+const { name: myName, food: myFood } = obj;
+console.log(myName, myFood);
+// 'Joe' 'cake'
+
+// OR
+const person = {
+    name: 'Eddie',
+    age: 24
+};
+function introduce({ name, age }) {
+    console.log(`I'm ${name} and I'm ${age} years old!`);
+};
+console.log(introduce(person));
+// "I'm Eddie and I'm 24 years old!"
+
+
+// 4. Spread Operator
+const arr = [4, 6, -1, 3, 10, 4];
+const max = Math.max(...arr);  // pass value in array to max
+console.log(max);  // 10
+
+// Getting the maximum element of an array
+var max = arr.reduce(function (a, b) {
+    return Math.max(a, b);
+});
+
+let parts = ['shoulders', 'knees'];
+let lyrics = ['head', ...parts, 'and', 'toes'];
+//  ["head", "shoulders", "knees", "and", "toes"]
+
+function sum(x, y, z) {
+    return x + y + z;
+};
+const numbers = [1, 2, 3];
+console.log(sum(...numbers));  // 6
+
+// Create new object
+const object1 = {
+    fullName: 'Anonystick',
+    occupation: 'Software developer',
+    age: 31,
+    website: 'https://anonystick.com'
+};
+
+const object2 = {
+    ...object1,
+    fullName: 'Tom',
+};
+console.log(object1);
+console.log(object2);
+//{fullName: "Tom", occupation: "Software developer", age: 31, website: "https://anonystick.com"}
+
+// Copying arrays
+const arr = [1, 2, 3];
+const arr2 = [...arr];  // any change in arr2 not effect arr
+
+// Adding array elements to an existing array
+const arr = ["Joy", "Wangari", "Warugu"];
+const newArr = ["joykare", ...arr];
+// [ 'joykare', 'Joy', 'Wangari', 'Warugu' ]
+
+const myNames = [...arr, "joykare"];
+// [ 'Joy', 'Wangari', 'Warugu', 'joykare' ]
+
+// rest operator
+function myFunc(...args) {
+    console.log(args[0] + args[1]);
+}
+myFunc(1, 2, 3, 4);  // 3
+
+function sum(...numbers) {
+    return numbers.reduce((sum, val) => {
+        return sum += val;
+    });
+};
+sum(3, 5) // gives 8
+sum(1, 2, 3, 5) //gives 11.
+
+
+// 5. Array Methods - map, filter, reduce
+// map()
+const arr = [1, 2, 3, 4, 5, 6];
+const mapped = arr.map(el => el + 20);
+console.log(mapped);  // [21, 22, 23, 24, 25, 26]
+
+// filter()
+const arr = [1, 2, 3, 4, 5, 6];
+const filtered = arr.filter(el => el === 2 || el === 4);
+console.log(filtered); // [2, 4]
+
+// reduce()
+const arr = [1, 2, 3, 4, 5, 6];
+const reduced = arr.reduce((total, current) => total + current);
+console.log(reduced); // 21
+
+// forEach
+const arr = [1, 2, 3, 4, 5, 6];
+
+arr.forEach(item => {
+    console.log(item); // output: 1 2 3 4 5 6
+});
+
+// includes()
+const arr = ['Nam', 2, 3, 4, 5, 6];
+arr.includes('Nam'); // output: true
+arr.includes(7); // output: false
+
+// some()
+const arr = [3, 9, 7, 6];
+const idiot = arr.some(num => num < 5);
+console.log(idiot); // output: true
+
+// every()
+const arr = [1, 2, 3, 4, 5, 6];
+const greaterFour = arr.every(num => num > 4);
+console.log(greaterFour); // output: false
+
+const lessTen = arr.every(num => num < 10);
+console.log(lessTen); // output: true
+
+// sort()
+const arr = [1, 2, 3, 4, 5, 6];
+const alpha = ['e', 'a', 'c', 'u', 'y'];
+
+descOrder = arr.sort((a, b) => a > b ? -1 : 1);
+console.log(descOrder); // output: [6, 5, 4, 3, 2, 1]
+
+ascOrder = alpha.sort((a, b) => a > b ? 1 : -1);
+console.log(ascOrder); // output: ['a', 'c', 'e', 'u', 'y']
+
+// Array.from()
+const name = 'javascript';
+const nameArray = Array.from(name);
+
+console.log(name); // output: javascript
+console.log(nameArray); // output: ['j', 'a', 'v', 'a', 's', 'c', 'r', 'i', 'p', 't']
+
+// Array.of()
+const nums = Array.of(1, 2, 3, 4, 5, 6);
+console.log(nums); // output: [1, 2, 3, 4, 5, 6]
+
+
+// 7. Generators => should use async/await
+//    Generator function is a function, capable of temporarily conducting
+//    execution before the function ends, and can continue to run at another
+//    time.syntax
+/**
+ * name() method name
+ * @param {*} param0 - max 255 param
+ * https://dev.to/micahriggan/streams-and-generators-36e1
+ */
+// function* name([param[, param[, ...param]]]) {
+//     statements
+// }
+function* greeter() {
+    yield 'Hi';
+    yield 'How are you?';
+    yield 'Bye';
+}
+const greet = greeter();
+console.log(greet.next().value);
+// 'Hi'
+console.log(greet.next().value);
+// 'How are you?'
+console.log(greet.next().value);
+// 'Bye'
+console.log(greet.next().value);
+// undefined
+
+
+// 8. Identity Operator (===) vs. Equality Operator (==)
+console.log(0 == '0');
+// true
+console.log(0 === '0');
+// false
+
+
+// 9. Object Comparison
+const joe1 = { name: 'Joe' };
+const joe2 = joe1;
+console.log(joe1 === joe2);
+// true
+
+const joe1 = { name: 'Joe' };
+const joe2 = { name: 'Joe' };
+console.log(joe1 === joe2);
+// false
+
+
+// 10. Callback Hell
+// callback
+function myFunc(text, callback) {
+    setTimeout(function () {
+        callback(text);
+    }, 2000);
+}
+myFunc('Hello world!', console.log);
+// 'Hello world
+
+
+// promise
+const myPromise = new Promise(function (res, rej) {
+    setTimeout(function () {
+        if (Math.random() < 0.9) {
+            return res('Hooray!');
+        }
+        return rej('Oh no!');
+    }, 1000);
+});
+myPromise
+    .then(function (data) {
+        console.log('Success: ' + data);
+    })
+    .catch(function (err) {
+        console.log('Error: ' + err);
+    });
+
+// If Math.random() returns less than 0.9 the following is logged:
+// "Success: Hooray!"
+// If Math.random() returns 0.9 or greater the following is logged:
+// "Error: On no!"
+
+// async/await
+const greeter = new Promise((res, rej) => {
+    setTimeout(() => res('Hello world!'), 2000);
+})
+async function myFunc() {
+    const greeting = await greeter;
+    console.log(greeting);
+}
+myFunc();
+// 'Hello world!'
+
+// Map vs Object
+// https://anonystick.com/blog-developer/map-vs-object-trong-javascript-khi-nao-nen-su-dung-2020051824737870
+
+// ====================================
+// ARROW FUNCTION
+// https://www.sitepoint.com/es6-arrow-functions-new-fat-concise-syntax-javascript/
+// ====================================
+
+// function declaration
+function sayHiStranger() {
+    return 'Hi, stranger!';
+};
+
+// function expression
+const sayHiStranger = function () {
+    return 'Hi, stranger!';
+};
+
+// arrow functions
+const sayHiStranger = () => 'Hi, stranger';
+// just one line of code
+// no function keyword
+// no return keyword
+// no curly braces {}
+// In JavaScript, functions are “first-class citizens”.
+// can store functions in variables
+// can pass functions to other functions as arguments
+// can return functions from other functions as values.
+
+// call the function
+sayHiStranger();
+
+// JavaScript async/await
+const catIDs = [132, 345, 243, 121, 423]; // id array.
+// BAD
+async function fetchOwners(catIDs) {
+    const owners = [];
+    // Don't use await in for or forEach, should use .map() by performance
+    for (const id of catIDs) {
+        const cat = await fetchCat(id);// get detail object Cat
+        const owner = await fetchOwner(cat.ownerID); // find owner via ownerID
+        // .push in loop for is the matter
+        owners.push(owner);
+    }
+    return owners;
+};
+
+// GOOD
+// catIDs -> ownerPromises -> owners
+async function fetchOwners(catIDs) {
+    // transform array ID to array promise (cats' owners) with map()
+    const ownerPromises = catIDs.map(async id => {
+        const cat = await fetchCat(id);
+        const owner = await fetchOwner(cat.ownerID);
+        return owner;
+    });
+
+    // unpack with Promise.all
+    const owners = await Promise.all(ownerPromises);
+    return owners;
+};
+
+
+// BAD
+async function getBooksAndAuthor(authorId) {
+    const books = await bookModel.fetchAll(); // get object Boonk
+    const author = await authorModel.fetch(authorId); // get author via authorId
+    return {
+        author,
+        books: books.filter(book => book.authorId === authorId),
+    };
+};
+// get all data with authorId.
+// Problem: wait time to wait fetchAll() returns, then fetch(authorId) run
+// but fetch(authorId) not depen on result of fetchAll()
+// shoud invoke it by parallel in Promise()
+// https://dev.to/micahriggan/serial-promises-vs-parallel-promises-1ejc
+async function getBooksAndAuthor(authorId) {
+    const bookPromise = bookModel.fetchAll();
+    const authorPromise = authorModel.fetch(authorId);
+    const book = await bookPromise;
+    const author = await authorPromise;
+    return {
+        author,
+        books: books.filter(book => book.authorId === authorId),
+    };
+}
+
+// Serial Promises vs Parallel Promises
+// Example 1: "Wait a second" x 3
+function wait(waitTime) {
+    return new Promise(resolve => setTimeout(() => {
+        console.log(`waited ${waitTime} ms`)
+        resolve()
+    }, waitTime));
+};
+
+async function serial() {
+    console.time('serial');
+    await wait(1000);
+    await wait(1000);
+    await wait(1000);
+    console.timeEnd('serial');
+};
+
+async function parallel() {
+    console.time('parallel');
+    await Promise.all([
+        wait(1000),
+        wait(1000),
+        wait(1000)
+    ])
+    console.timeEnd('parallel');
+};
+
+async function test() {
+    await serial();
+    await parallel();
+};
+
+test();
+
+// waited 1000 ms
+// waited 1000 ms
+// waited 1000 ms
+// serial: 3016.319ms
+// waited 1000 ms
+// waited 1000 ms
+// waited 1000 ms
+// parallel: 1003.017ms
+
+// Example 2: Add two async numbers
+function randomNumber() {
+    const rand = Math.random() * 100;
+    return new Promise(resolve => setTimeout(() => {
+        resolve(rand)
+    }, 1000))
+};
+
+async function addExampleSerial() {
+    console.time('add-serial');
+    const number1 = await randomNumber();
+    const number2 = await randomNumber();
+    const result = number1 + number2;
+    console.timeEnd('add-serial');
+    console.log('serial result: ', result);
+};
+
+async function addExampleParallel() {
+    console.time('add-parallel');
+    const [number1, number2] = await Promise.all([randomNumber(), randomNumber()]);
+    const result = number1 + number2;
+    console.timeEnd('add-parallel');
+    console.log('parallel result: ', result);
+};
+
+async function test() {
+    await addExampleSerial();
+    await addExampleParallel();
+};
+
+test();
+
+// add-serial: 2005.019ms
+// serial result: 59.0316729944722
+// add-parallel: 1000.616ms
+// parallel result: 48.7190841367634
+
+
+// Example 3: Required Data Dependencies
+function fetchData(data) {
+    return new Promise(resolve => setTimeout(() => {
+        resolve(data)
+    }, 1000))
+};
+
+function getLoggedInUser() {
+    return fetchData('user1');
+};
+
+async function getDataForUser(userName) {
+    const profileData = await fetchData({
+        user1: { name: 'Micah', points: 100 },
+        user2: { name: 'someone else', point: 200 }
+    });
+    return profileData[userName];
+}
+
+async function getUserPosts(userName) {
+    const posts = await fetchData({
+        user1: ['Promises Post'],
+        user2: ['Streams Post']
+    });
+    return posts[userName];
+}
+
+async function userDataSerial() {
+    console.time('userData-serial');
+    const userName = await getLoggedInUser();
+    const userData = await getDataForUser(userName);
+    const userPosts = await getUserPosts(userName);
+    console.timeEnd('userData-serial');
+}
+
+
+async function userDataParallel() {
+    console.time('userData-parallel');
+    const userName = await getLoggedInUser();
+    const [userData, userPosts] = await Promise.all([
+        getDataForUser(userName),
+        getUserPosts(userName)
+    ])
+    console.timeEnd('userData-parallel');
+}
+
+async function test() {
+    await userDataSerial();
+    await userDataParallel();
+};
+
+test();
+
+// userData-serial: 3007.785ms
+// userData-parallel: 2006.665ms
+
+
+// Reduce javascript
+// Find the total of Array
+var numbers = [1, 2, 3, 4, 5];
+var initialVal = 0;
+let result = numbers.reduce((accu, val) => val + accu, initialVal);
+console.log(result) // 15
+
+// Create an Array from an Object
+var names = ["ram", "raj"];
+// let result = acc?? []
+var result = names.reduce((acc, name) => {
+
+    let obj = {
+        name,
+        len: name.length
+    }
+    acc.push(obj);
+
+    return acc;
+}, []);
+
+result;
+
+// [
+//     {
+//         "name": "ram",
+//         "len": 3
+//     },
+//     {
+//         "name": "raj",
+//         "len": 3
+//     }
+// ]
+
+
+// Map javascript
+// Use Map () to make a function on each element of an array
+var numbers = [1, 2, 3, 4, 5];
+var doubled = numbers.map(n => n * 2);
+doubled; // [2,4,6,8,10]
+// When using Map (): If we want to perform the same operation / switch on each
+// element of the array and get back a new Array with the same length with the
+// converted value.
+
+
+// Filter javascript
+// Use Filter () when we want to delete items that do not meet the conditions
+var numbers = [1, 2, 3, 4, 5];
+var greaterThan2 = numbers.filter(n => n > 2);
+greaterThan2; // [3,4,5]
+// Each element of the array is transmitted to the callback function.On each
+// iteration, if the callback returns true, that element will be added to the
+// new array, otherwise it is not added to the new array.
+
+
 /*
     How do you check if a variable is a String in Javascript
 
@@ -6915,3 +7895,385 @@ window.onload = function () {
 function isString(value) {
     return typeof value === 'string' || value instanceof String;
 }
+
+
+
+/*
+    Lazy load
+
+    Browser support lazy-loading
+    caniuse.com: Chrome 77+ , Edge 79+
+*/
+// Check browser support attribute
+if ('loading' in HTMLImageElement.prototype) alert("yes"); else alert("no");
+
+// Implementing lazy-loading
+// <img data-fr-src="cat.jpg" loading="lazy" />
+// The loading="lazy" attribute to signal the browser that image / iframe that
+// it is slow load.
+
+// <img src="cat.jpg" loading="eager" />
+// the loading="eager" attribute means download immediately
+
+// <img src="cat.jpg" />
+// default: loading="auto"
+
+
+// debounce vs throttle javascript
+// debunce and throttle JavaScript are not the only two concepts in JavaScript
+// to optimize users and improve the Performance of the application or website
+// In programming with EVENTs such as Resize, Scroll, Keyup, Keydown or text
+// search functions in the application both activate unlimited persecution.
+// For example, for users to search for data, users will enter text and at which
+// continuous search data under the database via Ajax Call.That reduces the
+// search performance, increasing the working volume of Browser.This not only
+// reduces the user's experience but also our server is heavier.So Debounce and
+// Throttle come here to help us prevent those things.
+
+// <div>
+//     <input type="text" style="height:50px; width: 200px" id="debounce"/>
+// </div>
+
+// #without use Debounce
+window.onload = () => {
+    function ajax(data) {
+        console.log(new Date().toLocaleTimeString() + ' - ' + data)
+    }
+
+    document.querySelector('#debounce').addEventListener('keyup', e => {
+        ajax(e.target.value)
+    })
+};
+
+// suggestion?q=3
+// suggestion?q=33
+// suggestion?q=333...
+
+// #with debounce javascript
+// Imagine you are going into the elevator, on average every elevator will wait
+// 5s to close the door again.But suddenly a man who runs from and the elevator
+// door opens and reactes back to the waiting time of 5s.And so on until no one
+// comes, the elevator will close.That is the working mechanism of debounce in
+// JavaScript.
+window.onload = () => {
+    function ajax(data) {
+        console.log(new Date().toLocaleTimeString() + ' - ' + data)
+    }
+
+    function debounce(fn, delay) {
+        return args => {
+            clearTimeout(fn.id)
+
+            fn.id = setTimeout(() => {
+                fn.call(this, args)
+            }, delay)
+        }
+    }
+
+    const debounceAjax = debounce(ajax, 1000)
+
+    document.querySelector('#debounce').addEventListener('keyup', e => {
+        debounceAjax(e.target.value)
+    });
+};
+// This helps the server to reduce the Query continuously when the user enters
+// the search text, when the user stops input within 1s, the new search event
+// activates itself.
+
+
+// throttle javascript
+// Throttle's effects are like debouce, but only different in that if we take
+// the elevator as an example for Debounce, it's like a subway.It doesn't need
+// to know how many people come, it only knows every 15 minutes of the train
+// door will open and close it.That means how many events are activated, it's a
+// time when it only does a event.And when it's done, it will recreate the same
+// time for the next step.
+
+// #with throttle javascript
+window.onload = () => {
+    function ajax(data) {
+        console.log(new Date().toLocaleTimeString() + ' - ' + data);
+    };
+
+    function throttle(fn, delay) {
+        return args => {
+            if (fn.id) return;
+
+            fn.id = setTimeout(() => {
+                fn.call(this, args);
+                clearTimeout(fn.id);
+                fn.id = null;
+            }, delay);
+        };
+    };
+
+    const throttleAjax = throttle(ajax, 1000);
+
+    document.querySelector('#debounce').addEventListener('keyup', e => {
+        throttleAjax(e.target.value);
+    });
+};
+
+
+// Debounce is when a function is constantly called, this function is not
+// executed and it is only done once when all its functions stop calling in more
+// than a certain time.
+// Throttle is specified that a function can only be activated once in a time
+// unit.If multiple functions are enabled in this time unit, only one function
+// will take effect.
+
+
+// Fetch API
+// <h1 class="text-center">FETCH API</h1>
+// <div class="container text-center">
+// <button class="btn btn-primary" id="btn1">Covid 19 - Global</button>
+// </div>
+// </br>
+// <div class="container text-center">
+// <button class="btn btn-primary" id="btn1-vn">Covid 19 - Viet Nam</button>
+// </div>
+// <div class="container text-center" id="results"></div>
+
+var btn1 = document.getElementById("btn1");
+var btn1_vn = document.getElementById("btn1-vn");
+btn1_vn.addEventListener('click', () => {
+
+    // fetch request to api
+
+    fetch('https://corona.lmao.ninja/v2/countries/vn')
+        .then((response) => {
+            return (response.json());
+        })
+        .then((data) => {
+            results.innerHTML = `
+                <ul class="list-group mb-4">
+                <li class="list-group-item"><strong>Country: ${data.country}</strong></li>
+                <li class="list-group-item"><strong>Cases: </strong> ${data.cases}</li>
+                <li class="list-group-item"><strong>Deaths: </strong> ${data.deaths}</li>
+                </ul>
+            `;
+        })
+})
+btn1.addEventListener('click', () => {
+
+    // fetch request to api
+
+    fetch('https://corona.lmao.ninja/v2/countries')
+        .then((response) => {
+            return (response.json());
+        })
+        .then((data) => {
+
+            var results = document.getElementById('results');
+
+            var template = `
+                <h4 cass="mt-4">Covid Cases</h4>
+            `
+            data.forEach((element) => {
+                template += `
+                    <ul class="list-group mb-4">
+                    <li class="list-group-item"><strong>Country: ${element.country}</strong></li>
+                    <li class="list-group-item"><strong>Cases: </strong> ${element.cases}</li>
+                    <li class="list-group-item"><strong>Deaths: </strong> ${element.deaths}</li>
+                    </ul>
+                `
+            })
+
+            results.innerHTML = template;
+        })
+});
+
+
+// What is the module? - Import and Export in JavaScript
+// In short and obviously ... a module is a file.Or "One Script is one
+// module".These modules can load multiple functions by two special keywords
+// that are import and export.And especially this module can call and use
+// another module.
+
+// Import: allows importing functionality from other modules.
+// Export: Declare the Variables or Function allows other modules to access and
+// use
+
+// Exporting Modules JavaScript
+// # Named Export => Should use
+//-------util.js------
+export function addTwoNumbers(x, y) {
+    return x + y;
+};
+export let students = ['wisdom', 'bill', 'fred', 'grim'];
+// Named Export is used to export many things from a module by adding keyword
+// Export to their declaration.The export items will be distinguished by the
+// name.Then Import the things we need to use by surrounding them pairs {  }
+
+// # Default Export => should not use. 1 default in 1 file.
+//----myFunction.js ----
+export default function () {
+    alert("Hello Default Export")
+};
+
+
+// Importing Modules JavaScript
+// import with named export
+//----main.js---
+import { addTwoNumbers, students } from 'util';
+
+// import with alias
+import * as util from 'util';
+
+console.log(util.addTwoNumbers(2, 13));
+console.log(util.students);
+
+
+// Example
+// Named export
+// 📁 say.js
+function sayHi(user) {
+    alert(`Hello, ${user}!`);
+}
+
+function sayBye(user) {
+    alert(`Bye, ${user}!`);
+}
+
+export { sayHi, sayBye }; // a list of exported variables
+
+// Import as Alias
+// 📁 main.js
+import { sayHi as hi, sayBye as bye } from './say.js';
+
+hi('John'); // Hello, John!
+bye('John'); // Bye, John!
+
+
+
+// Arguments javascript
+// In a function, you can use arguments instead of the parameters transmitted to
+// the function.Arguments like a Array but not really a Array.
+function add(num1, num2) {
+
+    // logs [num1, num2] (with their values)
+    console.log(arguments);[num1, num2]
+
+    // get param1
+    console.log(arguments[0]); // num1
+
+    // get param2
+    console.log(arguments[1]); // num2
+
+    // ...
+
+};
+
+
+function add() {
+
+    // Set total
+    let total = 0;
+
+    // Cumulative per Params
+    Array.from(arguments).forEach(function (num) {
+        total += num;
+    });
+
+    // Return to the total
+    return total;
+
+};
+
+// returns 0
+add();
+
+// returns 4
+add(4);
+
+// returns 36
+add(4, 2, 11, 19);
+
+
+// Array-Like Objects
+// Array-Like Objects is an Array
+function testArgumentsKeyword() {
+    console.log(arguments.length, arguments[0]);
+};
+testArgumentsKeyword('arg1', 'arg2', 'arg3', 'arg4', 'arg5');
+
+// Array-Like Objects is not an Array
+console.log(['arg1', 'arg2', 'arg3', 'arg4', 'arg5'].filter(el => el === 'arg2'));// ["arg2"]
+
+function testArgumentsKeyword() {
+    // "Uncaught TypeError: arguments.filter is not a function"
+    console.log(arguments.filter(el => el === 'arg2'));
+};
+testArgumentsKeyword('arg1', 'arg2', 'arg3', 'arg4', 'arg5');
+
+// Array.prototype
+// concat
+// every
+// filter
+// forEach
+// indexOf
+// join
+// lastIndexOf
+// map
+// pop
+// push
+// reduce
+// reduceRight
+// reverse
+// shift
+// slice
+// some
+// sort
+// splice
+// toLocaleString
+// toString
+// unshift
+
+
+// Builder Pattern
+// A car with 3 parts
+"use strict";
+class Car {
+    constructor(engine, chassis, body) {
+        this.engine = engine;
+        this.chassis = chassis;
+        this.body = body;
+    };
+
+    toString() {
+        return JSON.stringify(this);
+    };
+};
+
+// parts of a Car
+class CarBuilder {
+    addChassis(chassis) {
+        this.chassis = chassis;
+        return this;
+    };
+    addEngine(engine) {
+        this.engine = engine;
+        return this;
+    };
+    addBody(body) {
+        this.body = body;
+        return this;
+    };
+    build() {
+        return new Car(this.engine, this.chassis, this.body);
+    };
+};
+
+// Build car
+const car = new CarBuilder()
+    .addEngine('v12')
+    .addBody('KIA SOLUTO')
+    .addChassis('LUXURY')
+    .build();
+
+const car1 = new CarBuilder().addEngine('v10')
+    .addBody('KIA SOLUTO LUXURY').build();
+
+
+console.log('kakaka Car', car.toString());
+console.log('kakaka Car1', car1.toString());
