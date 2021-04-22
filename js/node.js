@@ -1548,11 +1548,666 @@ const puppeteer = require("puppeteer");
 })();
 
 
+// Express and Node.Js BestPractice
 // =====================================================================
+// FOLDERS
+// Controllers
+// This directory will contain all the functions that write your APIs.Name:
+// xxxxx.controller.js in which xxx is the task, for example,
+// login.controller.js
+
+// Routes
+// This directory will contain all the routes you created using Express Router
+// and combine with Controllers.How to name as well as on xxxxx.routes.js
+
+
+// Models
+// This folder will contain all files like your schema and and the necessary
+// functions for Schema will also be here.Name xxxxx.model.js / middleware -
+// This folder will contain all intermediate software that you have created, for
+// example, authentication ... how to name: xxxxx.middleware.js
+
+
+// Utils
+// Popular functions that you will require multiple times throughout your code
+// for example, Check Missing Params before processing data for example.
+
+// Configs
+// This file uses a configuration for third-party APIs / services such as
+// Passport / S3, V.V.Parameters like Key api types.
+
+// FILES
+// app.js
+// This file is basically a declaration of Express application
+
+// package.json
+// This file contains all NPM details of the project, running commands like
+// scripts and dependencies
+
+// .gitignore
+// Files you don't want to push to Git
+
+// Models/Comments.js
+const mongoose = require('mongoose');
+
+const Schema = mongoose.Schema;
+
+const commentSchema = new Schema({
+    date: { type: Date, required: true },
+    editDate: { type: Date, },
+    content: { type: String },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true }
+});
+
+module.exports = mongoose.model('Comment', commentSchema);
+
+// Controllers/Comments.js
+const Comment_Model = require('../models/comment');
+
+const getCurrentDate = () => {
+    return new Date();
+};
+
+var that = module.exports = {
+    postComment: async (req, res) => {
+        // check params here use Utils
+        const isCheck = await Utils.checkMissingParams({ arrCheck, arrQuery });
+        if (!isCheck) {
+            return res.status(200).json({
+                code: 200, status: 'success', elements: 'Missing key'
+            })
+        }
+
+        // if ok then run continue
+        const isCreComment = await Comment_Model.create(req.query || req.body)
+        if (!isCreComment) {
+            return res.status(200).json({
+                code: 200, status: 'success', elements: 'Create is Failed!!'
+            })
+        }
+
+        return res.status(200).json({
+            code: 200, status: 'success', elements: isCreComment._id,
+        })
+    }
+};
+
+// Utils/index.js
+// include some very popular methods
+var that = module.exports = {
+    checkMissingParams: (arrCheck, arrQuery) => {
+        /*
+            Check missing params
+            arrCheck - params to check [LOGIN, FK100, ...]
+            arrQuery - params take from request [LOGIN, FK100, QV101 ...]
+
+            return
+            {flag: false, code: `Missing ${element}`}
+            {flag: true, code: 'is Okay'}
+        */
+        console.log('[2021]:::checkMissingParams::::', arrCheck, arrQuery);
+        for (let i = 0; i < arrCheck.length; i++) {
+            const element = arrCheck[i];
+            if (!arrQuery.includes(element)) {
+                return { flag: false, code: `Missing ${element}` }
+            }
+        }
+        return { flag: true, code: 'is Okay' }
+    },
+}
+
+// Middleware/index.js
+// role: check users has token or not? valid or invalid
+var self = module.exports = {
+
+    verifyToken: async (req, res, next) => {
+        if (!req.headers['authorization']) {
+            return res.status(400).json({
+                status: 'error',
+                elements: 'Missing Token',
+                code: 400
+            })
+        }
+
+        let authorization = req.headers['authorization'].split(' ');
+        if (authorization[0] !== 'Bearer') {
+            return res.status(400).json({
+                status: 'error',
+                elements: 'Invalid Token split authorization',
+                code: 400
+            })
+        }
+
+        const isCheckToken = await tokenControl.verifyToken(req.body || req.query)
+        if (!isCheckToken) {
+            return res.status(401).json({
+                status: 'error',
+                elements: 'invalid Token',
+                code: 401
+            })
+        }
+        next()
+    },
+    // check expired time web service
+};
+
+// Routes/comment.js
+// role: check token before allow run logic in postComment of Controllers/Comments
+var express = require('express');
+var router = express.Router();
+const { verifyToken } = require('../Middleware')
+const comment = require('../controllers/comment')
+router.post('/api/postComment', [verifyToken, comment.postComment]);
+
+module.exports = router;
+
+
+// Connect MongoDb
+// $ npm install mongodb
+var MongoClient = require('mongodb').MongoClient
+
+MongoClient.connect('mongodb://localhost:27017/animals', function (err, db) {
+    if (err) throw err
+
+    db.collection('mammals').find().toArray(function (err, result) {
+        if (err) throw err
+
+        console.log(result)
+    })
+});
+
+// OR
+var MongoClient = require('mongodb').MongoClient
+
+MongoClient.connect('mongodb://localhost:27017/animals', function (err, client) {
+    if (err) throw err
+
+    var db = client.db('animals')
+
+    db.collection('mammals').find().toArray(function (err, result) {
+        if (err) throw err
+
+        console.log(result)
+    })
+});
+
+
+// Connect Mysql nodejs
+// $ npm install mysql
+var mysql = require('mysql')
+var connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'dbuser',
+    password: 's3kreee7',
+    database: 'my_db'
+})
+
+connection.connect()
+
+connection.query('SELECT 1 + 1 AS solution', function (err, rows, fields) {
+    if (err) throw err
+
+    console.log('The solution is: ', rows[0].solution)
+})
+
+connection.end();
+
+// OR
+const mysql = require('mysql');
+
+// Get the Host from Environment or use default
+const host = process.env.DB_HOST || 'localhost';
+
+// Get the User for DB from Environment or use default
+const user = process.env.DB_USER || 'root';
+
+// Get the Password for DB from Environment or use default
+const password = process.env.DB_PASS || '';
+
+// Get the Database from Environment or use default
+const database = process.env.DB_DATABASE || 'twitter_clone';
+
+// Create the connection with required details
+const con = mysql.createConnection({
+    host, user, password, database,
+});
+
+const query = "SELECT * FROM tweets";
+
+// make to connection to the database.
+con.connect(function (err) {
+    if (err) throw err;
+
+    // if connection is successful
+    con.query(query, (err, result, fields) => {
+        // if any error while executing above query, throw error
+        if (err) throw err;
+
+        // if there is no error, you have the result
+        console.log(result);
+    });
+});
+
+
+// Nodejs mysql async/await
+const mysql = require('mysql');
+
+module.exports = async (params) => new Promise(
+    (resolve, reject) => {
+        const connection = mysql.createConnection(params);
+        connection.connect(error => {
+            if (error) {
+                reject(error);
+                return;
+            }
+            resolve(connection);
+        })
+    });
+
+// query
+module.exports = async (conn, q, params) => new Promise(
+    (resolve, reject) => {
+        const handler = (error, result) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+            resolve(result);
+        }
+        conn.query(q, params, handler);
+    });
+
+// Nodejs mysql async/await
+const express = require('express')
+
+const dbConfig = require('./dbConfig');
+// ↑ exports = {user, password, host, databse}
+
+const connection = require('./helpers/connection');
+const query = require('./helpers/query');
+
+const app = express()
+const port = 3000;
+
+app.get('/', (req, res) => res.send('Hello World!'))
+
+app.get('/list', async (req, res) => {
+    const conn = await connection(dbConfig).catch(e => { })
+    const results = await query(conn, 'SELECT * FROM tweets').catch(console.log);
+    res.json({ results });
+})
+
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+
+
+
+// Request nodejs
 // =====================================================================
+// Request nodejs with https
+const https = require('https');
+https.get('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY', (resp) => {
+    let data = '';
+    // A chunk of data has been recieved.
+    resp.on('data', (chunk) => {
+        data += chunk;
+    });
+    // The whole response has been received. Print out the result.
+    resp.on('end', () => {
+        console.log(JSON.parse(data).explanation);
+    });
+}).on("error", (err) => {
+    console.log("Error: " + err.message);
+});
+
+
+// Request in nodejs
+// npm install request@2.81.0 //install in node use npm
+const request = require('request');
+request('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY', { json: true }, (err, res, body) => {
+    if (err) { return console.log(err); }
+    console.log(body.url);
+    console.log(body.explanation);
+});
+
+
+// Use Axios in Nodejs
+const axios = require('axios');
+axios.get('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY')
+    .then(response => {
+        console.log(response.data.url);
+        console.log(response.data.explanation);
+    })
+    .catch(error => {
+        console.log(error);
+    });
+
+
+// Mysql pool cluster
 // =====================================================================
+// In requests, READ >>> WRITE => implement master slave in mysql
+// and need determine which server READ, which server WRITE
+// master-slave model to make sure not conflict deadlock.
+// master ( WRITE - 1 ), slave ( READ - more )
+// master create binLog when write => slave will sync base on binLog
+// ### db.js - master server (WRITE - 1), slave server ( READ - 2)
+var mysql = require('mysql')
+    , async = require('async')
+
+var PRODUCTION_DB = 'app_prod_database'
+    , TEST_DB = 'app_test_database'
+
+exports.MODE_TEST = 'mode_test'
+exports.MODE_PRODUCTION = 'mode_production'
+
+var state = {
+    pool: null,
+    mode: null,
+}
+
+exports.connect = function (mode, done) {
+    if (mode === exports.MODE_PRODUCTION) {
+        state.pool = mysql.createPoolCluster()
+
+        state.pool.add('WRITE', {
+            host: '192.168.0.5',
+            user: 'your_user',
+            password: 'some_secret',
+            database: PRODUCTION_DB
+        })
+
+        state.pool.add('READ1', {
+            host: '192.168.0.6',
+            user: 'your_user',
+            password: 'some_secret',
+            database: PRODUCTION_DB
+        })
+
+        state.pool.add('READ2', {
+            host: '192.168.0.7',
+            user: 'your_user',
+            password: 'some_secret',
+            database: PRODUCTION_DB
+        })
+    } else {
+        state.pool = mysql.createPool({
+            host: 'localhost',
+            user: 'your_user',
+            password: 'some_secret',
+            database: TEST_DB
+        })
+    }
+
+    state.mode = mode
+    done()
+}
+
+exports.READ = 'read'
+exports.WRITE = 'write'
+
+exports.get = function (type, done) {
+    var pool = state.pool
+    if (!pool) return done(new Error('Missing database connection.'))
+
+    if (type === exports.WRITE) {
+        state.pool.getConnection('WRITE', function (err, connection) {
+            if (err) return done(err)
+            done(null, connection)
+        })
+    } else {
+        state.pool.getConnection('READ*', function (err, connection) {
+            if (err) return done(err)
+            done(null, connection)
+        })
+    }
+};
+
+// Get data
+var db = require('../db.js')
+
+exports.create = function (userId, text, done) {
+    var values = [userId, text, new Date().toISOString()]
+
+    db.get(db.WRITE, function (err, connection) {
+        if (err) return done('Database problem')
+
+        connection.query('INSERT INTO comments (user_id, text, date) VALUES(?, ?, ?)', values, function (err, result) {
+            if (err) return done(err)
+            done(null, result.insertId)
+        })
+    })
+}
+
+exports.getAll = function (done) {
+    db.get(db.READ, function (err, connection) {
+        if (err) return done('Database problem')
+
+        connection.query('SELECT * FROM comments', function (err, rows) {
+            if (err) return done(err)
+            done(null, rows)
+        })
+    })
+}
+
+exports.getAllByUser = function (userId, done) {
+    db.get(db.READ, function (err, connection) {
+        if (err) return done('Database problem')
+
+        connection.query('SELECT * FROM comments WHERE user_id = ?', userId, function (err, rows) {
+            if (err) return done(err)
+            done(null, rows)
+        })
+    })
+};
+
+// connection pooling in nodejs performance
 // =====================================================================
+// parallelTest.js
+function callback() {
+    process.exit();
+}
+
+function hitQuery(callback) {
+    var user_query = "select count(*) from user u, access_code uac, user_location_info uli   where u.id = uac.user_id and u.id = uli.user_id"
+
+
+    connection.query(user_query, function (err, rows, fields) {
+        if (err) throw err;
+
+        if (rows.length == 0) {
+            console.log("No device token found for user: " + 16182);
+            callback(null, null);
+        } else {
+            var deviceToken = rows[0]['device_token'];
+            callback(null, rows[0]);
+        }
+    });
+}
+
+hitQuery(callback);
+
+// $ time node parallelTest.js
+
+// real	0m1.756s
+// user	0m0.159s
+// sys	    0m0.017s
+
+
+// Promise Serial javascript
+async.series([function (callback) {
+    hitQuery(callback);
+}, function (callback) {
+    hitQuery(callback);
+},
+function (callback) {
+    hitQuery(callback);
+},
+function (callback) {
+    hitQuery(callback);
+},
+function (callback) {
+    hitQuery(callback);
+}
+], function done(err, results) {
+    console.log(results);
+    process.exit()
+});
+
+// $ time node parallelTest.js
+
+// real	0m8.579s
+// user	0m0.178s
+// sys	    0m0.019s
+
+
+// Promise parallel javascript
+async.parallel([function (callback) {
+    hitQuery(callback);
+}, function (callback) {
+    hitQuery(callback);
+},
+function (callback) {
+    hitQuery(callback);
+},
+function (callback) {
+    hitQuery(callback);
+},
+function (callback) {
+    hitQuery(callback);
+}
+], function done(err, results) {
+    console.log(results);
+    process.exit()
+});
+
+// $ time node paralleltest.js
+
+// real	0m8.168s
+// user	0m0.165s
+// sys	    0m0.018s
+
+
+// With Connection Pooling
+var pool = mysql.createPool({
+    connectionLimit: 100, //important
+    host: '127.0.0.1',
+    user: '***',
+    password: '***',
+    database: 'user',
+    debug: false
+});
+
+function hitQuery(callback) {
+    var user_query = "select count(*) from user u, access_code uac, user_location_info uli   where u.id = uac.user_id and u.id = uli.user_id"
+
+    pool.getConnection(function (err, connection) {
+        if (err) {
+            connection.release();
+            res.json({ "code": 100, "status": "Error in connection database" });
+            return;
+        }
+
+        connection.query(user_query, function (err, rows, fields) {
+            if (err) throw err;
+
+            if (rows.length == 0) {
+                console.log("No device token found for user: " + 16182);
+                callback(null, null);
+            } else {
+                callback(null, rows[0]);
+
+            }
+        });
+
+    });
+};
+
+// One
+// $ time node parallelTest1.js
+
+// real	0m1.763s
+// user	0m0.163s
+// sys	    0m0.020s
+
+// Promise Serial javascript
+// $ time node parallelTest1.js
+
+// real	0m8.192s
+// user	0m0.182s
+// sys	    0m0.019s
+
+// Promise parallel javascript
+// $ time node parallelTest1.js
+
+// real	0m2.311s
+// user	0m0.175s
+// sys	    0m0.019s
+
+
+// Read and write JSON files in Node.js
 // =====================================================================
+// databases.json
+// [
+//     {
+//         "name": "MySQL",
+//         "type": "RDBMS"
+//     },
+//     {
+//         "name": "MongoDB",
+//         "type": "NoSQL"
+//     },
+//     {
+//         "name": "Neo4j",
+//         "type": "Graph DB"
+//     }
+// ]
+
+/*
+    Read a JSON file using fs.readFile()
+    - this method read async
+    - so, should work with data in it's function, or callback
+*/
+const fs = require('fs');
+
+fs.readFile('./databases.json', 'utf8', (err, data) => {
+
+    if (err) {
+        console.log(`Error reading file from disk: ${err}`);
+    } else {
+
+        // parse JSON string to JSON object
+        const databases = JSON.parse(data);
+
+        // print all databases
+        databases.forEach(db => {
+            console.log(`${db.name}: ${db.type}`);
+        });
+    }
+});
+
+/*
+    Read a JSON file using fs.readFileSync()
+    - this method read sync
+    - instead invoke callback, can use fs.readFileSync()
+    - not good to read large files related event loop, and performance
+*/
+const fs = require('fs');
+
+try {
+
+    const data = fs.readFileSync('./databases.json', 'utf8');
+
+    // parse JSON string to JSON object
+    const databases = JSON.parse(data);
+
+    // print all databases
+    databases.forEach(db => {
+        console.log(`${db.name}: ${db.type}`);
+    });
+
+} catch (err) {
+    console.log(`Error reading file from disk: ${err}`);
+}
+
 // =====================================================================
 // =====================================================================
 

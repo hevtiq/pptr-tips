@@ -1189,3 +1189,101 @@ const isArray = (value) => {
 }
 // ES5 actually has a method for this (ie9+)
 Array.isArray(value);
+
+
+
+//===========================================================
+/**
+ * formatCash() method to format VND
+ * @param {*} str - string number
+ * @returns format VND
+ */
+function formatCash(str) {
+    return str.split('').reverse().reduce((prev, next, index) => {
+        return ((index % 3) ? next : (next + ',')) + prev;
+    });
+};
+// console.log(formatCash('1234567890')); // 1,234,567,890
+
+
+
+//===========================================================
+/**
+ * memoize() method to memcached module/app
+ * @param {*} func - func
+ * @returns - func cached
+ */
+const memoize = (func) => {
+    const cache = new Map();
+
+    return (...args) => {
+        const key = args.join('-');
+
+        if (!cache.has(key)) {
+            cache.set(key, func(args));
+        };
+
+        return cache.get(key);
+    };
+};
+
+// Example
+const fibonacci = (n) => {
+    if (n < 2) return 1;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+};
+const fibonacciMemo = memoize(fibonacci);
+console.time("First run");
+fibonacciMemo(42);
+console.timeEnd("First run");
+
+console.time("Second run");
+fibonacciMemo(42);
+console.timeEnd("Second run");
+
+console.time("Third run");
+fibonacciMemo(42);
+console.timeEnd("Third run");
+
+// First run: 2858.337158203125ms
+// Second run: 0.005859375ms
+// Third run: 0.003173828125ms
+
+
+
+//===========================================================
+/**
+ * convertArrayToObject() method to convert an array to an object
+ * @param {*} array - target array
+ * @param {*} key - key in new object
+ * @returns object
+ */
+const convertArrayToObject = (array, key) => {
+    const initialValue = {};
+    return array.reduce((obj, item) => {
+        return {
+            ...obj,
+            [item[key]]: item,
+        };
+    }, initialValue);
+};
+
+// const arrModified = convertArrayToObject(arr, key);
+
+
+//===========================================================
+/**
+ * getMapFromArray() method to convert array to key value javascript
+ * @param {*} data - target array
+ * @param {*} obj - object will be returned
+ * @param {*} item - every item in array
+ * @returns - object
+ */
+const getMapFromArray = data => {
+    return data.reduce((obj, item) => {
+        obj[item.prop1] = { prop2: item.prop2 };
+        return obj
+    }, {})
+};
+
+// const arrModified = getMapFromArray(arr)

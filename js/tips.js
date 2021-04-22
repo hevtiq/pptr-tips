@@ -8277,3 +8277,525 @@ const car1 = new CarBuilder().addEngine('v10')
 
 console.log('kakaka Car', car.toString());
 console.log('kakaka Car1', car1.toString());
+
+
+// Factory pattern
+"use strict";
+class VIN {
+}
+class LUXA20 extends VIN {
+    run() {
+        console.log("LUXA20 Ô tô");
+    }
+}
+class LUXSA20 extends VIN {
+    run() {
+        console.log("LUXSA20 Ô tô");
+    }
+}
+class VINFactory {
+    static produceVIN(model) {
+        if (model === "A.20") {
+            return new LUXA20();
+        }
+        else {
+            return new LUXSA20();
+        }
+    }
+}
+
+const luxA20 = VINFactory.produceVIN("A.20");
+const luxSA20 = VINFactory.produceVIN("SA.20");
+luxA20.run();
+luxSA20.run();
+
+//Ouputs:
+// [LOG]: "LUXA20 Ô tô"
+// [LOG]: "LUXSA20 Ô tô"
+
+
+
+// Factory Method Pattern (Polymorphic Factory)
+class VIN {
+}
+class LUXA20 extends VIN {
+    run() {
+        console.log("LUXA20 Ô tô");
+    }
+}
+class LUXSA20 extends VIN {
+    run() {
+        console.log("LUXSA20 Ô tô");
+    }
+}
+class VINFactory {
+}
+class LUXA20Factory extends VINFactory {
+    produceVIN() {
+        return new LUXA20();
+    }
+}
+
+const luxa20Factory = new LUXA20Factory();
+const luxsa20Factory = new LUXA20Factory();
+const luxa20 = luxa20Factory.produceVIN();
+const luxsa20 = luxsa20Factory.produceVIN();
+luxa20.run();
+luxsa20.run();
+class LUXSA20Factory extends VINFactory {
+    produceVIN() {
+        return new LUXSA20();
+    }
+}
+
+
+// Fix javascript technique
+// show all data in a table
+console.table([
+    { blogName: 'anonystick', type: 'javascript, mongodb, nodejs', age: 4 },
+    { blogName: 'medium.com', type: 'javascript, reactjs...', age: 11 },
+]);
+
+// show data with column
+console.table([
+    { blogName: 'anonystick', type: 'javascript, mongodb, nodejs', age: 4 },
+    { blogName: 'medium.com', type: 'javascript, reactjs...', age: 11 },
+], ['blogName', 'type']);
+
+// Copying data using console
+const data = [2, 3, 4];
+copy(data);
+
+
+// Format currency in Javascript
+function format1(n, currency) {
+    return currency + n.toFixed(2).replace(/./g, function (c, i, a) {
+        return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
+    });
+};
+
+function format2(n, currency) {
+    return currency + n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+};
+
+
+var numbers = [1, 12, 123, 1234, 12345, 123456, 1234567, 12345.67];
+
+for (var i = 0; i < numbers.length; i++) {
+    console.log(format1(numbers[i], '£ '));
+};
+
+for (var i = 0; i < numbers.length; i++) {
+    console.log(format2(numbers[i], 'vnd '));
+};
+
+
+// Dynamic Imports
+let module = await import('/modules/my-module.js');
+
+el.onclick = () => {
+    import('/modules/my-module.js')
+        .then(module => {
+            // Do something with the module.
+        })
+        .catch(err => {
+            // load error;
+        })
+}
+
+
+// TOP 30 Javascript Interview
+// 1. Write a function the reverses a string.
+//    Javascript does not have a build in String Builder class so you cannot
+//    modify an existing string. What we can do is create a list that we push
+//    each character from the original string starting from the end.
+//    Then we use Array Join to combine the characters as the reversed string.
+function reverseString(s) {
+    // Create the result list
+    const result = [];
+    // Start from the end of the string and iterate towards the start
+    for (let i = s.length - 1; i >= 0; i -= 1) {
+        // Push the current char in the list
+        result.push(s[i]);
+    }
+    // Combine the result in a string
+    return result.join('');
+};
+
+// Examples
+console.log(reverseString(""));
+console.log(reverseString("abc"));
+console.log(reverseString("aaabbbcccd"));
+
+
+// 2. Write a function that filters out numbers from a list.
+function filterNumbers(arr) {
+    // Create the result list
+    const result = arr.filter(function (value, i) {
+        // Filter based on the rules for checking the input is number
+        if (isNaN(value) || isBoolean(value) || isEmptyString(value)) {
+            return false;
+        }
+        return true;
+    });
+    // Return numbers only list
+    return result;
+};
+
+function isBoolean(value) {
+    return typeof value === 'boolean';
+};
+
+function isEmptyString(value) {
+    return typeof value === 'string' && value.trim().length === 0;
+};
+console.log(filterNumbers([1, "2", " ", NaN, Number.POSITIVE_INFINITY, 66, "ab1", false]));
+
+
+// 3. Write a function that finds an element inside an unsorted list.
+//    This is a typical linear search algorithm that takes Θ(n) time to
+//    complete. We need to traverse the whole list and compare the search item
+//    with the current item
+function linearSearch(arr, x) {
+    let lo = 0;
+    let hi = arr.length - 1;
+    // Iterate from start till end of list
+    while (lo <= hi) {
+        // If item was found then return index
+        if (arr[lo] === x) {
+            return lo;
+        } else {
+            lo += 1;
+        };
+    };
+    // Return -1 to denote the item was not found
+    return -1;
+};
+
+let arr = [1, 3, 5, 7, 9, 11, 14, 18, 22];
+console.info("Item was found at index: " + linearSearch(arr, 22));
+
+
+// 4. Write a function that showcases the usage of closures.
+function multiplier(first) {
+    let a = first;
+    return function (b) {
+        return a * b;
+    };
+}
+
+let multiplyBy2 = multiplier(2);  // create an outner instance return function
+console.info(multiplyBy2(4));  // invoke inner instance
+console.info(multiplyBy2(5));  // invoke inner instance
+
+
+function f1() {
+    var N = 0; // N initial always 0, global var
+    console.log(N);
+    function f2() // f2 callback function
+    {
+        N += 1; // increase N, local var
+        console.log('-->>', N);
+    }
+
+    return f2;  // return callback
+}
+
+var result = f1();  // create an outner instance return function
+
+result(); // invoke inner instance
+result(); // invoke inner instance
+result(); // invoke inner instance
+
+
+function name(n) {
+    return function (a) {
+        return `${n} likes ${a}`;
+    };
+}
+var j = name('John');  // create an outner instance return function
+var c = name('Cindy');  // create an outner instance return function
+
+j('dogs');  // 'John likes dogs'
+c('cats');  // 'Cindy likes cats'
+
+
+// Memcached
+//===========================================================
+/**
+ * memoize() method to memcached module/app
+ * @param {*} func - func
+ * @returns - func cached
+ */
+const memoize = (func) => {
+    const cache = new Map();
+
+    return (...args) => {
+        const key = args.join('-');
+
+        if (!cache.has(key)) {
+            cache.set(key, func(args));
+        };
+
+        return cache.get(key);
+    };
+};
+
+// Example
+const fibonacci = (n) => {
+    if (n < 2) return 1;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+};
+const fibonacciMemo = memoize(fibonacci);
+console.time("First run");
+fibonacciMemo(42);
+console.timeEnd("First run");
+
+console.time("Second run");
+fibonacciMemo(42);
+console.timeEnd("Second run");
+
+console.time("Third run");
+fibonacciMemo(42);
+console.timeEnd("Third run");
+
+// First run: 2858.337158203125ms
+// Second run: 0.005859375ms
+// Third run: 0.003173828125ms
+
+
+// Memcached with NodeJS + Redis = Improved Performance
+// npm install express body-parser mongoose redis --save
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const redis = require('redis');
+
+const app = express();
+
+app.use(bodyParser.json());
+
+// connect tới redis, dùng port và address mặc định 
+
+const client = redis.createClient('redis://127.0.0.1:6379');
+client.on("error", (err) => {
+    console.error(err);
+});
+
+//MongoDB connection
+mongoose.connect('mongodb://localhost:27017/', {
+    dbName: 'notes',
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}, err => err ? console.log(err) : console.log('Connected to database'));
+
+//Mongoose Model
+const NoteSchema = new mongoose.Schema({
+    title: String,
+    note: String
+});
+
+const Note = mongoose.model('Note', NoteSchema);
+
+// api post an entry
+app.post('/api/notes', (req, res, next) => {
+
+    const { title, note } = req.body;
+
+    const _note = new Note({
+        title: title,
+        note: note
+    });
+
+    // save into mongodb
+    _note.save((err, note) => {
+        if (err) {
+            return res.status(404).json(err);
+        };
+
+        // If save into mongodb success, we can add it into reddis
+        client.setex(note.id, 60, JSON.stringify(note), (err, reply) => {
+            if (err) {
+                console.log(err);
+            }
+            console.log(reply);
+        });
+
+        return res.status(201).json({
+            message: 'Note has been saved',
+            note: note
+        });
+    })
+
+});
+
+const isCached = (req, res, next) => {
+
+    const { id } = req.params;
+
+    //First check in Redis
+    client.get(id, (err, data) => {
+        if (err) {
+            console.log(err);
+        }
+        if (data) {
+            const reponse = JSON.parse(data);
+            return res.status(200).json(reponse);
+        }
+        next();
+    });
+};
+
+// we will take it in the first Redis instead of accessing MongoDB to retrieve this data.
+app.get('/api/notes/:id', isCached, (req, res, next) => {
+
+    const { id } = req.params;
+
+    Note.findById(id, (err, note) => {
+        if (err) {
+            return res.status(404).json(err);
+        }
+        return res.status(200).json({
+            note: note
+        });
+    });
+});
+
+app.listen(3000, () => console.log('Server running at port 3000'));
+
+// NOTES
+/*
+    id : Unique ID must be provided to store data. It must be a string.
+    seconds : Expiry time in seconds (random to avoid cache avalanche)
+    value : Actual data to store in Redis. It must be a string. So we are
+    serializing object into string .
+    callback : Callback takes two parameters err and reply .
+*/
+client.setex(note.id, 60, JSON.stringify(note), (err, reply) => {
+    if (err) {
+        console.log(err);
+    }
+    console.log(reply);
+});
+
+/*
+    When taking a docments, it will go to iScached () to get it, if there is a
+    problem like the end of the cache, you will continue to retrieve the data in
+    MongoDB.
+    https://www.npmjs.com/package/redis-semaphore
+    https://viblo.asia/p/dockerize-project-nodejs-mongodb-redis-passport-4P856NXW5Y3
+    https://viblo.asia/p/deploy-ung-dung-docker-nodejs-mongo-redis-1VgZvMzYKAw
+*/
+app.get('/api/notes/:id', isCached, (req, res, next) => {
+
+    const { id } = req.params;
+
+    Note.findById(id, (err, note) => {
+        if (err) {
+            return res.status(404).json(err);
+        }
+        return res.status(200).json({
+            note: note
+        });
+    });
+});
+
+
+/*
+    AJAX Polling
+
+    Every 1s, client will request to server to get data
+    Problems: spam server, can't response
+*/
+var polling = function (url, type, data) {
+    var xhr = new XMLHttpRequest(),
+        type = type || "GET",
+        data = data || null;
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+            receive(xhr.responseText);
+            xhr.onreadystatechange = null;
+        }
+    };
+
+    xhr.open(type, url, true);
+    xhr.send(type == "GET" ? null : data);
+};
+
+var timer = setInterval(function () {
+    polling();
+}, 1000);
+
+
+/*
+    AJAX long-polling
+
+    when xhr object close, will re-connect
+    probkems: spam server
+*/
+var longPoll = function (type, url) {
+    var xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = function () {
+        //  re-connect
+        if (xhr.readyState == 4) {
+            receive(xhr.responseText);
+            xhr.onreadystatechange = null;
+
+            longPoll(type, url);
+        }
+    };
+
+    xhr.open(type, url, true);
+    xhr.send();
+}
+
+
+// JavaScript Reduce
+// arr.reduce(callback, initialValue);
+
+// Return JavaScript Reduce
+// ! reduce method only return one value
+// without reduce
+const value = 0;
+const numbers = [10, 20, 30];
+for (let i = 0; i < numbers.length; i++) {
+    value += numbers[i];
+}
+
+// with reduce - (acc - accumulator)
+const numbers = [5, 10, 15];
+const total = numbers.reduce((acc, item) => acc + item)
+// Result total = 60
+
+// Convert array to object javascript using reduce
+const convertArrayToObject = (array, key) => {
+    const initialValue = {};
+    return array.reduce((obj, item) => {
+        return {
+            ...obj,
+            [item[key]]: item,
+        };
+    }, initialValue);
+};
+
+const players = [
+    { id: 11, name: 'Messi', age: 33 },
+    { id: 12, name: 'Ronaldo', age: 34 },
+    { id: 13, name: 'Young', age: 35 },
+    { id: 14, name: 'Mane', age: 21 },
+    { id: 15, name: 'Salah', age: 24 },
+]
+
+const playersModified = convertArrayToObject(players, 'id');
+
+// playersModified = {
+//     11: {id: 11, name: "Messi", age: 33}
+//     12: {id: 12, name: "Ronaldo", age: 34}
+//     13: {id: 13, name: "Young", age: 35}
+//     14: {id: 14, name: "Mane", age: 21}
+//     15: {id: 15, name: "Salah", age: 24}
+// }
+
+
