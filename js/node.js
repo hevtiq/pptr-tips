@@ -1255,7 +1255,8 @@ var router = express.Router();
 const _CONF = require('../config')
 var jwt = require('jsonwebtoken')
 
-var refreshTokens = {};// tao mot object chua nhung refreshTokens
+// object to populate refreshTokens
+var refreshTokens = {};
 
 
 /* GET home page. */
@@ -1272,18 +1273,19 @@ router.post('/login', function (req, res, next) {
             role: 'admin'
         }
         // token should saved on client Cookie (not sessionStorage)
-        const token = jwt.sign(user, _CONF.SECRET, { expiresIn: _CONF.tokenLife });//20 giay
-        const refreshToken = jwt.sign(user, _CONF.SECRET_REFRESH, { expiresIn: _CONF.refreshTokenLife })
+        const token = jwt.sign(user, _CONF.SECRET, { expiresIn: _CONF.tokenLife });  // 20s
+        const refreshToken = jwt.sign(user, _CONF.SECRET_REFRESH, { expiresIn: _CONF.refreshTokenLife });
 
+        // when login success will generate two token with time life not same
+        // token: saved into cookie by client
+        // refreshToken: saved into Server/Redis by server to renew token or block hacker
         const response = {
             "status": "Logged in",
             "token": token,
             "refreshToken": refreshToken,
-        }
-
-        refreshTokens[refreshToken] = response
-
-        return res.json(response)
+        };
+        refreshTokens[refreshToken] = response;
+        return res.json(response);
     }
     return res.json({ status: 'success', elements: 'Login failed!!!' })
 
@@ -1319,17 +1321,21 @@ var express = require('express');
 var router = express.Router();
 
 
+// middleware check valid token before allow access
 router.use(require('../middleware/checkToken'))
 /* GET users listing. */
 router.get('/', function (req, res) {
-    const users = [{
-        username: 'Cr7',
-        team: 'Juve',
-    }, {
-        username: 'Messi',
-        team: 'Barca',
-    }]
-    res.json({ status: 'success', elements: users })
+    const users = [
+        {
+            username: 'Cr7',
+            team: 'Juve',
+        },
+        {
+            username: 'Messi',
+            team: 'Barca',
+        }
+    ];
+    res.json({ status: 'success', elements: users });
 })
 
 module.exports = router;
@@ -1374,6 +1380,11 @@ module.exports = (req, res, next) => {
         });
     }
 };
+
+
+// Tips: It is better to store refreshToken in Redis because when reload Server
+// will lose
+
 
 // Protect JWT
 // =====================================================================
@@ -2208,7 +2219,425 @@ try {
     console.log(`Error reading file from disk: ${err}`);
 }
 
-// =====================================================================
-// =====================================================================
+
+/*
+    Reading a JSON file with require()
+    - same fs.readFileSync()
+*/
+const databases = require('./databases.json');
+
+// print all databases
+databases.forEach(db => {
+    console.log(`${db.name}: ${db.type}`);
+});
 
 
+/*
+    Write to a JSON file using fs.writeFile()
+    - async
+*/
+const fs = require('fs');
+
+let user = {
+    name: 'Anonystick',
+    email: 'anonystick@gmail.com',
+    age: 37,
+    gender: 'Male',
+    profession: 'Software Developer'
+};
+
+// convert JSON object to a string
+const data = JSON.stringify(user);
+
+// write file to disk
+fs.writeFile('./user.json', data, 'utf8', (err) => {
+
+    if (err) {
+        console.log(`Error writing file: ${err}`);
+    } else {
+        console.log(`File is written successfully!`);
+    }
+
+});
+
+
+/*
+    Write to a JSON file using fs.writeFileSync()
+    -sync
+*/
+const fs = require('fs');
+
+let user = {
+    name: 'Anonystick',
+    email: 'anonystick@gmail.com',
+    age: 37,
+    gender: 'Male',
+    profession: 'Software Developer'
+};
+
+try {
+
+    // convert JSON object to a string
+    const data = JSON.stringify(user, null, 4);
+
+    // write file to disk
+    fs.writeFileSync('./user.json', data, 'utf8');
+
+    console.log(`File is written successfully!`);
+
+} catch (err) {
+    console.log(`Error writing file: ${err}`);
+};
+
+
+// Async in Javascript
+function sleep(second, param) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve(param);
+        }, second);
+    })
+}
+
+async function gaKFC() {
+    let result1 = await sleep(2000, 'Step1 - xếp hàng');
+    let result2 = await sleep(1000, 'Step2 - Thanh Toán khi đã xong ' + result1);
+    let result3 = await sleep(500, 'Step3 - Chờ và ăn khi đã xong ' + result2);
+    console.log(`
+        ${result3}
+        ${result2}
+        ${result1}
+    `);
+}
+
+gaKFC();
+
+/*
+    Step3 - Chờ và ăn khi đã xong Step2 - Thanh Toán khi đã xong Step1 - xếp hàng
+    Step2 - Thanh Toán khi đã xong Step1 - xếp hàng
+    Step1 - xếp hàng
+*/
+
+// Promise all javascript
+function sleep(second) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve('request done! ' + Math.random());
+        }, second);
+    })
+}
+
+async function nhauBinhDan() {
+    let p1 = sleep(1000); // gọi món
+    let p2 = sleep(1000); // nhậu
+    let p3 = sleep(1000); // Tính tiền
+    await Promise.all([p1, p2, p3]);
+    console.log('Nhậu anh em ơi....');
+}
+
+nhauBinhDan();
+
+
+// Promise error handling
+function handlePromise(promiseList) {
+    return promiseList.map(promise =>
+        promise.then((res) => ({ status: 'ok', res }), (err) => ({ status: 'not ok', err }))
+    );
+};
+
+Promise.all(handlePromise([Promise.reject(1), Promise.resolve(2), Promise.resolve(3)]))
+    .then(res => console.log(res), err => console.log(err));
+
+
+// Manage User Roles in Node.js
+// =====================================================================
+// https://www.youtube.com/watch?v=jI4K7L-LI58&t=1364s
+
+
+// Pagination with MongoDb
+// =====================================================================
+// ENDPOINT -- https://api.message.com/v1/conversationAAndB
+// SUPPORTED PARAMETERS -- PAGE, LIMIT
+// DEFAULT PARAMETERS VALUE -- PAGE=1, LIMIT=100
+// DESCRIPTION -- Fetch conversationAAndB
+
+// NOT GOOD
+db.messages
+    .find({})
+    .skip(0)
+    .limit(100); // 1 - returns messages from 0 to 100
+
+db.messages
+    .find({})
+    .skip(100)
+    .limit(100); // 2 - returns messages from 100 to 200
+
+db.messages
+    .find({})
+    .skip(200)
+    .limit(100); // 3 - returns messages from 200 to 300
+
+
+/*
+    find({}) - condition
+    skip(500) - skip 500 records from found result
+    limit(100) - return 100 records next
+    => find and store: 500 + 100 = 600 records
+*/
+db.messages
+    .find({})
+    .skip(500)
+    .limit(100); // 3 - returns messages from 200 to 300
+
+
+
+// Pagination with cursor in MongoDB
+// https://docs.mongodb.com/manual/reference/method/cursor.skip/
+let { next_cursor = 1, limit = 100 } = req.params;
+
+const messages = await db.messages
+    .find({ _id: { $gte: next_cursor } }) // find records with _id greater than cursor
+    .limit(limit + 1);
+
+const next_cursor = messages[limit]._id; // if next request will get from this _id
+
+messages.length = limit;
+
+res.send({
+    data: messages,
+    limit,
+    next_cursor
+});
+
+// Implementation
+db.messages
+    .find({})
+    .limit(100); // 1 - returns messages from 0 to 100
+
+db.messages
+    .find({ _id: { $gte: 101 } })
+    .limit(100); // 2 - returns messages from 100 to 200
+
+db.messages
+    .find({ _id: { $gte: 201 } })
+    .limit(100); // 3 - returns messages from 200 to 300
+
+
+
+// Logger Nodejs with winston
+// record any user operations, and record the Errors, Info, Bugs in console or
+// access the faulty database
+// npm i winston --save
+// one version
+const winston = require('winston');
+winston.log('info', 'Hello Anonystick.com!');
+winston.info('Hello Anonystick.com');
+
+// multiple versions
+const logger1 = winston.createLogger();
+const logger2 = winston.createLogger();
+logger1.info('logger1', 'Hello Anonystick.com!');
+logger2.info('logger2', 'Hello Anonystick.com!');
+
+// write log to file and console
+const logger = winston.createLogger({
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'combined.log' })
+    ]
+});
+
+// format winston
+const logger = winston.createLogger({
+    format: winston.format.combine(
+        winston.format.label({ label: 'Demo anonystick:' }),
+        winston.format.timestamp(),
+        winston.format.prettyPrint(),
+    ),
+    transports: [new winston.transports.Console()]
+});
+logger.info('hello anonystick.com');
+
+// {
+//     message: 'hello anonystick.com',
+//     level: 'info',
+//     label: 'Demo anonystick:',
+//     timestamp: '2020-10-09T04:13:45.309Z'
+// }
+
+// Other custom
+const customFormat = winston.format.printf((info) => {
+    return `[custom format] ${info.timestamp}:${info.label}:${info.message}`
+});
+
+
+// Manage file log size
+// file <= 5MB: testMaxSize.log, testMaxSize1.log, testMaxSize2.log
+// file with day: 2020-10-01.log, 2020-10-02.log
+const maxSizeTransport = new winston.transports.File({
+    level: 'info',
+    format: winston.format.printf(info => info.message),
+    filename: ('testMaxSize.log'), // file path
+    maxsize: 5242880, // 5MB
+});
+
+new transports.DailyRotateFile({
+    filename: path.join(__dirname, '..', 'logs', `%DATE%.log`),
+    datePattern: 'YYYY-MM-DD',
+    prepend: true,
+    json: false
+});
+
+
+// Stream log with winston
+// https://github.com/anonystick/logger-nodejs-winston/blob/main/index.js
+// console: print out console in nodejs
+// file: write log to file
+// http: push log via http
+// stream: stream log
+const { Writable } = require('stream');
+const stream = new Writable({
+    objectMode: false,
+    write: raw => console.log('stream msg>>>', raw.toString()) // stream log here
+});
+
+const http = require('http');
+http
+    .createServer((req, res) => {
+        const arr = []
+        req
+            .on('data', chunk => arr.push(chunk))
+            .on('end', () => {
+                const msg = Buffer.concat(arr).toString()
+                console.log('http msg', msg)// push log to other system http://localhost:8080
+                res.end(msg)
+            })
+    })
+    .listen(8080);
+
+const path = require('path');
+
+const logger = winston.createLogger({
+    format: winston.format.combine(
+        winston.format.label({ label: 'Demo Anonystick' }),
+        winston.format.timestamp(),
+        winston.format.prettyPrint(),
+        winston.format.printf((info) => {
+            return `[custom format] ${info.timestamp}:${info.label}:${info.message}`
+        })
+    ),
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({
+            level: 'info',
+            format: winston.format.printf((info) => {
+                return `[Muon gi thi tu di ma dinh dang] ${info.timestamp}:${info.label}:${info.message}`
+            }),
+            filename: 'info.log',
+            maxsize: 1
+        }),
+        new winston.transports.Http({ host: 'localhost', port: 8080 }),
+        new winston.transports.Stream({ stream }) //stream tai đây
+    ]
+});
+
+logger.info('winston transports')
+
+
+// Tips - Query array in MongoDB
+// Insert mongodb
+await db.collection('inventory').insertMany([
+    {
+        item: 'journal',
+        qty: 25,
+        tags: ['blank', 'red'],
+        dim_cm: [14, 21]
+    },
+    {
+        item: 'notebook',
+        qty: 50,
+        tags: ['red', 'blank'],
+        dim_cm: [14, 21]
+    },
+    {
+        item: 'paper',
+        qty: 100,
+        tags: ['red', 'blank', 'plain'],
+        dim_cm: [14, 21]
+    },
+    {
+        item: 'planner',
+        qty: 75,
+        tags: ['blank', 'red'],
+        dim_cm: [22.85, 30]
+    },
+    {
+        item: 'postcard',
+        qty: 45,
+        tags: ['blue'],
+        dim_cm: [10, 15.25]
+    }
+]);
+
+// Match an Array mongodb
+// #2. Find documents which filed tags with 'red' and 'blank'
+const cursor = db.collection('inventory').find({
+    tags: ['red', 'blank']
+});
+
+// #2. Find documents which filed tags with 'red' or 'blank'
+db.inventory.find({ tags: { $all: ["red", "blank"] } });
+
+// #3. Find documents which filed tags with 'red'
+db.inventory.find({ tags: "red" });
+
+// #4. Find documents which filed dim_cm > 25
+db.inventory.find({ dim_cm: { $gt: 25 } });
+
+// #5. Find documents which filed the secondary element of dim_cm > 25
+db.inventory.find({ "dim_cm.1": { $gt: 25 } });
+
+
+/*
+    Find mongoose - use async await instead of callback
+
+    Model.find()
+    Model.findById()
+    Model.findByIdAndDelete()
+    Model.findByIdAndRemove()
+    Model.findByIdAndUpdate()
+    Model.findOne()
+    Model.findOneAndDelete()
+    Model.findOneAndRemove()
+    Model.findOneAndReplace()
+    Model.findOneAndUpdate()
+*/
+// 1 - Create config.js
+module.exports = {
+    dbs: 'mongodb://127.0.0.1:27017/dbs'
+};
+
+// 2 - Create person.js
+const mongoose = require('mongoose');
+const personSchema = new mongoose.Schema({
+    name: String,
+    age: Number
+});
+module.exports = mongoose.model('Person', personSchema);
+
+// 3 - Create app.js
+const mongoose = require('mongoose');
+const dbConfig = require('./dbs/config');
+mongoose.connect(dbConfig.dbs, {
+    useNewUrlParser: true
+});
+
+// 4. connect mongodb in app.js
+// Declare Model person
+const person_model = require('person');
+
+// # NOT GOOD: callback
+person_model.find({ name:  'anonystick' }, 'name age', { skip: 10 }, function (err, docs) {});
+
+// # GOOD: async/await
+const obj = await person_model.find({ name:  'anonystick' }, 'name age', {skip: 10});

@@ -617,6 +617,15 @@ const toNumbers = arr => arr.map(x => +x);
 // toNumbers(['2', '3', '4']);  // [2, 3, 4]
 
 
+//===========================================================
+/**
+ * toNumber() method to convert a string to a number implicitly
+ * @param { String } - target string
+ * @returns number
+ */
+toNumber = str => +str;
+// toNumber = str => Number(str);  // explicity
+
 
 //===========================================================
 /**
@@ -1091,6 +1100,17 @@ const sortCharactersInString = str => [...str].sort((a, b) => a.localeCompare(b)
 
 //===========================================================
 /**
+ * sortArray() method to sort an array containing numbers
+ * @param {*} arr - target array
+ * @returns sorted array
+ */
+const sortArray = arr => arr.sort((a, b) => a - b);
+sortArray([1, 5, 2, 4, 3]);
+// Result: [1, 2, 3, 4, 5]
+
+
+//===========================================================
+/**
  * words() method to convert a string to an array
  * @param {*} str - target string
  * @param {*} pattern - regEx pattern
@@ -1287,3 +1307,146 @@ const getMapFromArray = data => {
 };
 
 // const arrModified = getMapFromArray(arr)
+
+
+//===========================================================
+/**
+ * diffDays() method to calculate the number of days between two dates
+ * @param {*} date - from date
+ * @param {*} otherDate - to date
+ * @returns days
+ */
+const diffDays = (date, otherDate) => Math.ceil(Math.abs(date - otherDate) / (1000 * 60 * 60 * 24));
+// diffDays(new Date('2014-12-19'), new Date('2020-01-01'));
+// Result: 1839
+
+
+
+//===========================================================
+/**
+ * isNotEmpty() method to check if an array contains any items
+ * @param {*} arr - target array
+ * @returns true/false
+ */
+const isNotEmpty = arr => Array.isArray(arr) && arr.length > 0;
+// isNotEmpty(s[1, 2, 3]);  // true
+// isNotEmpty([]);  // false
+
+
+
+//===========================================================
+/**
+ * getCookie() method to get cookie with name
+ */
+const getCookie = name => `; ${document.cookie}`.split(`; ${name}=`).pop().split(';').shift();
+// cookie('_ga');  // "GA1.2.1929736587.1601974046"
+
+
+
+//===========================================================
+/**
+ * getSelectedText() method to get the text that the user has selected
+ * @returns selected text
+ */
+const getSelectedText = () => window.getSelection().toString();
+// getSelectedText();
+
+
+
+//===========================================================
+/**
+ * randomBoolean() method to random boolean
+ * @returns true/false
+ */
+const randomBoolean = () => Math.random() >= 0.5;
+// randomBoolean();
+
+
+
+//===========================================================
+/**
+ * isWeekday() method to check if the provided day is a weekday
+ * @param {*} date - target date
+ * @returns true/false
+ */
+const isWeekday = (date) => date.getDay() % 6 !== 0;
+isWeekday(new Date(2021, 0, 11));  // true (Monday)
+isWeekday(new Date(2021, 0, 10));  // false (Sunday)
+
+
+
+//===========================================================
+/**
+ * reverseString() method to reverse a string
+ * @param {*} str - target string
+ * @returns reversed string
+ */
+const reverseString = str => str.split('').reverse().join('');
+// reverseString('hello world');
+
+
+
+//===========================================================
+/**
+ * isEven() method to check number is even or odd
+ * @param {*} num - target number
+ * @returns true/false
+ */
+const isEven = num => num % 2 === 0;
+// isEven(2);  // true
+// isEven(3);  // false
+
+
+
+//===========================================================
+/**
+ * getTimeFromDate() method to get time from date
+ * @param {*} date - target date
+ * @returns time
+ */
+const getTimeFromDate = date => date.toTimeString().slice(0, 8);
+// getTimeFromDate(new Date(2021, 0, 10, 17, 30, 0));  // "17:30:00"
+// getTimeFromDate(new Date());  // current time
+
+
+
+//===========================================================
+/**
+ * elementIsInFocus() method to check if an element is currently in focus
+ * @param {*} el - target element
+ * @returns true/false
+ */
+const elementIsInFocus = (el) => (el === document.activeElement);
+// elementIsInFocus(anyElement);
+
+
+
+//===========================================================
+/**
+ * touchSupported() method to check if the current user has touch events supported
+ * @returns true/false
+ */
+const touchSupported = () => {
+    ('ontouchstart' in window || window.DocumentTouch && document instanceof window.DocumentTouch);
+};
+// touchSupported();
+
+
+
+//===========================================================
+/**
+ * isAppleDevice() method to check if the current user is on an Apple device
+ * @returns true/false
+ */
+const isAppleDevice = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+// isAppleDevice;
+
+
+
+//===========================================================
+/**
+ * goToTop() method to scroll to the top page
+ * @returns top position
+ */
+const goToTop = () => window.scrollTo(0, 0);
+// goToTop();

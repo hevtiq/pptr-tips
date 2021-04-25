@@ -8520,6 +8520,126 @@ j('dogs');  // 'John likes dogs'
 c('cats');  // 'Cindy likes cats'
 
 
+// 5. What is a Promise? Write a function that returns a Promise.
+const resultPromise = function (idea) {
+    return new Promise(function (resolve, reject) {
+        if (idea.isGood) {
+            resolve(idea);
+        } else {
+            reject({
+                idea: idea,
+                reason: "Not Realistic"
+            });
+        }
+    });
+};
+
+resultPromise({ idea: "Make Gold from Iron", isGood: false })
+    .then(function () {
+        console.info("I'm Rich!")
+    }, function (err) {
+        console.info("Rejected as: " + err.reason);
+    });
+
+
+
+// 6. Write a function that flattens a list of items.
+// [1, [2,3, [4]]] => [1,2,3,4]
+function flatten(arr = []) {
+    // Create the result list;
+    let result = [];
+    for (let item of arr) {
+        // If item is an array we concat the contents
+        if (Array.isArray(item)) {
+            result = result.concat(flatten(item));
+        } else {
+            result = result.concat(item);
+        }
+    }
+    return result;
+}
+console.info(flatten([[1, 2, [3]], 4]));
+
+
+// 7. Write a function that finds an element inside a sorted list.
+function binarySearch(arr, x) {
+    let lo = 0;
+    let hi = arr.length - 1;
+    while (lo <= hi) {
+        // Find mid element
+        let m = Math.floor((lo + hi) / 2);
+        // Check if equal to target
+        if (arr[m] === x) {
+            return m;
+            // Reduce array search space by half
+        } else if (arr[m] < x) {
+            lo = m + 1;
+        } else {
+            hi = m - 1;
+        }
+    }
+    // Item not found
+    return -1;
+}
+
+let arr = [1, 3, 5, 7, 9, 11, 14, 18, 22];
+console.info(console.info("Item was found at index: " + binarySearch(arr, 22)));
+
+
+// 8. Write a function that accepts two numbers a and b and returns both the division of a and b and their modulo of a and b.
+function divMod(a, b) {
+    // Be careful for division by zero
+    if (b !== 0) {
+        return [a / b, a % b];
+    }
+    return [0, 0];
+}
+console.info(divMod(16, 5));
+console.info(divMod(20, 0));
+
+
+// 9. Write a function that computes the fibonacci number of N.
+function memo(func) {
+    let cache = {};
+    return function (x) {
+        if (x in cache) return cache[x];
+        return cache[x] = func(x);
+    };
+};
+
+let fib = memo(function (n) {
+    if (n === 0) {
+        return 0;
+    } else if (n === 1) {
+        return 1;
+    } else {
+        return fib(n - 1) + fib(n - 2);
+    }
+});
+console.info(fib(20));
+
+// 10. Write a function that accepts a string and returns a map with the strings character frequency.
+function computeFrequency(s) {
+    // Create the freq hashtable
+    const freqTable = new Map();
+    // for each char in the string
+    for (ch of s) {
+        // Check if we have seen it already
+        if (!freqTable.has(ch)) {
+            freqTable.set(ch, 1);
+        } else {
+            // Just increase the existing entry
+            freqTable.set(ch, freqTable.get(ch) + 1);
+        }
+    }
+    // Return result
+    return freqTable;
+}
+console.info(computeFrequency("abrakatabra"));
+
+
+
+
 // Memcached
 //===========================================================
 /**
@@ -8799,3 +8919,4601 @@ const playersModified = convertArrayToObject(players, 'id');
 // }
 
 
+// SONP vs AJAX
+// client send request to server and receive response from server
+// AJAX: same origin, JSONP: CORS (only support GET, not secure XSS)
+
+// Server
+var express = require('express');
+var app = express();
+
+app.get('/jsonp', function (req, res) {
+    const { callback, wd, from } = req.query;
+    let data = {
+        msg: 'Get data here',
+        word: wd,
+        referer: from,
+        data: [1, 2, 3]
+    };
+    data = JSON.stringify(data);
+    res.end(callback + '(' + data + ')');
+});
+
+app.listen(8080, function () {
+    console.log('App listening on port http://localhost:8080/!')
+});
+
+
+// Client use https://jsfiddle.net/ to access link
+// => (cors error case) with Ajax
+fetch('http://localhost:8080/')
+    .then(response => response.json())
+    .then(data => console.log(data)).catch((error));
+
+// Client use https://jsfiddle.net/ to access link
+// => (cors success case) with JSONP
+const jsonp = (opts = {}) => {
+    opts.url = `${opts.url}?callback=${opts.callback}`;
+
+    for (let key in opts.data) {
+        if (opts.data.hasOwnProperty(key)) {
+            opts.url += `&${key}=${opts.data[key]}`;
+        }
+    }
+
+    const script = document.createElement('script');
+    script.src = opts.url;
+
+    script.onload = () => {
+        document.body.removeChild(script);
+    }
+
+    document.body.appendChild(script);
+};
+
+
+jsonp({
+    url: 'http://localhost:8080/',
+    data: {
+        wd: 'nba',
+        from: 'home'
+    },
+
+    callback: 'getData'
+});
+
+function getData(data) {
+    console.log(data);
+}
+
+//Output:
+// { msg: "Get data here", word: "nba", referer: "home", data: Array(3) }
+
+
+// Currying In JavaScript
+// use to save time and effort for re-write other function
+// Currying is a function assessment function with multiple arguments, into a
+// unique string with single argument.In other words, when a function, instead
+// of grab all arguments at the same time, take the first function and return
+// the new function to get the second function and return the new function to
+// get the third function, and continue until allThe argument has been
+// completed.
+// fakeFunction('param1', 'param2', 'param3');
+// => fakeFunction('param1')('param2')('param3');
+// ES5
+var add = function (a) {
+    return function (b) {
+        return function (c) {
+            return a + b + c;
+        };
+    };
+};
+console.log(add(2)(3)(4)); //output 9
+console.log(add(3)(4)(5)); //output 12
+
+// ES6
+const movies = [
+    {
+        "id": 1,
+        "name": "Matrix"
+    },
+    {
+        "id": 2,
+        "name": "Star Wars"
+    },
+    {
+        "id": 3,
+        "name": "The wolf of Wall Street"
+    }
+]
+
+const series = [
+    {
+        "id": 4,
+        "name": "South Park"
+    },
+    {
+        "id": 5,
+        "name": "The Simpsons"
+    },
+    {
+        "id": 6,
+        "name": "The Big Bang Theory"
+    }
+]
+
+// NOT GOOD
+console.log(series.map((serie) => serie.id)) //should return [ 1, 2, 3 ])
+
+console.log(movies.map((movie) => movie.id)) //should return [ 1, 2, 3 ])
+
+// GOOD
+const get = property => object => object[property];
+
+const getId = get('id'); // if need get name then get('name')
+
+console.log(movies.map(getId)); //should return [ 1, 2, 3 ]
+console.log(series.map(getId)); //should return [ 4, 5, 6 ]
+
+
+// Pagination javascript ES6
+function pagination(c, m) {
+    var current = c,
+        last = m,
+        delta = 2,
+        left = current - delta,
+        right = current + delta + 1,
+        range = [],
+        rangeWithDots = [],
+        l;
+
+    for (let i = 1; i <= last; i++) {
+        if (i == 1 || i == last || i >= left && i < right) {
+            range.push(i);
+        }
+    }
+
+    for (let i of range) {
+        if (l) {
+            if (i - l === 2) {
+                rangeWithDots.push(l + 1);
+            } else if (i - l !== 1) {
+                rangeWithDots.push('...');
+            }
+        }
+        rangeWithDots.push(i);
+        l = i;
+    }
+
+    return rangeWithDots;
+}
+
+
+// Test it:
+for (let i = 1, l = 20; i <= l; i++) {
+    console.log(`Selected page ${i}:`, pagination(i, l));
+};
+
+/*
+Expected output:
+Selected page 1: [1, 2, 3, "...", 20]
+Selected page 2: [1, 2, 3, 4, "...", 20]
+Selected page 3: [1, 2, 3, 4, 5, "...", 20]
+Selected page 4: [1, 2, 3, 4, 5, 6, "...", 20]
+Selected page 5: [1, 2, 3, 4, 5, 6, 7, "...", 20]
+Selected page 6: [1, "...", 4, 5, 6, 7, 8, "...", 20]
+Selected page 7: [1, "...", 5, 6, 7, 8, 9, "...", 20]
+Selected page 8: [1, "...", 6, 7, 8, 9, 10, "...", 20]
+Selected page 9: [1, "...", 7, 8, 9, 10, 11, "...", 20]
+Selected page 10: [1, "...", 8, 9, 10, 11, 12, "...", 20]
+Selected page 11: [1, "...", 9, 10, 11, 12, 13, "...", 20]
+Selected page 12: [1, "...", 10, 11, 12, 13, 14, "...", 20]
+Selected page 13: [1, "...", 11, 12, 13, 14, 15, "...", 20]
+Selected page 14: [1, "...", 12, 13, 14, 15, 16, "...", 20]
+Selected page 15: [1, "...", 13, 14, 15, 16, 17, "...", 20]
+Selected page 16: [1, "...", 14, 15, 16, 17, 18, 19, 20]
+Selected page 17: [1, "...", 15, 16, 17, 18, 19, 20]
+Selected page 18: [1, "...", 16, 17, 18, 19, 20]
+Selected page 19: [1, "...", 17, 18, 19, 20]
+Selected page 20: [1, "...", 18, 19, 20]
+*/
+
+
+// Promise all in real example
+// 1: Many results must be processed simultaneously
+// render data in facebook page
+
+// Get detail page
+function getDetailPage() {
+    return new Promise((resolve, reject) => {
+        setTimeout(function () {
+            resolve('detail page');
+        }, 300);
+    });
+};
+
+// get info page
+function getInfoPage() {
+    return new Promise((resolve, reject) => {
+        setTimeout(function () {
+            resolve('info page');
+        }, 400);
+    });
+};
+
+// get articles page
+function getArticlesPage() {
+    return new Promise((resolve, reject) => {
+        setTimeout(function () {
+            resolve('articles page');
+        }, 500);
+    });
+};
+
+function initLoad() {
+    // loading.show() // show load icon
+    // https://codepen.io/niyazpoyilan/pen/PGQKZK
+    // https://www.youtube.com/watch?v=-xU95CUTvHg
+    // https://www.youtube.com/watch?v=xuA83OYTE7I
+    // https://www.codingnepalweb.com/
+    // https://www.youtube.com/watch?v=nJ81DFmgHdU
+    // https://www.youtube.com/watch?v=d1VoThpQno4
+    // https://www.youtube.com/watch?v=NZNhuzyeD-Y
+    // https://dev.to/vaishnavme/displaying-loading-animation-on-fetch-api-calls-1e5m
+
+    Promise.all([getDetailPage(), getInfoPage(), getArticlesPage()]).then(res => {
+        console.log(res)
+        // loading.hide() //Sau khi có data rồi thì hide nó và hiện thị lên thôi
+    }).catch(err => {
+        console.log(err)
+        // loading.hide()// Lỗi cũng hide nó đi
+    })
+}
+
+// invoke init load
+initLoad();
+
+// 2: Verify multiple results required to meet the conditions
+// verify form
+function verify1(content) {
+    return new Promise((resolve, reject) => {
+        setTimeout(function () {
+            resolve(true)
+        }, 200)
+    })
+}
+
+function verify2(content) {
+    return new Promise((resolve, reject) => {
+        setTimeout(function () {
+            resolve(true)
+        }, 700)
+    })
+}
+
+function verify3(content) {
+    return new Promise((resolve, reject) => {
+        setTimeout(function () {
+            resolve(true)
+        }, 300)
+    })
+}
+
+Promise.all([verify1('verify1'), verify2('verify2'), verify3('verify3')]).then(result => {
+    console.log(result);  // [true, true, true]
+
+    let verifyResult = result.every(item => item);
+}).catch(err => {
+    console.log(err)
+});
+
+
+// 3: Combining results required and error handling
+// Get detail page
+function getDetailPage() {
+    return new Promise((resolve, reject) => {
+        setTimeout(function () {
+            resolve('detail page')
+        }, 300);
+    });
+};
+
+// get info page
+function getInfoPage() {
+    return new Promise((resolve, reject) => {
+        setTimeout(function () {
+            resolve('info page')
+        }, 400);
+    });
+};
+
+// get articles page
+function getArticlesPage() {
+    return new Promise((resolve, reject) => {
+        setTimeout(function () {
+            resolve('articles page')
+        }, 500);
+    });
+};
+
+function initLoad() {
+    // loading.show()
+    Promise.all([
+        getDetailPage().catch(err => err),
+        getInfoPage().catch(err => err),
+        getArticlesPage().catch(err => err)
+    ]).then(res => {
+        console.log(res); // ["detail page", "info page", "articles page"]
+
+        if (res[0] === 'detail page') {
+            // Get data success
+        } else {
+            // error handle
+        };
+        /*
+            same with res[1] and res[2] ...
+        */
+        // loading.hide()
+    });
+};
+
+// init load
+initLoad();
+
+
+// Pluck javascript array
+// task: filter to grab category
+var goal = [
+    {
+        "category": "other",
+        "title": "harry University",
+        "value": 50000,
+        "id": "1"
+    },
+    {
+        "category": "traveling",
+        "title": "tommy University",
+        "value": 50000,
+        "id": "2"
+    },
+    {
+        "category": "education",
+        "title": "jerry University",
+        "value": 50000,
+        "id": "3"
+    },
+    {
+        "category": "business",
+        "title": "Charlie University",
+        "value": 50000,
+        "id": "4"
+    }
+];
+
+// #1 from and map
+const pluck = key => array => Array.from(new Set(array.map(obj => obj[key])));
+const getCategorys = pluck('category'); // return a next function
+// const getTitles = pluck('title'); // return a next function
+// const getIds = pluck('id'); // return a next function
+// const getVersions = pluck('version'); // return a next function
+console.log(getCategorys(goal));
+
+// #2 map()
+let result = goal.map(a => a.category);
+// OR
+let result = goal.map(({ category }) => category)
+console.log(result);
+
+// #3 for in
+function pluck(objs, name) {
+    var sol = [];
+    for (var i in objs) {
+        if (objs[i].hasOwnProperty(name)) {
+            sol.push(objs[i][name]);
+        };
+    };
+    return sol;
+};
+console.log(pluck(goal, 'category'));
+
+// #4 reduce
+const pluck = (key, array) =>
+    array.reduce((values, current) => {
+        values.push(current[key]);
+
+        return values;
+    }, []);
+console.log(pluck('category', goal));
+
+// #5 lodash
+console.log(_.pluck(goal, 'category'));
+
+
+
+// What is a Callback?
+// #1
+function foo(callback) {
+    //do something
+    callback();
+};
+
+// #2
+function showAlert() {
+    alert('Alerta');
+}
+button.addEventListener('click', showAlert);
+
+// #3 anonymous function
+button.addEventListener('click', function () {
+    alert('Alerta');
+});
+
+// #4 callback with warn to do next something
+function foo(callback) {
+    console.log("hello")
+    callback();
+};
+foo(function () { console.log("finished") });
+
+// #5 Checking the asynchronous execution with callbacks
+function foo(val, callback) {
+    if (val == 1) return callback(true);
+    return callback(false);
+};
+
+
+// pipeline operator in javascript
+const reverseWords =
+    str => str
+        .split(' ')
+        .reduce((revStr, word) => [word, ...revStr], [])
+        .join(' ');
+
+console.log(reverseWords('this is fun')); // Output: fun is this
+
+// OR
+const splitBySpace = str => str.split(' ');
+const reverseArray = arr => arr.reduce((acc, cur) => [cur, ...acc], []);
+const joinWithSpace = arr => arr.join(' ');
+
+const reverseWords =
+    str => joinWithSpace(
+        reverseArray(
+            splitBySpace(
+                str
+            )
+        )
+    );
+
+console.log(reverseWords('this is fun')); // Output: fun is this
+
+// OR
+const reverseWords = str => joinWithSpace(reverseArray(splitBySpace(str)));
+
+
+// Numerical separator
+const longNum = 1_000_000_000_000;
+// same as
+const longNum = 1000000000000;
+
+
+
+// Unit Test by example
+// https://www.toptal.com/javascript/writing-testable-code-in-javascript
+// https://www.youtube.com/watch?v=7r4xVDI2vho
+// https://www.youtube.com/watch?v=FgnxcUQ5vho
+// https://www.youtube.com/watch?v=4Fl5GH4eYZ8
+// https://www.youtube.com/watch?v=r9HdJ8P6GQI
+// https://www.youtube.com/watch?v=i4P4x7dIfCs
+// code
+const capitalize = (word) => {
+    const rest = word.slice(1);
+    const firstLtr = word.charAt(0);
+    return firstLtr.toUpperCase() + rest.toLowerCase();
+};
+const titleCase = (phrase) => {
+    if (!phrase) return phrase;
+    [first, ...rest] = phrase.split(' ');
+    return rest.reduce((res, a) => res + ' ' + capitalize(a),
+        capitalize(first))
+};
+
+// testcases
+let testCases = [
+    { input: "I’m a little tea pot", expected: "I’m A Little Tea Pot" },
+    { input: "sHoRt AnD sToUt", expected: "Short And Stout" },
+    { input: "sHoRt AnD sToUt", expected: "Short And Stout" },
+    { input: "tôi là một lập trình viên javascript", expected: "Tôi Là Một Lập Trình Viên Javascript" },
+    { input: "HERE IS MY HANDLE HERE IS MY SPOUT", expected: "Here Is My Handle Here Is My Spout" },
+    { input: "", expected: "" },
+    { input: undefined, expected: undefined },
+];
+
+// code test
+const assert = (func, input, expected) => {
+    return func(input) === expected ?
+        'passed' :
+        `failed on input=${input}. expected ${expected}, but got ${func(input)}`;
+};
+
+let testResult = testCases.map(d => assert(titleCase, d.input, d.expected))
+
+console.log(testResult);
+// 0: "passed"
+// 1: "passed"
+// 2: "passed"
+// 3: "passed"
+// 4: "passed"
+// 5: "passed"
+
+
+// Flatten array
+// #1 - flat() es6
+const arr4 = [1, 2, [3, 4, [5, 6, [7, 8, [9, 10]]]]];
+console.log(arr4.flat(Infinity)); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+
+// #2 loop
+let result = []
+let flatten = function (arr) {
+    for (let i = 0; i < arr.length; i++) {
+        let item = arr[i]
+        if (Array.isArray(arr[i])) {
+            flatten(item)
+        } else {
+            result.push(item)
+        };
+    };
+    return result;
+};
+
+let arr = [1, 2, [3, 4], [5, [6, 7]]];
+console.log(flatten(arr));
+
+// #3 reduce
+function flatten(arr) {
+    return arr.reduce((pre, cur) => {
+        return pre.concat(Array.isArray(cur) ? flatten(cur) : cur)
+    }, []);
+};
+
+let arr = [1, 2, [3, 4], [5, [6, 7]]]
+console.log(flatten(arr));
+
+// #4 operator spread
+function flatten(arr) {
+    while (arr.some((item) => Array.isArray(item))) {
+        arr = [].concat(...arr)
+    }
+    return arr
+}
+
+let arr = [1, 2, [3, 4], [5, [6, 7]]]
+console.log(flatten(arr))
+
+
+// Prepare ReactJS in 3 months
+// var/let/const
+// var can re-assigned
+var name = 'Jane Tracy 👩‍💻';
+var name = 'Luke Wilsey 🎥';
+console.log(name);
+//output => Luke wilsey 🎥
+
+//let can’t be re-assigned
+let name = 'Jane Tracy 👩‍💻';
+let name = 'Luke Wilsey 🎥 ';
+console.log(name);
+//output => Syntax error: the name has already been declared
+
+// let can be updated
+let name = 'Spencer 👩‍💻';
+name = 'Tom🍄';
+console.log(name);
+//output => Tom🍄
+
+//const can’t be re-assigned
+const name = 'Jane Tracy 👩‍💻';
+const name = 'Luke Wilsey 🎥 ';
+console.log(name);
+//output => Syntax error: the name has already been declared
+
+//const object properties or array values can be changed
+const friends = [
+    {
+        name: 'Bob 🥽',
+        age: 22,
+        hobby: 'golf🏌',
+        music: 'rock 🎸'
+    }
+];
+
+const result = friends.age = 23;
+console.log(result);
+// output => 23
+
+// const object can't be re-assigned 
+const friends = [
+    {
+        name: 'Bob 🥽',
+        age: 22,
+        hobby: 'golf🏌',
+        music: 'rock 🎸'
+    }
+];
+
+friends = [
+    {
+        name: 'Jane 🥽',
+        age: 24,
+        hobby: 'golf🏌',
+        music: 'Pop 🎸'
+    }
+];
+
+console.log(friends);
+//output => Uncaught TypeError: Assignment to constant variable.
+
+
+// Arrow functions
+// # without parameter
+/***** ES5 Regular Function  *****/
+let prtLangReg = function () {
+    console.log("JavaScript");
+}
+prtLangReg();
+
+/***** ES6 Arrow Function  *****/
+let prtLangArrow = _ => { console.log("JavaScript"); }
+prtLangArrow();
+
+// # with parameter
+/***** ES5 Regular Function  *****/
+let prtLangReg = function (language) {
+    console.log(language);
+}
+prtLangReg("JavaScript");
+
+/***** ES6 Arrow Function  *****/
+let prtLangArrow = (language) => { console.log(language); }
+prtLangArrow("JavaScript");
+
+// # with parameters
+/***** ES5 Regular Function  *****/
+let prtLangReg = function (id, language) {
+    console.log(id + ".) " + language);
+}
+prtLangReg(1, "JavaScript");
+
+/***** ES6 Arrow Function  *****/
+let prtLangArrow = (id, language) => { console.log(id + ".) " + language); }
+prtLangArrow(1, "JavaScript");
+
+
+// ES6 Classes
+class User {
+    constructor(name, age, email) {
+        this.name = name;
+        this.age = age;
+        this.email = email;
+    }
+    increaseAge() {
+        this.age += 1;
+    }
+}
+
+const user1 = new User('messi', 31, 'messi@gmail.com')
+console.log(user1); //User {name: "messi", age: 31, email: "messi@gmail.com"}
+user1.increaseAge()
+console.log(user1); // User {name: "messi", age: 32, email: "messi@gmail.com"}
+
+
+// Imports và Exports
+// # export
+// 📁 say.js
+function sayHi(user) {
+    alert(`Hello, ${user}!`);
+};
+
+function sayBye(user) {
+    alert(`Bye, ${user}!`);
+};
+
+export { sayHi, sayBye }; // a list of exported variables
+
+// # import
+// 📁 main.js
+import { sayHi as hi, sayBye as bye } from './say.js';
+
+hi('John'); // Hello, John!
+bye('John'); // Bye, John!
+
+
+// Spread and rest operator
+// # (...) dots
+//In arrays
+const jobs = ["teacher 👩‍🏫 ", "engineer 🧰", "developer 👩‍💻"];
+
+const currentJobs = [
+    ...jobs,
+    "actor 🎥",
+    "social media influencer 📴",
+    "musician 🎻",
+];
+
+console.log(currentJobs);
+//output => ["teacher 👩‍🏫 ", "engineer 🧰", "developer 👩‍💻", "actor 🎥", "social media influencer 📴", "musician 🎻"]
+
+//In objects
+const currentJob = {
+    name: "Jane",
+    job: "developer 👩‍💻",
+};
+
+console.log(currentJob);
+
+const funJob = {
+    ...currentJob,
+    name: "Tracy",
+    PartTimejob: "musician 🎻",
+};
+
+console.log(funJob);
+//output => {name: "Tracy", job: "developer 👩‍💻", PartTimejob: "musician 🎻"}
+
+
+// # rest operator
+const num = (...args) => {
+    return args.map((arg) => arg / 2);
+};
+const result = num(40, 60, 80, 120, 200, 300);
+console.log(result);
+
+//output => [20, 30, 40, 60, 100, 150]
+
+//example 2
+const myFruits = (...fruits) => {
+    return fruits.filter((fruit) => fruit !== "🍌");
+};
+
+const result = myFruits("🍎", "🥝", "🍌", "🍍", "🍉", "🍏");
+
+console.log(result);
+//output
+["🍎", "🥝", "🍍", "🍉", "🍏"]
+
+
+// Destructuring javascript
+// # Array destructuring
+const myFruits = ["🍎", "🥝", "🍌", "🍍", "🍉", "🍏"];
+const [myFavorite, , , listFavorite] = myfruits;
+console.log(myFavorite, listFavorite);
+// 🍎 🍍
+
+// # Objects destructuring
+const { name, job } = { name: "Tracy", job: "musician 🎻" };
+console.log(name, job);
+// Tracy musician 🎻
+
+
+// Capitalize the first letter of a string
+const capitalize = str => `${str.charAt(0).toUpperCase()}${str.slice(1)}`;
+capitalize("hello, you are a cool person!");
+// Result: "Hello, you are a cool person!"
+
+
+
+// Calendar Hacking - next seven days
+// Create an array of the past seven days, inclusive
+[...Array(7).keys()].map(days => new Date(Date.now() - 86400000 * days));
+
+
+// Random ID generation
+// Generate a random alphanumerical string of length 11
+const a = Math.random().toString(36).substring(2);
+console.log(a);
+
+
+// Working clock
+{/* <body onload="setInterval(()=>document.body.innerHTML=new Date().toGMTString().slice(17,25))"></body> */ }
+
+// Shuffle an array
+// Return a shuffled copy of an Array-like
+let arr = ["A", "B", "C", "D", "E"];
+(arr) => arr.slice().sort(() => Math.random() - 0.5)
+
+
+// Checking whether all the elements in an array meets a certain condition
+const hasEnoughSalary = (salary) => salary >= 30000;
+
+const salarys = [70000, 19000, 12000, 30000, 15000, 50000];
+result = salarys.every(hasEnoughSalary);
+console.log(result); // false
+
+const salarys = [70000, 190000, 120000, 30000, 150000, 50000];
+result = salarys.every(hasEnoughSalary);
+console.log(result); // true
+
+
+// https://gist.github.com/tombigel/6473f36407352fc21f1774d48f4740c7
+// https://davidwalsh.name/essential-javascript-functions
+// https://gist.github.com/iSkore/dcfa6399f7dce509fd4a7b7c7592ec96
+// https://gist.github.com/alsolovyev/eabb24d7ec9cb4040a1680b44baadfa4
+// https://gist.github.com/sheideman/65cb81a1c9594a9eab9e114d4f9d4480
+// https://gist.github.com/tstabla/428876c0f3f5936c82f5f8ea703ae3c6
+
+
+// cookiehelpers.js
+window.createCookie = function (name, value, days) {
+    var expires;
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+    }
+    else {
+        expires = "";
+    }
+    document.cookie = name + "=" + value + expires + "; path=/";
+};
+
+window.getCookie = function (name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+};
+
+
+const range = (size, from = 0) => {
+    return [...Array(size)].map((v, i) => i + from);
+}
+
+const randomLetter = () => {
+    return String.fromCharCode(Math.floor(Math.random() * 26) + 97);
+};
+
+const randomWord = (minSize = 5, maxSize = 10) => {
+    return ([...Array(Math.floor((Math.random() * (maxSize + 1 - minSize)) + minSize))].map(v => randomLetter())).join('');
+}
+
+const randomNumber = (from = 5, to = 20) => {
+    return Math.floor(Math.random() * ((to + 1) - from) + from);
+};
+
+const getRandomDNI = () => {
+    let num = (Math.random() * 100000000).toPrecision(8);
+    return num + "TRWAGMYFPDXBNJZSQVHLCKET"[(num % 23)];
+};
+
+
+
+// js-debugging-helpers.js
+// adapted from https://stackoverflow.com/questions/1248302/how-to-get-the-size-of-a-javascript-object
+
+export function roughObjSizeLength(obj) {
+    return JSON.stringify(obj).length;
+}
+
+export function roughSizeOfObjectInBytes(object) {
+    var objectList = [];
+    var stack = [object];
+    var bytes = 0;
+
+    while (stack.length) {
+        var value = stack.pop();
+
+        if (typeof value === 'boolean') {
+            bytes += 4;
+        } else if (typeof value === 'string') {
+            bytes += value.length * 2;
+        } else if (typeof value === 'number') {
+            bytes += 8;
+        } else if (typeof value === 'object' && objectList.indexOf(value) === -1) {
+            objectList.push(value);
+
+            for (var i in value) {
+                stack.push(value[i]);
+            }
+        }
+    }
+    return bytes;
+}
+
+
+// vk-helpers.js
+var queryAll = function (selector) {
+    return [].slice.call(document.querySelectorAll(selector));
+};
+
+// 1. Open album.
+// 2. Execute code in console.
+// 3. Press → button until the end of the album
+// 4. Then execute `printLinks();`, copy the output and pass it to wget.
+var addAlbumPhotoLinks = function () {
+    var links = [];
+    var addLink = function () {
+        var url = document.querySelector('.pvs_act:last-child').href;
+        links.push(url);
+    };
+    var printLinks = function () {
+        return links.join(' ');
+    };
+
+    document.addEventListener('keyup', function (event) {
+        if (event.keyCode === 39) {
+            addLink();
+        }
+    });
+};
+
+// 1. Open wall.
+// 2. Scroll many pages to the end.
+// 3. Execute the code in console.
+var deleteWallPosts = function () {
+    var posts = queryAll('.delete_post > div');
+    var index = 0;
+    var deletePost = function () {
+        posts[index].onclick();
+        index += 1;
+    };
+    setInterval(deletePost, 2500);
+};
+
+var lastEveryIndex = 0;
+var every = function (interval, list, callback) {
+    var interval = window.setInterval(function () {
+        if (lastEveryIndex >= list.length) return window.clearInterval(interval);
+        callback(list[lastEveryIndex++]);
+    }, interval);
+};
+
+// Delete all dialogs at http://vk.com/im.
+var deleteDialogs = function () {
+    var dialogs = queryAll('.dialogs_del');
+
+    var deleteDialog = function (index) {
+        console.log('deleteDialog', index);
+        var dialog = dialogs[index];
+
+        if (dialog == null) throw new Error('No more dialogs');
+
+        try {
+            dialog.onclick();
+        } catch (e) { }
+
+        setTimeout(function () {
+            document.querySelector('.button_blue > button').onclick();
+            deleteWhenBalloonDisposed(index + 1);
+        }, 500);
+    };
+
+    var balloonExists = function () {
+        return document.querySelector('.popup_box_container') != null &&
+            document.querySelector('.top_result_baloon_wrap') != null;
+    };
+
+    var deleteWhenBalloonDisposed = function (index) {
+        setTimeout(function () {
+            if (balloonExists()) {
+                deleteWhenBalloonDisposed(index);
+            } else {
+                deleteDialog(index);
+            }
+        }, 200);
+    };
+
+    deleteDialog(0);
+};
+
+var removeWallLikes = function () {
+    var likes = queryAll('.post_like.fl_r');
+    var counter = 0;
+    setInterval(function () { likes[counter++].onclick(); }, 1500);
+};
+
+// Dotjs script that will auto-add audio download buttons
+// near to their “play” buttons.
+var createDownloadButtons = function () {
+    var css = '.rotated-button {\
+      width: 16px; \
+      height: 16px; \
+      margin-top: 5px; \
+      display: block; \
+      -webkit-transform: rotate(90deg); }';
+
+    var head = document.getElementsByTagName('head')[0];
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode(css));
+    head.appendChild(style);
+
+    var addDownloadButton = function (item) {
+        item.classList.add('added-download-button');
+        var url = item.nextSibling.nextSibling.value.split(',')[0];
+        item.innerHTML += '<a class="play_new rotated-button" href="' + url + '" download="file"></a>';
+    };
+
+    var parsePage = function () {
+        var selector = '.play_btn_wrap:not(.added-download-button)';
+        queryAll(selector).forEach(addDownloadButton);
+    };
+
+    window.setTimeout(function () {
+        parsePage();
+        window.setInterval(parsePage, 2000);
+    }, 100);
+};
+
+
+// GenerateUUID.js
+export default function GenerateUUID() {
+    let u = Date.now().toString(16) + Math.random().toString(16) + '0'.repeat(16);
+    return [u.substr(0, 8), u.substr(8, 4), '4000-8' + u.substr(13, 3), u.substr(16, 12)].join('-');
+}
+
+
+// objectCopy.js
+export function objectCopy(obj) {
+    if (typeof obj === "object") {
+        return JSON.parse(JSON.stringify(obj));
+    } else {
+        console.log(obj);
+    }
+}
+
+// utils.js
+const head = array => array[0];
+const zip = (...arrays) => (
+    head(arrays).map((value, index) => arrays.map(otherArray => otherArray[index]))
+);
+const map = (collection, mapFn) => (
+    Object.keys(collection).map(key => mapFn(collection[key], key))
+);
+const reduce = (collection, reduceFn, seed) => (
+    Object.keys(collection).reduce((acc, key) => {
+        const value = collection[key];
+        return reduceFn(acc, value, key);
+    }, seed)
+);
+const mapKeys = (collection, mapFn) => (
+    reduce(collection, (acc, value, key) => {
+        acc[mapFn(value, key)] = value;
+        return acc;
+    }, {})
+);
+const contains = (array, itemToFind) => array.some(item => item === itemToFind);
+
+const range = (start, end) => (
+    Array.from({ length: end - start }, (x, i) => i + start)
+);
+// OR
+const range = (start, end) => Array(end - start).fill().map((x, i) => i + start)
+
+const flatten = (xs) => xs.reduce((acc, value) => acc.concat(value), [])
+
+
+function replaceEntities(str) {
+    return se('<textarea>' + ((str || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')) + '</textarea>').value;
+}
+
+function clean(str) {
+    return str ? (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;') : '';
+}
+
+function unclean(str) {
+    return replaceEntities((str + '').replace(/\t/g, "\n"));
+}
+
+function rand(mi, ma) {
+    return Math.random() * (ma - mi + 1) + mi;
+}
+
+function isUndefined(obj) {
+    return typeof obj === 'undefined'
+};
+
+function isFunction(obj) {
+    return Object.prototype.toString.call(obj) === '[object Function]';
+}
+
+function isString(obj) {
+    return typeof obj === 'string';
+}
+
+function isArray(obj) {
+    return Object.prototype.toString.call(obj) === '[object Array]';
+}
+
+function isObject(obj) {
+    return Object.prototype.toString.call(obj) === '[object Object]' && !(browser.msie8 && obj && obj.item !== 'undefined' && obj.namedItem !== 'undefined');
+}
+
+function isEmpty(o) {
+    if (Object.prototype.toString.call(o) !== '[object Object]') { return false; } for (var i in o) { if (o.hasOwnProperty(i)) { return false; } } return true;
+}
+
+function isNumeric(value) {
+    return !isNaN(value);
+}
+
+
+var req = function (params) { var xhr = new XMLHttpRequest(); xhr.open(params.verb || 'GET', params.url); for (name in params.headers || []) { xhr.setRequestHeader(name, (params.headers || [])[name]) }; cb = console.log.bind(console); xhr.onerror = params.error || cb; xhr.onreadystatechange = params.cb || cb; return xhr };
+
+var mkparams = function (params) { var param_str = ""; for (key in params) { var sep = param_str == "" ? "?" : "&"; param_str += sep + key + "=" + params[key] }; return param_str }
+
+var q = function (sel) { return document.querySelector(sel) }
+var qa = function (sel) { return document.querySelectorAll(sel) }
+
+var range = function (from, to) { var ary = []; for (var i = 0; i < from + to; i++) { ary[from + i] = from + i; }; return ary }
+
+var slug = function (str) { return str.replace(/[^\w\d\s]/g, "").trim().replace(/\s+/g, "-") }
+
+var ary = function (indexable) { var ary = []; for (var i = 0; i < indexable.length; i++) { ary[i] = indexable[i]; }; return ary }
+
+
+/**
+ *
+ * @param value
+ * @returns {boolean}
+ */
+export const isUndefined = function (value) {
+    return typeof value === 'undefined'
+};
+
+/**
+ *
+ * @param val
+ * @returns {boolean}
+ */
+export const isEmpty = function (val) {
+
+    let has = Object.prototype.hasOwnProperty;
+
+    let toString = Object.prototype.toString;
+
+    // Null and Undefined...
+    if (val == null) return true;
+
+    // Booleans...
+    if ('boolean' == typeof val) return false;
+
+    // Numbers...
+    if ('number' == typeof val) return val === 0;
+
+    // Strings...
+    if ('string' == typeof val) return val.length === 0;
+
+    // Functions...
+    if ('function' == typeof val) return val.length === 0;
+
+    // Arrays...
+    if (Array.isArray(val)) return val.length === 0;
+
+    // Errors...
+    if (val instanceof Error) return val.message === '';
+
+    // Objects...
+    if (val.toString == toString) {
+        switch (val.toString()) {
+
+            // Maps, Sets, Files and Errors...
+            case '[object File]':
+            case '[object Map]':
+            case '[object Set]': {
+                return val.size === 0
+            }
+
+            // Plain objects...
+            case '[object Object]': {
+                for (let key in val) {
+                    if (has.call(val, key)) return false
+                }
+
+                return true
+            }
+        }
+    }
+
+    // Anything else...
+    return false;
+};
+
+/**
+ *
+ * @param value
+ * @returns {boolean}
+ */
+export const isJSON = function (value) {
+
+    let re = /^\{[\s\S]*\}$|^\[[\s\S]*\]$/;
+
+    if (typeof value !== 'string') {
+        return false;
+    }
+    if (!re.test(value)) {
+        return false;
+    }
+    try {
+
+        JSON.parse(value);
+
+    } catch (err) {
+
+        return false;
+
+    }
+
+    return true;
+};
+
+/**
+ *
+ * @param string
+ * @returns {*}
+ */
+export const capitalizeFirstLetter = function (string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+/**
+ *
+ * @param array
+ * @param value
+ * @returns {boolean}
+ */
+export const isInArray = function (array, value) {
+    array = array || [];
+    let len = array.length;
+    let i;
+    for (i = 0; i < len; i++) {
+        if (array[i] === value) {
+            return true;
+        }
+    }
+    return false;
+};
+
+/**
+ * 
+ * @returns {Promise<string>}
+ */
+export const getLeroLero = async function () {
+
+    return await (await fetch("http://whatthecommit.com/index.txt", {
+        method: 'GET',
+        headers: ((new Headers()).append("Content-Type", "text/plain")),
+        mode: 'cors',
+        cache: 'default'
+    })).text();
+
+};
+
+/**
+ *
+ * @param condition
+ * @param fn
+ */
+export const isReady = function (condition, fn) {
+    if (document.readyState == "complete" && eval('typeof ' + condition) !== 'undefined' && condition) {
+        fn();
+    } else {
+        setTimeout(function () {
+            isReady(condition, fn);
+        }, 100);
+    }
+};
+
+/**
+ *
+ * @param arrayOrObjectToSort
+ * @param term
+ * @returns {*}
+ */
+export const sortAlphabeticalyByTerm = function (arrayOrObjectToSort, term) {
+
+    return arrayOrObjectToSort.sort(function (a, b) {
+        if (a.term < b.term) return -1;
+        if (a.term > b.term) return 1;
+        return 0;
+    });
+
+};
+
+/**
+ *
+ * @param cname
+ * @returns {string}
+ */
+export const getCookie = function (cname) {
+
+    let name = cname ? cname + "=" : '';
+    let decodedCookie = decodeURIComponent(window.parent.document.cookie);
+    let ca = decodedCookie.split(';');
+    let all = {};
+    let hasAll = false;
+
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+
+        if (name === '') {
+            let indice = c.indexOf('=');
+            all[c.substr(0, indice)] = c.substr((indice + 1));
+            hasAll = true;
+            continue;
+        }
+
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+
+    return hasAll ? all : "";
+
+};
+
+/**
+ *
+ * @param cname
+ * @param cvalue
+ * @param exdays
+ * @param cdomain
+ * @returns {string}
+ */
+export const setCookie = function (cname, cvalue, exdays, cdomain) {
+
+    if (typeof exdays === 'undefined') {
+
+        exdays = new Date("Thu, 30 Sep 2027 00:00:01 GMT");
+
+    } else if (typeof exdays === 'number') {
+
+        let days = exdays, t = exdays = new Date();
+        t.setMilliseconds(t.getMilliseconds() + (days * 864e+5));
+    }
+
+    return (document.cookie = [
+        encodeURIComponent(cname), '=', String(cvalue),
+        exdays ? '; expires=' + exdays.toUTCString() : '',
+        '; path=/',
+        '; domain=' + cdomain || '.madeiramadeira.com.br',
+    ].join(''));
+
+};
+
+/**
+ *
+ * @param key
+ * @param value
+ */
+export const setItemInSessionStorage = function (key, value) {
+
+    return window.sessionStorage.setItem(key, value);
+
+};
+
+/**
+ *
+ * @param key
+ * @returns {string}
+ */
+export const getItemFromSessionStorage = function (key) {
+
+    return sessionStorage.getItem(key);
+
+};
+
+/**
+ *
+ * @param key
+ */
+export const removeItemFromSessionStorage = function (key) {
+
+    return sessionStorage.removeItem(key);
+
+};
+
+/**
+ *
+ */
+export const clearAllSessionStorage = function () {
+
+    return sessionStorage.clear();
+
+};
+
+/**
+ *
+ * @param obj
+ * @returns {*}
+ */
+export const memorySizeOf = function (obj) {
+    let bytes = 0;
+
+    function sizeOf(obj) {
+        if (obj !== null && obj !== undefined) {
+            switch (typeof obj) {
+                case 'number':
+                    bytes += 8;
+                    break;
+                case 'string':
+                    bytes += obj.length * 2;
+                    break;
+                case 'boolean':
+                    bytes += 4;
+                    break;
+                case 'object':
+                    let objClass = Object.prototype.toString.call(obj).slice(8, -1);
+                    if (objClass === 'Object' || objClass === 'Array') {
+                        for (let key in obj) {
+                            if (!obj.hasOwnProperty(key)) continue;
+                            sizeOf(obj[key]);
+                        }
+                    } else bytes += obj.toString().length * 2;
+                    break;
+            }
+        }
+        return bytes;
+    };
+
+    function formatByteSize(bytes) {
+        if (bytes < 1024) return bytes + " bytes";
+        else if (bytes < 1048576) return (bytes / 1024).toFixed(3) + " KB";
+        else if (bytes < 1073741824) return (bytes / 1048576).toFixed(3) + " MB";
+        else return (bytes / 1073741824).toFixed(3) + " GB";
+    };
+
+    return formatByteSize(sizeOf(obj));
+};
+
+/**
+ *
+ * @returns {boolean}
+ */
+export const isMobile = function () {
+
+    let isMobile = false;
+    // device detection
+    if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent) ||
+        /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0, 4))) isMobile = true;
+
+    return isMobile;
+
+};
+
+/**
+ *
+ * @returns {*|boolean}
+ */
+export const isIPhone = function () {
+    return /iphone|ipad/ig.test(navigator.userAgent);
+};
+
+/**
+ *
+ * @returns {boolean}
+ */
+export const isLocalStorageSupported = function () {
+    let testKey = 'test', storage = window.sessionStorage;
+    try {
+        storage.setItem(testKey, '1');
+        storage.removeItem(testKey);
+        return true;
+    } catch (error) {
+        return false;
+    }
+};
+
+/**
+ *
+ * @param el
+ * @returns {boolean}
+ */
+export const isElementInViewport = function (el) {
+
+    if (isEmpty(el)) return;
+
+    try {
+        //special bonus for those using jQuery
+        if (typeof $ === "function" && el instanceof $) {
+            el = el[0];
+        }
+
+        if (typeof el.getBoundingClientRect === 'function') {
+            let rect = el.getBoundingClientRect();
+
+            return (
+                (rect.top >= 0 || (rect.top < 0 && rect.height - rect.top >= 0)) &&
+                rect.left >= 0 &&
+                // !(rect.top == 0 && rect.right == 0 && rect.bottom == 0 && rect.left == 0 && rect.width == 0) && // Avoid itens on no pointview
+                rect.top <= (window.innerHeight || document.documentElement.clientHeight)
+            );
+        }
+
+        return;
+
+    } catch (e) {
+
+        return;
+
+    }
+
+};
+
+/**
+ *
+ * @param CPF
+ * @returns {boolean}
+ */
+export const isValidCPF = function (CPF) {
+
+    let sum = 0;
+    let _module;
+
+    if (CPF == "00000000000") return false;
+
+    for (let i = 1; i <= 9; i++) sum = sum + parseInt(CPF.substring(i - 1, i)) * (11 - i);
+    _module = (sum * 10) % 11;
+
+    if ((_module == 10) || (_module == 11)) _module = 0;
+    if (_module != parseInt(CPF.substring(9, 10))) return false;
+
+    sum = 0;
+    for (let i = 1; i <= 10; i++) sum = sum + parseInt(CPF.substring(i - 1, i)) * (12 - i);
+    _module = (sum * 10) % 11;
+
+    if ((_module == 10) || (_module == 11)) _module = 0;
+    if (_module != parseInt(CPF.substring(10, 11))) return false;
+    return true;
+};
+
+/**
+ * @param email
+ * @returns {boolean}
+ */
+export const validateEmail = function (email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+};
+
+/**
+ *
+ * @returns {{user_navigator_version: number | *, user_navigator_vendor: string, user_navigator_app_version: string, user_navigator_platform: string, user_navigator_user_agent: string, user_os_name: *, user_navigator_name: *, user_os_version: number | *}}
+ */
+export const getOsAndBrowserData = function () {
+    let module = {
+        options: [],
+        header: [navigator.platform, navigator.userAgent, navigator.appVersion, navigator.vendor, window.opera],
+        dataos: [
+            { name: 'Windows Phone', value: 'Windows Phone', version: 'OS' },
+            { name: 'Windows', value: 'Win', version: 'NT' },
+            { name: 'iPhone', value: 'iPhone', version: 'OS' },
+            { name: 'iPad', value: 'iPad', version: 'OS' },
+            { name: 'Kindle', value: 'Silk', version: 'Silk' },
+            { name: 'Android', value: 'Android', version: 'Android' },
+            { name: 'PlayBook', value: 'PlayBook', version: 'OS' },
+            { name: 'BlackBerry', value: 'BlackBerry', version: '/' },
+            { name: 'Macintosh', value: 'Mac', version: 'OS X' },
+            { name: 'Linux', value: 'Linux', version: 'rv' },
+            { name: 'Palm', value: 'Palm', version: 'PalmOS' }
+        ],
+        databrowser: [
+            { name: 'Chrome', value: 'Chrome', version: 'Chrome' },
+            { name: 'Firefox', value: 'Firefox', version: 'Firefox' },
+            { name: 'Safari', value: 'Safari', version: 'Version' },
+            { name: 'Internet Explorer', value: 'MSIE', version: 'MSIE' },
+            { name: 'Opera', value: 'Opera', version: 'Opera' },
+            { name: 'BlackBerry', value: 'CLDC', version: 'CLDC' },
+            { name: 'Mozilla', value: 'Mozilla', version: 'Mozilla' }
+        ],
+        init: function () {
+            let agent = this.header.join(' '),
+                os = this.matchItem(agent, this.dataos),
+                browser = this.matchItem(agent, this.databrowser);
+
+            return { os: os, browser: browser };
+        },
+        matchItem: function (string, data) {
+            let i = 0,
+                j = 0,
+                html = '',
+                regex,
+                regexv,
+                match,
+                matches,
+                version;
+
+            for (i = 0; i < data.length; i += 1) {
+                regex = new RegExp(data[i].value, 'i');
+                match = regex.test(string);
+                if (match) {
+                    regexv = new RegExp(data[i].version + '[- /:;]([\\d._]+)', 'i');
+                    matches = string.match(regexv);
+                    version = '';
+                    if (matches) { if (matches[1]) { matches = matches[1]; } }
+                    if (matches) {
+                        matches = matches.split(/[._]+/);
+                        for (j = 0; j < matches.length; j += 1) {
+                            if (j === 0) {
+                                version += matches[j] + '.';
+                            } else {
+                                version += matches[j];
+                            }
+                        }
+                    } else {
+                        version = '0';
+                    }
+                    return {
+                        name: data[i].name,
+                        version: parseFloat(version)
+                    };
+                }
+            }
+            return { name: 'unknown', version: 0 };
+        }
+    };
+
+    let e = module.init();
+    let obj = {
+        "user_os_name": e.os.name
+        , "user_os_version": e.os.version
+        , "user_navigator_name": e.browser.name
+        , "user_navigator_version": e.browser.version
+        , "user_navigator_user_agent": navigator.userAgent
+        , "user_navigator_app_version": navigator.appVersion
+        , "user_navigator_platform": navigator.platform
+        , "user_navigator_vendor": navigator.vendor
+    };
+
+    return obj;
+};
+
+/**
+ *
+ * @param selector
+ * @returns {Element}
+ */
+export const queryBySelector = function (selector) {
+
+    let element = document.querySelector(selector);
+
+    if (!element) {
+        throw Error('Function getBySelector: HTML ELEMENT WITH SELECTOR:' + selector + ' WAS NOT FOUND!');
+    }
+
+    return element;
+
+};
+
+export const queryAllBySelector = function (selector) {
+
+    let elements = document.querySelectorAll(selector);
+
+    //console.log('elements: ',typeof elements,elements.__proto__,elements );
+
+    if (!elements) {
+        throw Error('Function queryAllBySelector: HTML ELEMENTS WITH SELECTOR:' + selector + ' WERE NOT FOUND!');
+    }
+
+    return Array.prototype.slice.call(elements);
+
+};
+
+export const debounce = function (func, wait, immediate) {
+    var timeout;
+    return function () {
+        var context = this, args = arguments;
+        var later = function () {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        var callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+};
+
+export const isUrl = function (string) {
+
+    if (typeof string !== 'string') return false;
+
+    let match = string.match(/^(?:\w+:)?\/\/(\S+)$/);
+
+    if (!match) return false;
+
+    let everythingAfterProtocol = match[1];
+
+    if (!everythingAfterProtocol) return false;
+
+    if (/^localhost[\:?\d]*(?:[^\:?\d]\S*)?$/.test(everythingAfterProtocol) ||
+        /^[^\s\.]+\.\S{2,}$/.test(everythingAfterProtocol)) {
+        return true;
+    }
+
+    return false;
+};
+
+export const findAndReplaceUrls = function (text) {
+
+    return (text || '').replace(
+        /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)(:[0-9]*)?((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/gi,
+        function (ocur) {
+            let link = ocur;
+            if (!/^(http:\/\/|https:\/\/)/.test(link.toLowerCase())) link = '//' + link;
+            return '<a href="javascript:false;" onclick="window.open(\'' + link + '\')">' + ocur + '</a>';
+        }
+    );
+
+};
+
+// file-utils.js
+/** 
+  Method to remove directory and files recursively &
+  check if user wants to delete the directory or just the files in it. 
+**/
+const fs = require('fs');
+const path = require('path');
+function rmDir(dir, rmSelf = true) {
+    let files;
+    try {
+        files = fs.readdirSync(dir);
+    } catch (e) {
+        console.log('!Oops, directory not exist.');
+        return;
+    }
+    if (files.length > 0) {
+        files.forEach(function (file, index) {
+            let newDir = path.join(dir, file);
+            if (fs.statSync(newDir).isDirectory()) {
+                rmDir(newDir);
+            } else {
+                fs.unlinkSync(newDir);
+            }
+        });
+    }
+    if (rmSelf) {
+        // check if user want to delete the directory or just the files in this directory
+        fs.rmdirSync(dir);
+    }
+};
+
+
+// string-utils.js
+/* 
+  To UpperCamelCase(string) 
+  input: toUpperCamelCase('action-button-material');
+  returns 'ActionButtonMaterial'
+*/
+function toUpperCamelCase(str) {
+    return str
+        .replace(/[a-z]/, function (p) { return p[0].toUpperCase() })
+        .replace(/-([a-z])/g, function (p) { return p[1].toUpperCase() });
+}
+
+
+/*
+   extractFileName(string, boolean)
+   1. input: extractFileName('/src/components/action-button/action-buton.js');
+      returns 'action-buton'
+   2. input: extractFileName('/src/components/action-button/action-buton.js', true);
+      returns ['action-buton','js']
+*/
+function extractFileName(file, ext = false) {
+    let fileParts = file.substr(file.lastIndexOf('/') + 1).split('.');
+    return ext ? fileParts : fileParts.shift();
+}
+
+/*
+  deep equality
+*/
+const deepEquality = (value1, value2) => {
+    return value1 === value2
+        ? true
+        : value !== null &&
+            value2 !== null &&
+            (typeof value1 === 'object' && typeof value2 === 'object')
+            ? deepEquality(
+                Object.keys(value1)
+                    .map(value => value1[value] === value2[value])
+                    .reduce((acc, cur) => acc && cur),
+                Object.keys(value2)
+                    .map(value => value2[value] === value1[value])
+                    .reduce((acc, cur) => acc && cur)
+            )
+            : false;
+};
+//console.log([1,2,3] === [1,2,3]); false
+//console.log(deepEquality[1,2,3],[1,2,3])); true
+
+
+//  utils.js
+export default {
+    // 判断是否为微信小程序
+    isWxMini() {
+        return window.__wxjs_environment === 'miniprogram'
+    },
+
+    // 判断是否为微信浏览器
+    isWxBrowser() {
+        let isMiniProgram = window.__wxjs_environment === 'miniprogram';
+        return navigator.userAgent.toLowerCase().indexOf('micromessenger') !== -1 && window.__wxjs_environment !== 'miniprogram'
+    },
+
+    /**
+     * 校验18位身份证号格式
+     * @param code 身份证号
+     * @return {tip, isValid} tip 提示信息, isValid true 合法 false 非法
+     */
+    validateIdCode(code) {
+        let city = {
+            11: '北京',
+            12: '天津',
+            13: '河北',
+            14: '山西',
+            15: '内蒙古',
+            21: '辽宁',
+            22: '吉林',
+            23: '黑龙江 ',
+            31: '上海',
+            32: '江苏',
+            33: '浙江',
+            34: '安徽',
+            35: '福建',
+            36: '江西',
+            37: '山东',
+            41: '河南',
+            42: '湖北 ',
+            43: '湖南',
+            44: '广东',
+            45: '广西',
+            46: '海南',
+            50: '重庆',
+            51: '四川',
+            52: '贵州',
+            53: '云南',
+            54: '西藏 ',
+            61: '陕西',
+            62: '甘肃',
+            63: '青海',
+            64: '宁夏',
+            65: '新疆',
+            71: '台湾',
+            81: '香港',
+            82: '澳门',
+            91: '国外'
+        }
+        let tip = ''
+        let isValid = true
+
+        if (!code || !/^[1-9][0-9]{5}(19[0-9]{2}|200[0-9]|2010)(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[0-9]{3}[0-9xX]$/i.test(code)) {
+            tip = '身份证号格式错误'
+            isValid = false
+            return { tip, isValid }
+        }
+        if (!city[code.substr(0, 2)]) {
+            tip = '身份证号错误'
+            isValid = false
+            return { tip, isValid }
+        }
+        // 此处不考虑15位的旧代身份证号
+        if (code.length !== 18) {
+            tip = '身份证号位数不足18位'
+            isValid = false
+            return { tip, isValid }
+        }
+        code = code.split('')
+        //∑(ai×Wi)(mod 11)
+        //加权因子
+        let factor = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
+        //校验位
+        let parity = [1, 0, 'X', 9, 8, 7, 6, 5, 4, 3, 2]
+        let sum = 0
+        let ai = 0
+        let wi = 0
+        for (let i = 0; i < 17; i++) {
+            ai = code[i]
+            wi = factor[i]
+            sum += ai * wi
+        }
+        let result = parity[sum % 11]
+        if (result === 'X') {
+            if (String(result) !== String(code[17])) {
+                tip = '身份证号校验位错误'
+                isValid = false
+            }
+        } else {
+            if (Number(result) !== Number(code[17])) {
+                tip = '身份证号校验位错误'
+                isValid = false
+            }
+        }
+        return { tip, isValid }
+    },
+
+    uuid() {
+        let s = [];
+        let hexDigits = "0123456789abcdef";
+        for (let i = 0; i < 36; i++) {
+            s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+        }
+        s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
+        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
+        s[8] = s[13] = s[18] = s[23] = "-";
+
+        return s.join("");
+    },
+
+    /**
+     * 设置苹果 微信浏览器的页面title
+     * @param title
+     */
+    setIPhoneWxTitle(title) {
+        document.title = title
+        let mobile = navigator.userAgent.toLowerCase()
+        if (/iphone|ipad|ipod/.test(mobile)) {
+            let iframe = document.createElement('iframe')
+            iframe.style.display = 'none'
+            // 替换成站标favicon路径或者任意存在的较小的图片即可
+            // iframe.setAttribute('src', '/favicon.ico')
+            let iframeCallback = function () {
+                setTimeout(function () {
+                    iframe.removeEventListener('load', iframeCallback)
+                    document.body.removeChild(iframe)
+                }, 0)
+            }
+            iframe.addEventListener('load', iframeCallback)
+            document.body.appendChild(iframe)
+        }
+    },
+
+    isNotEmpty(obj) {
+        if (obj instanceof Array) {
+            return obj && obj.length > 0
+        }
+        if (typeof obj === 'string') {
+            return obj && obj.trim().length > 0
+        }
+        return !!obj // 如果obj为数值型且值为0, 返回false
+    },
+    isEmpty(obj) {
+        return !this.isNotEmpty(obj)
+    },
+};
+
+export function getPath(url) {
+    return url
+        .replace(/^(http[s]?:)?\/\/[^/#?]+/, '') // remove origin
+        .replace(/[?#].*$/, ''); // remove querystring or hash
+}
+export function getUrlParams(url) {
+    if (url.indexOf('?') !== -1) {
+        return parseQueryString(url.split('?')[1]);
+    }
+    else {
+        return {};
+    }
+}
+export function parseQueryString(query) {
+    let params = {};
+    for (let v of query.split('&')) {
+        let [key, val = ""] = v.split('=');
+        params[decodeURIComponent(key)] = decodeURIComponent(val);
+    }
+    return params;
+}
+
+
+export const toCamel = (str) =>
+    str.replace(/([-_][a-z])/gi, s =>
+        s
+            .toUpperCase()
+            .replace('-', '')
+            .replace('_', '')
+    );
+
+export const toUpperCamel = str => toCamel(str.charAt(0).toUpperCase() + str.slice(1))
+
+
+
+// cookies.js
+var docCookies = {
+    getItem: function (sKey) {
+        if (!sKey) { return null; }
+        return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+    },
+    setItem: function (sKey, sValue, vEnd, sPath, sDomain, bSecure) {
+        if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) { return false; }
+        var sExpires = "";
+        if (vEnd) {
+            switch (vEnd.constructor) {
+                case Number:
+                    sExpires = vEnd === Infinity ? "; expires=Fri, 31 Dec 9999 23:59:59 GMT" : "; max-age=" + vEnd;
+                    break;
+                case String:
+                    sExpires = "; expires=" + vEnd;
+                    break;
+                case Date:
+                    sExpires = "; expires=" + vEnd.toUTCString();
+                    break;
+            }
+        }
+        document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + (bSecure ? "; secure" : "");
+        return true;
+    },
+    removeItem: function (sKey, sPath, sDomain) {
+        if (!this.hasItem(sKey)) { return false; }
+        document.cookie = encodeURIComponent(sKey) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "");
+        return true;
+    },
+    hasItem: function (sKey) {
+        if (!sKey) { return false; }
+        return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
+    },
+    listKeys: function () {
+        var aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/);
+        for (var nLen = aKeys.length, nIdx = 0; nIdx < nLen; nIdx++) { aKeys[nIdx] = decodeURIComponent(aKeys[nIdx]); }
+        return aKeys;
+    },
+    clearItems: function () {
+        var cKies = this.listKeys(),
+            cLen = cKies.length;
+        for (var nId = 0; nId < cLen; nId++) {
+            this.removeItem(cKies[nId]);
+        }
+        return true;
+    }
+};
+
+// docCookies.setItem(name, value[, end[, path[, domain[, secure]]]]);
+// docCookies.getItem(name);
+// docCookies.removeItem(name[, path[, domain]]);
+// docCookies.hasItem(name);
+// docCookies.keys();
+
+
+// cacheUtils.js
+const Cache = {
+    setCache(key, val) {
+        if (!this.isIncognitoMode()) {
+            if (val === null) {
+                localStorage.removeItem(key)
+            } else {
+                localStorage.setItem(key, JSON.stringify(val))
+            }
+        } else {
+            // 兼容隐身模式
+            this.setCookie(key, JSON.stringify(val))
+        }
+    },
+
+    getCache(key) {
+        if (!this.isIncognitoMode()) {
+            return JSON.parse(localStorage.getItem(key))
+        } else {
+            // 兼容隐身模式
+            const result = this.getCookie(key)
+            if (result) {
+                if (result.indexOf('{') >= 0 && result.indexOf('}') >= 0) {
+                    return JSON.parse(result)
+                } else {
+                    return result
+                }
+            }
+        }
+    },
+    setCookie(name, value, options) {
+        let arr = []
+        let date
+        options = Object.assign({}, options)
+        // 配置过期时间
+        if (value == null) {
+            value = ''
+            options.expires = -1
+        }
+        if (typeof options.expires === 'number') {
+            date = new Date()
+            date.setTime(date.getTime() + options.expires * 1000)
+        } else if (options.expires instanceof Date) {
+            date = options.expires
+        }
+
+        arr.push(`${name}=${encodeURIComponent(value)}`)
+        date && arr.push(`expires=${date.toUpperCase()}`)
+        options.path && arr.push(`path=${options.path}`)
+        options.domain && arr.push(`domain=${options.domain}`)
+        options.secure && arr.push('secure')
+
+        document.cookie = arr.join('; ')
+    },
+    getCookie(name) {
+        let ret
+        let arr
+        if (document.cookie) {
+            arr = document.cookie.split('; ')
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i].indexOf(name + '=') === 0) {
+                    ret = decodeURIComponent(arr[i].substr(name.length + 1))
+                    break
+                }
+            }
+        }
+        return ret
+    },
+    isIncognitoMode() {
+        let isIncognito
+        // noinspection JSUnresolvedVariable
+        if (window.webkitRequestFileSystem) {
+            window.webkitRequestFileSystem(window.TEMPORARY, 1, function () {
+                isIncognito = false
+            }, function (e) {
+                // eslint-disable-next-line no-console
+                console.log(e)
+                isIncognito = true
+            })
+        } else if (window.indexedDB && /Firefox/.test(window.navigator.userAgent)) {
+            try {
+                window.indexedDB.open('test')
+            } catch (e) {
+                isIncognito = true
+            }
+        } else if (this.isIE10OrLater(window.navigator.userAgent)) {
+            isIncognito = false
+            try {
+                if (!window.indexedDB) {
+                    isIncognito = true
+                }
+            } catch (e) {
+                isIncognito = true
+            }
+        } else if (window.localStorage && /Safari/.test(window.navigator.userAgent)) {
+            try {
+                window.localStorage.setItem('isIncognitoMode', 'true')
+            } catch (e) {
+                isIncognito = true
+            }
+            if (typeof isIncognito === 'undefined') {
+                isIncognito = false
+                window.localStorage.removeItem('isIncognitoMode')
+            }
+        }
+
+        return isIncognito
+    },
+
+    isIE10OrLater(userAgent) {
+        let ua = userAgent.toLowerCase()
+        if (ua.indexOf('msie') === 0 && ua.indexOf('trident') === 0) {
+            return false
+        }
+        let match = /(?:msie|rv:)\s?([\d.]+)/.exec(ua)
+        return !!(match && parseInt(match[1], 10) >= 10)
+    }
+}
+
+export default Cache
+
+
+/**
+ * 首字母大写转换
+ * @param {string} word
+ */
+export const firstUpperCase = ([first, ...rest]) =>
+    first.toUpperCase() + rest.join('')
+
+
+// generateInstanceID.js
+function generateInstanceID() {
+    const a = "abcdefghijklmnopqrstuv";
+    const l = a.length;
+    const t = Date.now();
+    const r = [0, 0, 0].map(d => a[Math.floor(Math.random() * l)]).join("");
+    return `${r}${t}`;
+};
+
+
+// Set CSS pseudo-element styles via JavaScript
+// reference: https://stackoverflow.com/questions/4481485/changing-css-pseudo-element-styles-via-javascript/12207551#answer-8051488
+
+var addRule = (function (style) {
+    var sheet = document.head.appendChild(style).sheet;
+    return function (selector, css) {
+        var propText = typeof css === "string" ? css : Object.keys(css).map(function (p) {
+            return p + ":" + (p === "content" ? "'" + css[p] + "'" : css[p]);
+        }).join(";");
+        sheet.insertRule(selector + "{" + propText + "}", sheet.cssRules.length);
+    };
+})(document.createElement("style"));
+
+addRule("p:before", {
+    display: "block",
+    width: "100px",
+    height: "100px",
+    background: "red",
+    "border-radius": "50%",
+    content: "''"
+});
+
+// copy.js
+export const copyToClip = (text) => {
+    const input = document.createElement('input')
+    input.setAttribute('value', text)
+    input.setAttribute('readonly', 'readonly')
+    document.body.appendChild(input)
+    input.select()
+    try {
+        document.execCommand('copy')
+    } catch {
+        console.log('无法复制，请手动复制！')
+    }
+    document.body.removeChild(input)
+}
+
+// measureTime.js
+const measureTime = (cb, ...args) => {
+    const t0 = performance.now()
+    cb(...args)
+    const t1 = performance.now()
+    console.log(`Call to do something took ${t1 - t0} milliseconds.`)
+}
+
+measureTime(myFunction, params);
+
+
+// location.js
+// 跳转
+window.location.replace('https://www.awesomes.cn') // 不将被跳转页面加入浏览器记录
+window.location.assign('https://www.awesomes.cn')
+window.location.href = 'https://www.awesomes.cn'
+window.location = 'https://www.awesomes.cn'
+
+// 返回上一页
+window.history.back()
+window.history.go(-1)
+
+// 刷新当前页
+window.location.reload()
+
+
+/**
+ * 获取表单数据对象
+ *
+ * @param {HTMLFormElement | string} form
+ * @return {object}
+ */
+export const getFormData = form => {
+    let data = {}
+    const kvObjArray = $(form).serializeArray()
+
+    for (let obj of kvObjArray) {
+        if (data[obj.name]) {
+            // 多選
+            data[obj.name] = [data[obj.name], $.trim(obj.value)].join(',')
+        } else {
+            data[obj.name] = $.trim(obj.value)
+        }
+    }
+
+    return data
+}
+
+/**
+ * 將 queryString 解析为对象
+ *
+ * @param {string} search
+ * @return {object}
+ */
+export const queryParse = (search = window.location.search) => {
+    if (!search) return {}
+    const queryString = search[0] === '?' ? search.substring(1) : search
+    const query = {}
+    queryString.split('&').forEach(queryStr => {
+        const [key, value] = queryStr.split('=')
+        /* istanbul ignore else */
+        if (key) query[decodeURIComponent(key)] = decodeURIComponent(value)
+    })
+
+    return query
+}
+
+/**
+ * 将对象转化为 queryString
+ *
+ * @param {object} query
+ * @return {string}
+ */
+export const queryStringify = query => {
+    const queryString = Object.keys(query)
+        .map(key => `${key}=${encodeURIComponent(query[key] || '')}`)
+        .join('&')
+    return queryString
+}
+
+/**
+ * 去除 url 中特定的 queryString
+ *
+ * @param {string} key
+ * @param {string} href
+ * @return {string}
+ */
+export const removeQueryString = (key, href = window.location.href) => {
+    const [url, search] = href.split('?')
+
+    if (!search) {
+        return url
+    }
+
+    let queryString = search.split('&')
+    let finalQuery = ''
+
+    if (queryString.length) {
+        queryString = queryString.filter(item => !item.startsWith(key + '='))
+    }
+
+    if (!queryString.length) {
+        return url
+    }
+
+    finalQuery = queryString.length > 1 ? queryString.join('&') : queryString[0]
+    return url + '?' + finalQuery
+}
+
+// 通用校验
+export const Verify = {
+    present(val) {
+        val = $.trim(val)
+
+        if (val === '') {
+            return false
+        }
+
+        return true
+    },
+    isEmail(val) {
+        const reg = /^([a-zA-Z0-9_-])+%40([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$/
+        return reg.test(val)
+    }
+}
+
+// 防 XSS
+export function escapeHtml(str) {
+    if (str.length === 0) return ''
+    let s
+    s = str.replace(/&/g, '&amp;')
+    s = s.replace(/</g, '&lt;')
+    s = s.replace(/>/g, '&gt;')
+    s = s.replace(/ /g, '&nbsp;')
+    s = s.replace(/\'/g, '&#39;')
+    s = s.replace(/\"/g, '&quot;')
+
+    return s
+};
+
+
+// randomStr.js
+/**
+ * 生成指定位数的随机数
+ * @param {number} x
+ */
+export const randomStr = (x) => {
+    let s = "";
+    while (s.length < x && x > 0) {
+        let v = Math.random() < 0.5 ? 32 : 0;
+        s += String.fromCharCode(Math.round(Math.random() * ((122 - v) - (97 - v)) + (97 - v)));
+    }
+    return s;
+};
+
+// currency.js
+let num = 123456.1234
+
+num.toLocaleString('zh-Hans-CN', { style: 'currency', currency: 'CNY' })
+// ￥123,456.12
+
+num.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+// $123,456.12
+
+num.toLocaleString('zh', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 })
+// 123,456.12
+
+
+// Flexible layout with viewport unit
+// viewport-units.scss
+// $vu_base: 375 // iphone6
+
+// @function vu($px) {
+//   @return ($px / $vu_base) * 100vw
+// }
+
+
+// batch.js - 插入大量 DOM 的优化
+const container = document.getElementById('js-list');
+if (!container) {
+    return
+}
+
+const total = 10000
+const batchSize = 4 // 每次插入多少个结点，越大越卡
+const batchCount = total / batchSize // 插入次数
+let batchDone = 0 // 已经完成的批处理个数
+
+function appendItems() {
+    const fragment = document.createDocumentFragment()
+
+    for (let i = 0; i < batchSize; i++) {
+        const item = document.createElement('li')
+        item.innerText = batchDone * batchSize + i + 1
+        fragment.appendChild(item)
+    }
+
+    container.appendChild(fragment)
+
+    batchDone += 1
+    doBatchAppend()
+}
+
+function doBatchAppend() {
+    if (batchDone < batchCount) {
+        window.requestAnimationFrame(appendItems)
+    }
+}
+
+// Kickoff
+doBatchAppend()
+
+// Event delegation
+container.addEventListener('click', function (e) {
+    const target = e.target
+    if (target.tagName === 'LI') {
+        alert(target.innerHTML)
+    }
+});
+
+
+// safeStringify.js
+// A utility function to safely escape JSON for embedding in a <script> tag
+function safeStringify(obj) {
+    return JSON.stringify(obj)
+        .replace(/<\/(script)/ig, '<\\/$1')
+        .replace(/<!--/g, '<\\!--')
+        .replace(/\u2028/g, '\\u2028') // line ending
+        .replace(/\u2029/g, '\\u2029') // paragraph ending
+}
+
+
+// example.js
+// Get the color value of .element:before
+var color = window.getComputedStyle(
+    document.querySelector('.element'), ':before'
+).getPropertyValue('color');
+
+// Get the content value of .element:before
+var content = window.getComputedStyle(
+    document.querySelector('.element'), ':before'
+).getPropertyValue('content');
+
+
+// parseurl.js
+// https://gist.github.com/roshanca/9775536
+function parseURL(url) {
+    var a = document.createElement('a');
+    a.href = url;
+    return {
+        source: url,
+        protocol: a.protocol.replace(':', ''),
+        host: a.hostname,
+        port: a.port,
+        query: a.search,
+        params: (function () {
+            var ret = {},
+                seg = a.search.replace(/^\?/, '').split('&'),
+                len = seg.length, i = 0, s;
+            for (; i < len; i++) {
+                if (!seg[i]) { continue; }
+                s = seg[i].split('=');
+                ret[s[0]] = s[1];
+            }
+            return ret;
+        })(),
+        file: (a.pathname.match(/\/([^\/?#]+)$/i) || [, ''])[1],
+        hash: a.hash.replace('#', ''),
+        path: a.pathname.replace(/^([^\/])/, '/$1'),
+        relative: (a.href.match(/tps?:\/\/[^\/]+(.+)/) || [, ''])[1],
+        segments: a.pathname.replace(/^\//, '').split('/')
+    };
+};
+
+var myURL = parseURL('http://abc.com:8080/dir/index.html?id=255&m=hello#top');
+
+myURL.file;     // = 'index.html'
+myURL.hash;     // = 'top'
+myURL.host;     // = 'abc.com'
+myURL.query;    // = '?id=255&m=hello'
+myURL.params;   // = Object = { id: 255, m: hello }
+myURL.path;     // = '/dir/index.html'
+myURL.segments; // = Array = ['dir', 'index.html']
+myURL.port;     // = '8080'
+myURL.protocol; // = 'http'
+myURL.source;   // = 'http://abc.com:8080/dir/index.html?id=255&m=hello#top'
+
+
+// ping.js
+function ping(ip) {
+    var img = new Image();
+    var start = new Date().getTime();
+    img.src = 'http://' + ip + '?t=' + start;
+    var flag = false;
+
+    img.onload = function () {
+        flag = true;
+        console.log('ok');
+    }
+
+    img.onerror = function () {
+        flag = true;
+        console.log('ok');
+    }
+
+    var timer = setTimeout(function () {
+        if (!flag) {
+            flag = false;
+            console.log('failed');
+        }
+    }, 1500);
+}
+
+ping('192.168.1.1');
+
+
+// loadScript.js
+// https://websemantics.uk/archived/useful-javascript-functions/
+(function (d, s, f) {
+    s = d.createElement('script');
+    s.async = 'async';
+    s.src = 'path/to/file.js';
+    f = d.getElementsByTagName('script')[0];
+    f ? f.parentNode.insertBefore(s, f) : d.body.appendChild(s);
+})(document);
+
+
+/**
+ * 截取指定长度的中英文混合字符串
+ * @param  {String} str 待截取的字符串
+ * @param  {Number} n   截取长度（中文字符为英文的 double）
+ * @return {String}     截取后的字符串
+ */
+function subString(str, n) {
+    var r = /[^\x00-\xff]/g;
+    var m;
+
+    if (str.replace(r, '**').length > n) {
+        m = Math.floor(n / 2);
+
+        for (var i = m, l = str.length; i < l; i++) {
+            if (str.substr(0, i).replace(r, '**').length >= n) {
+                return str.substr(0, i);
+            }
+        }
+    }
+
+    return str;
+}
+
+// replace
+let replace = (arr, add = [], del = []) => {
+    return arr.concat(add).filter(item => !del.includes(item))
+};
+replace(['1', '2', 3], ['5,', 9, 'ahihi'], ['2', 'ahihi']);
+// (4) ["1", 3, "5,", 9]
+
+
+function trim(text) {
+    return (text || '').replace(/^\s+|\s+$/g, '');
+}
+
+function stripHTML(text) {
+    return text ? text.replace(/<(?:.|\s)*?>/g, '') : '';
+}
+
+function escapeRE(s) {
+    return s ? s.replace(/([.*+?^${}()|[\]\/\\])/g, '\\$1') : '';
+};
+
+
+// cache.js
+const crypto = require('crypto')
+
+const toMD5 = object => crypto.createHash('md5').update(JSON.stringify(object)).digest('hex')
+
+module.exports = ({
+    timeout = (/* 1 h */ 1 * 60 * 60 * 1000),
+    maxEntries = 100,
+    name = 'cache',
+    log = console.log,
+} = {}) => {
+    const cache = {}
+
+    const purge = () => {
+        // timeout
+        const keysTimeout = Object
+            .entries(cache)
+            .map(([key, store]) => (store.date + timeout) > Date.now() ? undefined : key)
+            .filter(Boolean)
+        if (keysTimeout.length > 0) {
+            log(`[cache](${name}) timeout keys: [${keysTimeout}]`)
+            keysTimeout.forEach((key) => { delete cache[key] })
+        }
+
+        // max entries
+        const entries = Object.entries(cache)
+        if (entries.length <= maxEntries) return
+        entries.sort((a, b) => a[1].date < b[1].date)
+        const keysMaxEntries = entries
+            .filter((val, index) => index >= maxEntries)
+            .map(([key]) => key)
+        if (keysMaxEntries.length > 0) {
+            log(`[cache](${name}) max entries keys: [${keysMaxEntries}]`)
+            keysMaxEntries.forEach((key) => { delete cache[key] })
+        }
+    }
+
+    const add = (key, value) => {
+        purge()
+
+        cache[toMD5(key)] = {
+            value,
+            date: Date.now(),
+        }
+
+        return value
+    }
+
+    const get = (key) => {
+        purge()
+
+        const found = cache[toMD5(key)]
+        if (!found) return undefined
+
+        return found.value
+    }
+
+    return {
+        get,
+        add,
+    }
+};
+
+
+// logger.js
+// Located at app/lib/logger.js
+
+const { log, error, warn } = console
+
+class Log {
+    constructor(message) {
+        this.message = message
+    }
+
+    Write() {
+        throw new Error('Not Implemented')
+    }
+}
+
+class ErrorLog extends Log {
+    Write() {
+        const response = `Error: ${this.message}`
+
+        error(response)
+
+        return response
+    }
+}
+
+class InfoLog extends Log {
+    Write() {
+        const response = `Info: ${this.message}`
+
+        log(response)
+
+        return response
+    }
+}
+
+class WarningLog extends Log {
+    Write() {
+        const response = `Warning: ${this.message}`
+
+        warn(response)
+
+        return response
+    }
+}
+
+const Write = (type, message) => {
+    const writingLogType = {
+        error: new ErrorLog(message),
+        warning: new WarningLog(message),
+        info: new InfoLog(message)
+    }
+
+    if (!writingLogType[type]) {
+        throw new Error('Invalid log type!')
+    }
+
+    return writingLogType[type].Write()
+}
+
+module.exports = {
+    WriteLog: Write
+};
+
+
+function test(a = [1, 2, 3, 4, 5, 6, 7, 8, 9], size = 3) {
+    let index = 0
+    let result = []
+    let resultIndex = 0
+    while (index < a.length) {
+        result[resultIndex++] = a.slice(index, index + size)
+        index += size
+    }
+    return result
+};
+
+function isArray(val) {
+    return Object.prototype.toString.call(val) === '[object Array]'
+}
+const flattern = (arr) => arr.reduce((pre, current) => isArray(current) ? pre.concat(flattern(current)) : pre.concat(current), [])
+console.log(flattern([1, 2, 3, [1, 2, 3, [3, 3, 3, { a: 1 }]]]))
+
+
+
+const get = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
+const user = {
+    comments: [
+        {
+            blog: {
+                title: 'rhb is right'
+            }
+        }
+    ]
+}
+console.log(get(['user', 'comments', 0, 'blog', 'title'], { user }))
+
+
+// form表单结合XMLHttpRequest，post数据
+// 序列化表单
+function serialize(arr) {
+    return arr.reduce((total, current, currentIndex) => {
+        if (currentIndex === 0) {
+            return `${current.name}=${encodeURIComponent(current.value)}`
+        } else {
+            return `${total}&${current.name}=${current.value}`
+        }
+    }, 0)
+}
+document.querySelector('[type=submit]').addEventListener('click', function (e) {
+    e.preventDefault()
+    var xhr = new XMLHttpRequest()
+    xhr.open('POST', 'url', true)
+    // 重点是设置x-www-from-urlencoded
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                alert('成功')
+            } else {
+                alert('失败')
+            }
+        }
+    }
+    var $form = document.querySelector('#myform')
+    let params = serialize(Array.from($form).slice(0, -1)) // 切掉最后一个元素
+    console.log(params)
+    xhr.send()
+})
+
+
+function makeActiveInputVisible() {
+    if ((/Android/gi).test(navigator.userAgent)) {
+        window.addEventListener('resize', function () {
+            if (document.activeElement.tagName == 'INPUT' ||
+                document.activeElement.tagName == 'TEXTAREA') {
+                document.activeElement.scrollIntoViewIfNeeded();
+            }
+        });
+    }
+}
+
+// 解决输入法遮挡textarea输入框
+var focusTextarea = function (e) {
+    // 判断是否为ios机型，另做处理
+    if ((/iPhone/).test(navigator.userAgent)) {
+        // 使用定时器是为了让输入框上滑时更加自然
+        var interval = setInterval(function () {
+            document.body.scrollTop = document.body.scrollHeight;
+        }, 50)
+        setTimeout(function () {
+            clearInterval(interval)
+        }, 500)
+    }
+};
+
+/* elementPosition */
+function elementPosition(obj) {
+    let curleft = 0, curtop = 0;
+    if (obj.offsetParent) {
+        curleft = obj.offsetLeft;
+        curtop = obj.offsetTop;
+        while (obj = obj.offsetParent) {
+            curleft += obj.offsetLeft;
+            curtop += obj.offsetTop;
+        }
+    }
+    return { x: curleft, y: curtop };
+}
+/* end */
+
+/* isEmpty */
+function isEmpty(obj) {
+
+    // null and undefined are "empty"
+    if (obj == null) return true;
+
+    // Assume if it has a length property with a non-zero value
+    // that that property is correct.
+    if (obj.length > 0) return false;
+    if (obj.length === 0) return true;
+
+    // If it isn't an object at this point
+    // it is empty, but it can't be anything *but* empty
+    // Is it empty?  Depends on your application.
+    if (typeof obj !== "object") return true;
+    if (typeof obj === 'number') return false
+
+    // Otherwise, does it have any properties of its own?
+    // Note that this doesn't handle
+    // toString and valueOf enumeration bugs in IE < 9
+    for (var key in obj) {
+        if (hasOwnProperty.call(obj, key)) return false;
+    }
+
+    return true;
+}
+/* end */
+
+/* deep clone */
+function clone(obj) {
+    if (obj === null || typeof (obj) !== 'object' || 'isActiveClone' in obj)
+        return obj;
+
+    if (obj instanceof Date)
+        var temp = new obj.constructor(); //or new Date(obj);
+    else
+        var temp = obj.constructor();
+
+    for (var key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            obj['isActiveClone'] = null;
+            temp[key] = clone(obj[key]);
+            delete obj['isActiveClone'];
+        }
+    }
+
+    return temp;
+}
+/* end */
+
+/* JS防抖 */
+function debounce(func, wait, immediate) {
+
+    var timeout, result;
+
+    var debounced = function () {
+        var context = this;
+        var args = arguments;
+
+        if (timeout) clearTimeout(timeout);
+        if (immediate) {
+            // 如果已经执行过，不再执行
+            var callNow = !timeout;
+            timeout = setTimeout(function () {
+                timeout = null;
+            }, wait)
+            if (callNow) result = func.apply(context, args)
+        }
+        else {
+            timeout = setTimeout(function () {
+                result = func.apply(context, args)
+            }, wait);
+        }
+        return result;
+    };
+
+    debounced.cancel = function () {
+        clearTimeout(timeout);
+        timeout = null;
+    };
+
+    return debounced;
+}
+/* end */
+/* JS节流 */
+// Returns a function, that, when invoked, will only be triggered at most once
+// during a given window of time. Normally, the throttled function will run
+// as much as it can, without ever going more than once per `wait` duration;
+// but if you'd like to disable the execution on the leading edge, pass
+// `{leading: false}`. To disable execution on the trailing edge, ditto.
+function throttle(func, wait, options) {
+    var context, args, result;
+    var timeout = null;
+    var previous = 0;
+    if (!options) options = {};
+    var later = function () {
+        previous = options.leading === false ? 0 : Date.now();
+        timeout = null;
+        result = func.apply(context, args);
+        if (!timeout) context = args = null;
+    };
+    return function () {
+        var now = Date.now();
+        if (!previous && options.leading === false) previous = now;
+        var remaining = wait - (now - previous);
+        context = this;
+        args = arguments;
+        if (remaining <= 0 || remaining > wait) {
+            if (timeout) {
+                clearTimeout(timeout);
+                timeout = null;
+            }
+            previous = now;
+            result = func.apply(context, args);
+            if (!timeout) context = args = null;
+        } else if (!timeout && options.trailing !== false) {
+            timeout = setTimeout(later, remaining);
+        }
+        return result;
+    };
+};
+/* end */
+/* cached fucntion */
+function cached(fn) {
+    const cache = Object.create(null)
+    return function cachedFn(str) {
+        const hit = cache[str]
+        return hit || (cache[str] = fn(str))
+    }
+}
+/* end */
+
+
+// values.js
+/**
+ * Retrieve the values of an object's properties
+ * @module 101/values
+ */
+'use strict';
+
+module.exports = values;
+
+/**
+ * Borrowing from underscorejs
+ * https://github.com/jashkenas/underscore
+ * @param {Object} obj
+ * @return {Array}
+ */
+function values(obj) {
+    var keys = Object.keys(obj);
+    var length = keys.length;
+    var vals = new Array(length);
+    for (var i = 0; i < length; i++) {
+        vals[i] = obj[keys[i]];
+    }
+    return vals;
+};
+
+// curry.js
+/**
+ * @module 101/curry
+ */
+
+var slice = Array.prototype.slice;
+
+/**
+ * Returns a curried function
+ * @function module:101/curry
+ * @param {function} f - function to be curried
+ * @param {integer} [n] - how many arguments to curry
+ * @return {function} 
+ */
+module.exports = curry;
+
+function curry(f, n) {
+    var length = n || f.length;
+    return _curry(f, length, []);
+}
+
+function _curry(f, n, args) {
+    return function (/* args */) {
+        var curryArgs = args.concat(slice.call(arguments));
+        if (curryArgs.length >= n) {
+            return f.apply(null, curryArgs.slice(0, n));
+        } else {
+            return _curry(f, n, curryArgs);
+        }
+    };
+}
+
+// converge.js
+/**
+ * @module 101/converge
+ */
+
+/**
+ * Converges an array of functions into one
+ * @function module:101/converge
+ * @param {function} f
+ * @param {Array} array of functions
+ * @return {function}
+ */
+module.exports = converge;
+
+function converge(f, funcs) {
+    return function converged(/* args */) {
+        var args = Array.prototype.slice.call(arguments);
+        return f.apply(null, funcs.map(function (g) {
+            return g.apply(null, args);
+        }));
+    };
+}
+
+// compose.js
+/**
+ * @module 101/compose
+ */
+
+/**
+ * [compose description]
+ * @function module:101/compose
+ * @param {function} f
+ * @param {function} g
+ * @return {function} 
+ */
+module.exports = compose;
+
+function compose(f, g) {
+    return function composed(/* args */) {
+        var args = Array.prototype.slice.call(arguments);
+        return f(g.apply(null, args));
+    }
+};
+
+
+// getSymbolPositions.js
+function getSymbolPositions(text, value) {
+    var positions = text.split(value),
+        results = [];
+
+    for (var i = 0, len = positions.length - 1; i < len; i++) {
+        results.push(positions[i].length + (results[i - 1] + 1 || 0));
+    }
+    return results;
+}
+getSymbolPositions("1234561891abcdefghi1lmnop", "1"); // [0, 6, 9, 19]
+
+
+// leadingZero.js
+var leadingZero = function (v, n) {
+    v = isNaN(v) ? 0 : v || 0;
+    n = isNaN(n) ? 1 : n || 1;
+    return v.toPrecision(n).split('.').reverse().join('');
+};
+
+leadingZero(1, 6);    // "000001"
+leadingZero(12, 6);   // "000012"
+leadingZero(123, 6);  // "000123"
+leadingZero(1234, 6); // "001234"
+
+
+// debouncedListener.js
+/**
+ * Debounces a listener so that it doesn't run as often.
+ *
+ * @param {Function} listener
+ * @param {Number} delay
+ * @return {Function}
+ */
+export default function debouncedListener(listener, delay = 300) {
+    let timeout = null
+
+    return function () {
+        if (timeout !== null) {
+            clearTimeout(timeout)
+        }
+
+        timeout = setTimeout(listener, delay)
+    }
+};
+
+// ready.js
+/**
+ * Listens to the DOMContentLoaded event or checks if the DOM has already loaded.
+ *
+ * @param {Function} callback
+ */
+export function ready(callback) {
+    if (['complete', 'interactive'].includes(document.readyState)) {
+        // call on next available tick
+        setTimeout(callback, 1)
+        return
+    }
+    document.addEventListener('DOMContentLoaded', callback)
+};
+
+//================================================================
+// regex-validator.js
+export const is = {
+    blank: /^\s*$/,
+    string: /^[a-zA-Z]+$/,
+    email: /^[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$/,
+    tel: /^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$/,
+    specialNumeric: /^(?:[\d,\/().]*[a-zA-Z][a-zA-Z\d,\/().]*)?$/,
+    streetAddress: /^\d+\s[A-z]+\s[A-z]+/,
+    stateZip: /([A-Z]{2}) (\d{5})$/,
+    number: /^\d+$/,
+    alphaNumeric: /^[a-zA-Z0-9]+$/,
+    image: /[\/.](gif|jpe?g|tiff|png|svg|pdf)$/,
+    pdf: /[\/.]pdf$/,
+    filepath: /(\\\\?([^\\/]*[\\/])*)([^\\/]+)$/,
+    url: /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/,
+};
+
+export const validate = (validator, value, not) => is[validator].test(value);
+
+export const isEmail = (str) => is.email.test(str);
+export const isEmpty = (str) => !str || 0 === str.length;
+export const isBlank = (str) => !str || /^\s*$/.test(str);
+export const isString = (str) => {
+    return typeof str === "string" && !isEmpty(str) && !isBlank(str);
+};
+
+export const patterns = {
+    blank: "^s*$",
+    string: "^[a-zA-Z]+$",
+    email: "^[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$",
+    tel:
+        "^(?:(?:+?1s*(?:[.-]s*)?)?(?:(s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])s*)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))s*(?:[.-]s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})s*(?:[.-]s*)?([0-9]{4})(?:s*(?:#|x.?|ext.?|extension)s*(d+))?$",
+    specialNumeric: "^(?:[d,/().]*[a-zA-Z][a-zA-Zd,/().]*)?$",
+    streetAddress: "^d+s[A-z]+s[A-z]+",
+    stateZip: "([A-Z]{2}) (d{5})$",
+    number: "^d+$",
+    alphaNumeric: "^[a-zA-Z0-9]+$",
+    image: "[/.](gif|jpe?g|tiff|png|svg|pdf)$",
+    pdf: "[/.]pdf$",
+    filepath: "(\\\\?([^\\/]*[\\/])*)([^\\/]+)$",
+    url:
+        "^(http://www.|https://www.|http://|https://)?[a-z0-9]+([-.]{1}[a-z0-9]+)*.[a-z]{2,5}(:[0-9]{1,5})?(/.*)?$",
+};
+
+export function isEmpty(s) {
+    return !s.length;
+}
+
+export function isBlank(s) {
+    return isEmpty(s.trim());
+}
+
+// validator.js
+export const is = {
+    string(str) {
+        return typeof str === "string" || str instanceof String;
+    },
+    integer(num) {
+        return num === parseInt(num, 10);
+    },
+    function(fn) {
+        return typeof fn === "function";
+    },
+    object(obj) {
+        return (obj && obj.constructor === Object) || obj === Object(obj);
+    },
+    empty(value) {
+        // returns true when any of the conditions are met --
+        // indicating that the value is considered empty
+
+        if (value === null) return true;
+        if (value === undefined) return true;
+        // is empty string
+        if (is.string(value) && value.trim().length === 0) return true;
+        // is empty array
+        if (Array.isArray(value) && value.length === 0) return true;
+        // is empty object
+        if (is.object(value) && Object.keys(value).length === 0) return true;
+    },
+    nan(num) {
+        return isNaN(num);
+    },
+};
+
+// ========================================================
+
+// removeAllChildNodes.js
+/* NOT TO BE USED IN PRODUCTION == FOR BROWSER HACKS ONLY */
+
+function removeAllChildNodes(parent) {
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
+}
+
+// USAGE:
+const container = document.querySelector('#container');
+removeAllChildNodes(container);
+
+// createFormObject.js
+export function createFormObject(inputsElements) {
+    /**
+     * #SCOPE:  takes in an array of inputs and returns a single object with the shape
+     * {[input.name]L input.value}
+     */
+    return inputsElements.reduce(
+        (obj, item) => ({ ...obj, [item.name]: item.value.trim() }), // trim whitespace
+        {}
+    );
+}
+
+
+// isValidJson.js
+export function isValidJson(string) {
+    /**
+     * @SCOPE:  uses json.parse to validate a string as json
+     * used by:
+     * - show-json
+     *
+     */
+    if (typeof string !== "string") return false;
+    try {
+        JSON.parse(string);
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+
+// jsonCompare.js
+export function jsonCompare(val1, val2) {
+    // unused
+    let compare1, compare2;
+    const values = [val1, val2];
+
+    const comparators = values.map((val) =>
+        isValidJson(val) ? val : JSON.stringify(val)
+    );
+
+    return comparators[0] === comparators[1];
+};
+
+// arrayFill.js
+export function arrayFill(length, val) {
+    return new Array(length).fill(val);
+};
+
+// combineObjects.js
+export function flattenObjects(arr) {
+    var object = arr.reduce(
+        (obj, item) => Object.assign(obj, { [item.key]: item.value }), {});
+    return object
+};
+
+// limit.js
+export function limit(arr, c) {
+    return arr.filter((x, i) => {
+        if (i <= c - 1) {
+            return true;
+        }
+    });
+};
+
+// reject.js
+/*
+* Array Reject
+* opposite of array.filter, takes a testFn that will remove items that pass the test and returns a new array with the remaining items.
+* @link: https://dustinpfister.github.io/2020/07/01/lodash_reject/
+*/
+
+
+
+function reject(arr, testFn) {
+    return arr.filter((item) => !testFn(item))
+}
+
+
+// example: 
+let a = [1, 2, 'b', 3];
+let test = (el) => typeof el === 'string';
+
+reject(a, test) //=> [1, 2, 3]
+
+// compared to typical array.filter:
+a.filter(test) //=> ['b']
+
+
+// shuffle.js
+/**
+ * @SCOPE:
+ * Shuffles array in place. ES6 version
+ * @param {Array} an array of [any] items
+ */
+function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+};
+
+
+// sortBy.js
+export function sortBy(arrToSort = [], values = ["id", "title"]) {
+    let sorted;
+
+    if (Array.isArray(values)) {
+        arrToSort.sort(
+            (a, b) =>
+                a[values[0]] > b[values[0]] // compare each value individually
+                    ? 1 // return if true
+                    : (a[values[0]] === b[values[0]] // check if equal
+                        ? a[values[1]] > b[values[1]] // secondary sorting if equal
+                            ? 1 // return if secondary true
+                            : -1 // return if secondary false
+                        : -1) - 1 // return if
+        );
+    }
+
+    sorted = arrToSort.sort((a, b) => (a[values[0]] > b[values[0]] ? 1 : -1));
+
+    return sorted;
+};
+
+
+// uniqueData.js
+export function uniqueData(data = []) {
+    return [
+        ...data.reduce((map, obj) => map.set(obj.id, obj), new Map()).values(),
+    ];
+};
+
+
+// handlePromises.js
+export function handlePromises(promises = []) {
+    return Promise.all(promises)
+        .then((responses) => {
+            console.log('handlePromises Success', responses);
+            return responses;
+        })
+        .catch((error) =>
+            console.log(
+                `handlePromises Error ${JSON.stringify(error, null, 2)}`
+            )
+        );
+};
+
+
+// waitAtLeast.js
+function waitAtLeast(time, promise) {
+    const timeoutPromise = new Promise((resolve) => {
+        setTimeout(resolve, time)
+    })
+    return Promise.all([promse, timeoutPromise]).then((values) => values[0])
+};
+
+// injectField.js
+function injectField(obj, { name, value }) {
+    return { ...obj, [name]: value }
+};
+
+
+// removeEmpty.js
+export function isEmpty(value) {
+    return (
+        value === undefined ||
+        value === null ||
+        (typeof value === "object" && Object.keys(value).length === 0) ||
+        (typeof value === "string" && value.trim().length === 0)
+    );
+}
+
+export function removeEmptyFromObject(obj) {
+    const empty = Object.assign(
+        ...Object.keys(obj)
+            .map((key) => !isEmpty(obj[key]) && { [key]: obj[key] })
+            .filter(Boolean)
+    );
+    return empty;
+}
+
+export function removeEmptyFromObjectRecursively(obj) {
+    let newObj = {};
+    Object.keys(obj).forEach((key) => {
+        if (obj[key] === Object(obj[key])) newObj[key] = removeEmpty(obj[key]);
+        else if (isEmpty(obj[key])) newObj[key] = obj[key];
+    });
+    return newObj;
+};
+
+
+// removeKeys.js
+export const removeKeys = (obj, keys) => obj !== Object(obj)
+    ? obj
+    : Array.isArray(obj)
+        ? obj.map((item) => removeKeys(item, keys))
+        : Object.keys(obj)
+            .filter((k) => !keys.includes(k))
+            .reduce(
+                (acc, x) => Object.assign(acc, { [x]: removeKeys(obj[x], keys) }),
+                {}
+            )
+
+
+export function removeKeysRecurr(obj, keys) {
+    // @link https://gist.github.com/aurbano/383e691368780e7f5c98#gistcomment-3560352
+    /**
+     * @SCOPE:  remove keys from a list off of an object or array of objects recursively
+     */
+    return obj !== Object(obj)
+        ? obj
+        : Array.isArray(obj)
+            ? obj.map((item) => removeKeysRecurr(item, keys))
+            : remove(([k]) => !keys.includes(k), obj);
+};
+
+
+// removeRecurr.js
+export function removeRecurr(fn, obj) {
+    // @SCOPE:  runs a function against every key in an object or array of objects
+    return obj !== Object(obj)
+        ? obj
+        : Array.isArray(obj)
+            ? obj.map((item) => removeRecurr(fn, item))
+            : remove(fn, obj);
+};
+
+
+// Download javascript Object as JSON
+// downloadAsJson.js
+function downloadAsJson(exportObj, exportName) {
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+    var downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", exportName + ".json");
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+};
+
+
+// local-markdown-cms
+// fs-cms.js
+import { promises as fsPromises } from 'fs';
+import os from 'os';
+import path from 'path';
+
+// used to render and work with local markdown files
+
+export async function pathExists(filePath) {
+    try {
+        const stat = await fsPromises.stat(filePath);
+        return stat.isFile();
+    } catch (err) {
+        return false;
+    }
+}
+
+export async function getPostList({ ownerId }) {
+
+    // getAllUserBlogPosts called if ownerId is provided
+    const getAllUserBlogPosts = async () => {
+        // create posts directory  -- if none exists?
+        const postPath = await genPostsPath();
+        // get file names for each file in posts directory
+        const filenames = await fsPromises.readdir(postPath);
+        const posts = [];
+        for (const filename of filenames) {
+            // get post JSON? content for each post
+            const postText = await fsPromises.readFile(path.join(postPath, filename), 'utf8');
+            // parse through post JSON content
+            const post = JSON.parse(postText);
+
+            posts.push(post);
+        }
+
+        return posts;
+    };
+
+    if (ownerId) {
+        // if ownerId is provided get all posts related to user
+        const posts = await getAllUserBlogPosts();
+
+        const ownerPosts = posts.filter((post) => post.ownerId === ownerId);
+        ownerPosts.sort((a, b) => b.createdAt - a.createdAt);
+
+        return ownerPosts;
+    }
+
+    // when no ownerId is passed in read posts from the local data directory
+    const markdownFiles = await fsPromises.readdir('data');
+
+    const dataDirPostList = markdownFiles.map((filename) => {
+        const slug = filename.replace(/.md$/, '');
+        const [year, month, date, ...rest] = slug.split('-');
+        const createdAt = new Date(`${year} ${month} ${date}`).getTime();
+        const title = rest.join(' ');
+
+        return {
+            slug,
+            createdAt,
+            title
+        };
+    });
+
+    const allPosts = [...dataDirPostList, ...(await getAllUserBlogPosts())];
+
+    allPosts.sort((a, b) => b.createdAt - a.createdAt);
+
+    return allPosts;
+}
+
+export async function getPost(slug) {
+    // Try to fetch from the user's post list
+    const filePath = await genPostsFilePath(slug);
+    if (await pathExists(filePath)) {
+        const postJson = await fsPromises.readFile(filePath, 'utf8');
+        return JSON.parse(postJson);
+    }
+
+    // Fetch from the data directory
+    const [year, month, day, ...rest] = slug.split('-');
+    const createdAt = new Date(`${year} ${month} ${day}`).getTime();
+    const title = rest.join(' ');
+    const content = await fsPromises.readFile(`data/${slug}.md`, 'utf8');
+
+    return {
+        slug: slug,
+        title,
+        content,
+        createdAt
+    };
+}
+
+export async function deletePost(slug) {
+    // Try to fetch from the user's post list
+    const filePath = await genPostsFilePath(slug);
+    if (await pathExists(filePath)) {
+        await fsPromises.unlink(filePath);
+    }
+}
+
+export async function createPost({ ownerId, slug, title, content }) {
+    const createdAt = Date.now();
+
+    const post = {
+        ownerId,
+        slug,
+        title,
+        content,
+        createdAt,
+        updatedAt: createdAt
+    };
+
+    const filePath = await genPostsFilePath(slug);
+    if (await pathExists(filePath)) {
+        throw new Error(`Blog post already exists`);
+    }
+
+    await fsPromises.writeFile(filePath, JSON.stringify(post, null, 2), 'utf8');
+    return post;
+}
+
+export async function updatePost({ ownerId, slug, title, content }) {
+    const createdAt = Date.now();
+
+    const post = await getPost(slug, { ownerId });
+    if (post.ownerId !== ownerId) {
+        throw new Error(`Invalid ownerId`);
+    }
+
+    post.title = title;
+    post.content = content;
+    post.updatedAt = Date.now();
+
+    const filePath = await genPostsFilePath(slug);
+    await fsPromises.writeFile(filePath, JSON.stringify(post, null, 2), 'utf8');
+    return post;
+}
+
+function genUserFilePath(userId) {
+    return path.join(os.tmpdir(), 'bulletproof-next-app', 'user', `${userId}.json`);
+}
+
+async function genCommentsFilePath(slug) {
+    const filePath = path.join(os.tmpdir(), 'bulletproof-next-app', 'comments', `${slug}.json`);
+    await fsPromises.mkdir(path.dirname(filePath), { recursive: true });
+
+    if (!(await pathExists(filePath))) {
+        await fsPromises.writeFile(filePath, '[]', 'utf8');
+    }
+
+    return filePath;
+}
+
+async function genPostsPath() {
+    const postsPath = path.join(os.tmpdir(), 'bulletproof-next-app', 'posts');
+    await fsPromises.mkdir(postsPath, { recursive: true });
+    return postsPath;
+}
+
+async function genPostsFilePath(slug) {
+    const filePath = path.join(await genPostsPath(), `${slug}.json`);
+    return filePath;
+}
+
+export async function saveUser(type, profile) {
+    const user = {
+        id: `${type}-${profile.id}`,
+        [type]: profile,
+        profile: {
+            name: profile.name,
+            avatar: profile.avatar
+        }
+    };
+
+    const payload = JSON.stringify(user);
+    const filePath = genUserFilePath(user.id);
+    await fsPromises.mkdir(path.dirname(filePath), { recursive: true });
+
+    await fsPromises.writeFile(filePath, payload, 'utf8');
+    return user.id;
+}
+
+export async function getUser(id) {
+    const filePath = genUserFilePath(id);
+    try {
+        const jsonString = await fsPromises.readFile(filePath, 'utf8');
+        return JSON.parse(jsonString);
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            return null;
+        }
+
+        throw err;
+    }
+}
+
+async function getAllComments(slug) {
+    const filePath = await genCommentsFilePath(slug);
+    const content = await fsPromises.readFile(filePath, 'utf8');
+    if (!content) {
+        return [];
+    }
+
+    return JSON.parse(content);
+}
+
+export async function getComments(slug, options = {}) {
+    const { sort = 1, limit = 5, offset = null } = options;
+    const comments = await getAllComments(slug);
+
+    // sort it
+    comments.sort((a, b) => {
+        return sort === 1 ? a.createdAt - b.createdAt : b.createdAt - a.createdAt;
+    });
+
+    // remove everything upto the offset
+    let foundOffset = false;
+    const commentsWithOffset = offset
+        ? comments.filter((c) => {
+            if (foundOffset) {
+                return true;
+            }
+
+            foundOffset = c.createdAt == offset;
+            return false;
+        })
+        : comments;
+
+    // apply the limit
+    const commentsWithLimit = commentsWithOffset.slice(0, limit);
+
+    return commentsWithLimit;
+}
+
+export async function addComment(slug, comment) {
+    const filePath = await genCommentsFilePath(slug);
+    const comments = await getAllComments(slug);
+    if (!comment.id) {
+        comment.id = String(Math.random());
+    }
+    comments.push(comment);
+
+    await fsPromises.writeFile(filePath, JSON.stringify(comments), 'utf8');
+    return comments;
+};
+
+
+
+// seed.js
+function seed(length, schema) {
+    return new Array(length) //create a new array with length(num) of 'undefined' values 
+        .fill(1) // convert 'undefined' values to the number 1
+        .map((_, i) => ({ schema })) // map over the array length(num) of times and output an item based on schema
+};
+
+// slugify.js
+/* eslint-disable */
+export function slugify(text) {
+    const from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;"
+    const to = "aaaaaeeeeeiiiiooooouuuunc------"
+
+    const newText = text
+        .split("")
+        .map((letter, i) =>
+            letter.replace(new RegExp(from.charAt(i), "g"), to.charAt(i))
+        )
+
+    return newText
+        .toString() // Cast to string
+        .toLowerCase() // Convert the string to lowercase letters
+        .trim() // Remove whitespace from both sides of a string
+        .replace(/\s+/g, "-") // Replace spaces with -
+        .replace(/&/g, "-y-") // Replace & with 'and'
+        .replace(/[^\w\-]+/g, "") // Remove all non-word chars
+        .replace(/\-\-+/g, "-") // Replace multiple - with single -
+}
+
+// https://gist.github.com/codeguy/6684588
+
+
+// tools.js
+/* eslint-disable */
+
+/**********************************
+ * * Enironment helpers
+ * ********************************
+ */
+export const isApiSupported = api => api in window
+// if (!isApiSupported('IntersectionObserver')) {}
+export const isClient = typeof window === "object"
+export const isSSR = typeof window === "undefined"
+export const isDev =
+    process &&
+    process.env &&
+    (!process.env.NODE_ENV || process.env.NODE_ENV === "development")
+
+/**********************************
+ * * Typography Helpers
+ * see "./truncate" for more
+ * see "./slugify" for more
+ * ********************************
+ */
+
+export const getFontSize = () =>
+    !isSSR &&
+    parseFloat(
+        getComputedStyle(document.body, null).fontSize.replace(/[^\d]/g, "")
+    )
+
+export const convertEmToPx = val => val.replace("em", "") * getFontSize() + "px"
+
+export const capitalize = string =>
+    string.replace(/\b\w/g, c => c.toUpperCase())
+//https://attacomsian.com/blog/string-capitalize-javascript
+
+/**********************************
+ * * Convenience Functions
+ * ********************************
+ */
+export function shortid() {
+    //http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+    return (
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15)
+    )
+}
+
+export function formatNumber(num) {
+    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+}
+
+export const randomNumGen = (
+    // array of random nums
+    num, // number of random numbers to generate
+    limit = 100 // highest number possible
+) => Array.from(Array(num)).map(() => Math.floor(Math.random() * limit))
+
+export const isExternal = string => {
+    const urlregex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/
+    return urlregex.test(string)
+}
+
+export const randomConditional = (probability, { truthy, falsy }) =>
+    Math.random() >= probability ? truthy : falsy
+export const hidden = [`none`, `none`, `block`]
+
+/**********************************
+ * * Array Operations
+ * ********************************
+ */
+
+export const makeArray = string => {
+    const newArr = string.split(", ")
+    return newArr
+}
+
+export const doesInclude = (arr = [], idx = 0) => arr.includes(idx)
+
+/**********************************
+ * * Object Operations
+ * ********************************
+ */
+
+export const mapObject = obj => {
+    return isObject(obj)
+        ? Object.entries(obj).map((entry, i) => {
+            return isObject(entry) ? mapObject(entry) : entry
+        })
+        : obj
+}
+
+export const hasOwnProperty = (obj, prop) =>
+    obj ? Object.prototype.hasOwnProperty.call(obj, prop) : false
+
+/**********************************
+ * * Conditional Checks
+ * ********************************
+ */
+export const isBoolean = arg => {
+    return typeof arg === "boolean"
+}
+
+export const isTruthy = (condition, setting) =>
+    condition && setting ? setting : !isBoolean(condition) && condition
+
+export const isArray = obj => (Array.isArray(obj) ? true : false)
+export const isNull = obj => (obj === null ? true : false)
+export const isArrayOrNull = obj => (isNull(obj) && isArray(obj) ? true : false)
+export const isObject = obj =>
+    obj !== null &&
+        typeof obj !== "string" &&
+        typeof obj !== "number" &&
+        !Array.isArray(obj) &&
+        typeof obj === "object"
+        ? true
+        : false
+
+/**********************************
+ * * Form Tools
+ * ********************************
+ */
+
+export function addDashes(target) {
+    let val = target.value.replace(/\D[^\.]/g, "")
+    target.value = val.slice(0, 3) + "-" + val.slice(3, 6) + "-" + val.slice(6)
+    // usage: addDashes(e.target)
+};
+
+
+// truncate.js
+export function truncateOnWord(str, limit) {
+    var trimmable =
+        "\u0009\u000A\u000B\u000C\u000D\u0020\u00A0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u2028\u2029\u3000\uFEFF"
+    var reg = new RegExp("(?=[" + trimmable + "])")
+    var words = str.split(reg)
+    var count = 0
+    return (
+        words
+            .filter(function (word) {
+                count += word.length
+                return count <= limit
+            })
+            .join("") + "..."
+    )
+};
+
+
+// Google Maps Listings Scraper
+function JSONToCSVConvertor(JSONData, ReportTitle, ShowLabel) {
+    // http://jsfiddle.net/d7n0hj6k/1/
+
+    //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
+    var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+
+    var CSV = '';
+    //Set Report title in first row or line
+
+    CSV += ReportTitle + '\r\n\n';
+
+    //This condition will generate the Label/Header
+    if (ShowLabel) {
+        var row = "";
+
+        //This loop will extract the label from 1st index of on array
+        for (var index in arrData[0]) {
+
+            //Now convert each value to string and comma-seprated
+            row += index + ',';
+        }
+
+        row = row.slice(0, -1);
+
+        //append Label row with line break
+        CSV += row + '\r\n';
+    }
+
+    //1st loop is to extract each row
+    for (var i = 0; i < arrData.length; i++) {
+        var row = "";
+
+        //2nd loop will extract each column and convert it in string comma-seprated
+        for (var index in arrData[i]) {
+            row += '"' + arrData[i][index] + '",';
+        }
+
+        row.slice(0, row.length - 1);
+
+        //add a line break after each row
+        CSV += row + '\r\n';
+    }
+
+    if (CSV == '') {
+        alert("Invalid data");
+        return;
+    }
+
+    //Generate a file name
+    var fileName = "MyReport_";
+    //this will remove the blank-spaces from the title and replace it with an underscore
+    fileName += ReportTitle.replace(/ /g, "_");
+
+    //Initialize file format you want csv or xls
+    var uri = 'data:text/csv;charset=utf-8,' + escape(CSV);
+
+    // Now the little tricky part.
+    // you can use either>> window.open(uri);
+    // but this will not work in some browsers
+    // or you will not get the correct file extension    
+
+    //this trick will generate a temp <a /> tag
+    var link = document.createElement("a");
+    link.href = uri;
+
+    //set the visibility hidden so it will not effect on your web-layout
+    link.style = "visibility:hidden";
+    link.download = fileName + ".csv";
+
+    //this part will append the anchor tag and remove it after automatic click
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+
+class Listing {
+    constructor(title, rating, details, location, phone, website) {
+        this.title = title
+        this.rating = rating
+        this.details = details
+        this.location = location
+        this.phone = phone
+        this.website = website
+    }
+}
+
+
+let listings = [];
+
+if (!listings.length > 0) {
+    listings = document.querySelectorAll('.section-result-content')
+    console.log('listings found', listings)
+    const listingsArr = Array.prototype.slice.call(listings).map(listing => {
+        const listTitle = listing.querySelector('.section-result-title > span').textContent
+        const listRating = listing.querySelector('.cards-rating-score')?.textContent || 0
+        const listDetails = listing.querySelector('.section-result-details')?.textContent || "n/a"
+        const listLocation = listing.querySelector('.section-result-location')?.textContent || "n/a"
+        const listPhone = listing.querySelector('.section-result-phone-number')?.textContent || "n/a"
+        const listWebsite = listing.querySelector('a[href^="http"]')?.href || "n/a"
+        const listItem = new Listing(listTitle, listRating, listDetails, listLocation, listPhone, listWebsite)
+        return listItem
+    })
+
+    const newJSON = JSON.stringify(listingsArr, null, 2)
+
+    if (newJSON) {
+        JSONToCSVConvertor(newJSON, "Listings", true)
+    }
+} else {
+    console.log(listings.length)
+};
+
+
+// https://gist.github.com/gaurangrshah/07e47ae7197534b2d1e03d586b161434
+
+
+// string-utils.js
+// String utils
+//
+// resources:
+//  -- mout, https://github.com/mout/mout/tree/master/src/string
+
+
+export function unPluralize(str = "") {
+    // @SCOPE:  if a string ends in a 's' we simple remove the 's'
+    if (!str) return;
+    str = str?.toLowerCase();
+    if (str[str?.length - 1] === "s") str = str?.substring(0, str?.length - 1);
+    return str;
+}
+
+
+export function capitalizeFirstWord(str = "") {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function capitalizeEveryWord(str = "") {
+    // @link: https://tinyurl.com/yde3emms
+    return str.map(capitalizeString).join();
+}
+
+export function removeSpecialCharacters(str = "") {
+    return str.replace(/[^a-zA-Z ]/g, "");
+}
+
+export const toDateTime = (secs) => {
+    var t = new Date("1970-01-01T00:30:00Z"); // Unix epoch start.
+    t.setSeconds(secs);
+    return t;
+};
+
+/**
+ * "Safer" String.toLowerCase()
+ */
+function lowerCase(str) {
+    return str.toLowerCase();
+}
+
+/**
+ * "Safer" String.toUpperCase()
+ */
+function upperCase(str) {
+    return str.toUpperCase();
+}
+
+/**
+ * Convert string to camelCase text.
+ */
+function camelCase(str) {
+    str = replaceAccents(str);
+    str = removeNonWord(str)
+        .replace(/\-/g, " ") //convert all hyphens to spaces
+        .replace(/\s[a-z]/g, upperCase) //convert first char of each word to UPPERCASE
+        .replace(/\s+/g, "") //remove spaces
+        .replace(/^[A-Z]/g, lowerCase); //convert first char to lowercase
+    return str;
+}
+
+/**
+ * Add space between camelCase text.
+ */
+function unCamelCase(str) {
+    str = str.replace(/([a-z\xE0-\xFF])([A-Z\xC0\xDF])/g, "$1 $2");
+    str = str.toLowerCase(); //add space between camelCase text
+    return str;
+}
+
+/**
+ * UPPERCASE first char of each word.
+ */
+function properCase(str) {
+    return lowerCase(str).replace(/^\w|\s\w/g, upperCase);
+}
+
+/**
+ * camelCase + UPPERCASE first char
+ */
+function pascalCase(str) {
+    return camelCase(str).replace(/^[a-z]/, upperCase);
+}
+
+function normalizeLineBreaks(str, lineEnd) {
+    lineEnd = lineEnd || "n";
+
+    return str
+        .replace(/rn/g, lineEnd) // DOS
+        .replace(/r/g, lineEnd) // Mac
+        .replace(/n/g, lineEnd); // Unix
+}
+
+/**
+ * UPPERCASE first char of each sentence and lowercase other chars.
+ */
+function sentenceCase(str) {
+    // Replace first char of each sentence (new line or after '.\s+') to
+    // UPPERCASE
+    return lowerCase(str).replace(/(^\w)|\.\s+(\w)/gm, upperCase);
+}
+
+/**
+ * Convert to lower case, remove accents, remove non-word chars and
+ * replace spaces with the specified delimeter.
+ * Does not split camelCase text.
+ */
+function slugify(str, delimeter) {
+    if (delimeter == null) {
+        delimeter = "-";
+    }
+
+    str = replaceAccents(str);
+    str = removeNonWord(str);
+    str = trim(str) //should come after removeNonWord
+        .replace(/ +/g, delimeter) //replace spaces with delimeter
+        .toLowerCase();
+
+    return str;
+}
+
+/**
+ * Replaces spaces with hyphens, split camelCase text, remove non-word chars, remove accents and convert to lower case.
+ */
+function hyphenate(str) {
+    str = unCamelCase(str);
+    return slugify(str, "-");
+}
+
+/**
+ * Replaces hyphens with spaces. (only hyphens between word chars)
+ */
+function unhyphenate(str) {
+    return str.replace(/(\w)(-)(\w)/g, "$1 $3");
+}
+
+/**
+ * Replaces spaces with underscores, split camelCase text, remove
+ * non-word chars, remove accents and convert to lower case.
+ */
+function underscore(str) {
+    str = unCamelCase(str);
+    return slugify(str, "_");
+}
+
+/**
+ * Remove non-word chars.
+ */
+function removeNonWord(str) {
+    return str.replace(/[^0-9a-zA-Z\xC0-\xFF \-]/g, "");
+}
+
+/**
+ * Convert line-breaks from DOS/MAC to a single standard (UNIX by default)
+ */
+function normalizeLineBreaks(str, lineEnd) {
+    lineEnd = lineEnd || "\n";
+
+    return str
+        .replace(/\r\n/g, lineEnd) // DOS
+        .replace(/\r/g, lineEnd) // Mac
+        .replace(/\n/g, lineEnd); // Unix
+}
+
+/**
+ * Replaces all accented chars with regular ones
+ */
+function replaceAccents(str) {
+    // verifies if the String has accents and replace them
+    if (str.search(/[\xC0-\xFF]/g) > -1) {
+        str = str
+            .replace(/[\xC0-\xC5]/g, "A")
+            .replace(/[\xC6]/g, "AE")
+            .replace(/[\xC7]/g, "C")
+            .replace(/[\xC8-\xCB]/g, "E")
+            .replace(/[\xCC-\xCF]/g, "I")
+            .replace(/[\xD0]/g, "D")
+            .replace(/[\xD1]/g, "N")
+            .replace(/[\xD2-\xD6\xD8]/g, "O")
+            .replace(/[\xD9-\xDC]/g, "U")
+            .replace(/[\xDD]/g, "Y")
+            .replace(/[\xDE]/g, "P")
+            .replace(/[\xE0-\xE5]/g, "a")
+            .replace(/[\xE6]/g, "ae")
+            .replace(/[\xE7]/g, "c")
+            .replace(/[\xE8-\xEB]/g, "e")
+            .replace(/[\xEC-\xEF]/g, "i")
+            .replace(/[\xF1]/g, "n")
+            .replace(/[\xF2-\xF6\xF8]/g, "o")
+            .replace(/[\xF9-\xFC]/g, "u")
+            .replace(/[\xFE]/g, "p")
+            .replace(/[\xFD\xFF]/g, "y");
+    }
+
+    return str;
+}
+
+/**
+ * Searches for a given substring
+ */
+function contains(str, substring, fromIndex) {
+    return str.indexOf(substring, fromIndex) !== -1;
+}
+
+/**
+ * Truncate string at full words.
+ */
+function crop(str, maxChars, append) {
+    return truncate(str, maxChars, append, true);
+}
+
+/**
+ * Escape RegExp string chars.
+ */
+function escapeRegExp(str) {
+    var ESCAPE_CHARS = /[\\.+*?\^$\[\](){}\/'#]/g;
+    return str.replace(ESCAPE_CHARS, "\\$&");
+}
+
+/**
+ * Escapes a string for insertion into HTML.
+ */
+function escapeHtml(str) {
+    str = str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/'/g, "&#39;")
+        .replace(/"/g, "&quot;");
+
+    return str;
+}
+
+/**
+ * Unescapes HTML special chars
+ */
+function unescapeHtml(str) {
+    str = str
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&#39;/g, "'")
+        .replace(/&quot;/g, '"');
+    return str;
+}
+
+/**
+ * Escape string into unicode sequences
+ */
+function escapeUnicode(str, shouldEscapePrintable) {
+    return str.replace(/[\s\S]/g, function (ch) {
+        // skip printable ASCII chars if we should not escape them
+        if (!shouldEscapePrintable && /[\x20-\x7E]/.test(ch)) {
+            return ch;
+        }
+        // we use "000" and slice(-4) for brevity, need to pad zeros,
+        // unicode escape always have 4 chars after "\u"
+        return "\\u" + ("000" + ch.charCodeAt(0).toString(16)).slice(-4);
+    });
+}
+
+/**
+ * Remove HTML tags from string.
+ */
+function stripHtmlTags(str) {
+    return str.replace(/<[^>]*>/g, "");
+}
+
+/**
+ * Remove non-printable ASCII chars
+ */
+function removeNonASCII(str) {
+    // Matches non-printable ASCII chars -
+    // http://en.wikipedia.org/wiki/ASCII#ASCII_printable_characters
+    return str.replace(/[^\x20-\x7E]/g, "");
+}
+
+/**
+ * String interpolation
+ */
+function interpolate(template, replacements, syntax) {
+    var stache = /\{\{(\w+)\}\}/g; //mustache-like
+
+    var replaceFn = function (match, prop) {
+        return prop in replacements ? replacements[prop] : "";
+    };
+
+    return template.replace(syntax || stache, replaceFn);
+}
+
+/**
+ * Pad string with `char` if its' length is smaller than `minLen`
+ */
+function rpad(str, minLen, ch) {
+    ch = ch || " ";
+    return str.length < minLen ? str + repeat(ch, minLen - str.length) : str;
+}
+
+/**
+ * Pad string with `char` if its' length is smaller than `minLen`
+ */
+function lpad(str, minLen, ch) {
+    ch = ch || " ";
+
+    return str.length < minLen ? repeat(ch, minLen - str.length) + str : str;
+}
+
+/**
+ * Repeat string n times
+ */
+function repeat(str, n) {
+    return new Array(n + 1).join(str);
+}
+
+/**
+ * Limit number of chars.
+ */
+function truncate(str, maxChars, append, onlyFullWords) {
+    append = append || "...";
+    maxChars = onlyFullWords ? maxChars + 1 : maxChars;
+
+    str = trim(str);
+    if (str.length <= maxChars) {
+        return str;
+    }
+    str = str.substr(0, maxChars - append.length);
+    //crop at last space or remove trailing whitespace
+    str = onlyFullWords ? str.substr(0, str.lastIndexOf(" ")) : trim(str);
+    return str + append;
+}
+
+var WHITE_SPACES = [
+    " ",
+    "\n",
+    "\r",
+    "\t",
+    "\f",
+    "\v",
+    "\u00A0",
+    "\u1680",
+    "\u180E",
+    "\u2000",
+    "\u2001",
+    "\u2002",
+    "\u2003",
+    "\u2004",
+    "\u2005",
+    "\u2006",
+    "\u2007",
+    "\u2008",
+    "\u2009",
+    "\u200A",
+    "\u2028",
+    "\u2029",
+    "\u202F",
+    "\u205F",
+    "\u3000"
+];
+
+/**
+ * Remove chars from beginning of string.
+ */
+function ltrim(str, chars) {
+    chars = chars || WHITE_SPACES;
+
+    var start = 0,
+        len = str.length,
+        charLen = chars.length,
+        found = true,
+        i,
+        c;
+
+    while (found && start < len) {
+        found = false;
+        i = -1;
+        c = str.charAt(start);
+
+        while (++i < charLen) {
+            if (c === chars[i]) {
+                found = true;
+                start++;
+                break;
+            }
+        }
+    }
+
+    return start >= len ? "" : str.substr(start, len);
+}
+
+/**
+ * Remove chars from end of string.
+ */
+function rtrim(str, chars) {
+    chars = chars || WHITE_SPACES;
+
+    var end = str.length - 1,
+        charLen = chars.length,
+        found = true,
+        i,
+        c;
+
+    while (found && end >= 0) {
+        found = false;
+        i = -1;
+        c = str.charAt(end);
+
+        while (++i < charLen) {
+            if (c === chars[i]) {
+                found = true;
+                end--;
+                break;
+            }
+        }
+    }
+
+    return end >= 0 ? str.substring(0, end + 1) : "";
+}
+
+/**
+ * Remove white-spaces from beginning and end of string.
+ */
+function trim(str, chars) {
+    chars = chars || WHITE_SPACES;
+    return ltrim(rtrim(str, chars), chars);
+}
+
+/**
+ * Capture all capital letters following a word boundary (in case the
+ * input is in all caps)
+ */
+function abbreviate(str) {
+    return str.match(/\b([A-Z])/g).join("");
+};
+
+
+// debounce.js
+export function debounce(func, wait = 20, immediate = true) {
+    var timeout;
+    return function () {
+        var context = this,
+            args = arguments;
+        var later = function () {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        var callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+}
+
+/*
+usage: debounce(anyFunction)
+*/
+
+
+// animatedScrollTo.js
+document.getElementsByTagName('button')[0].onclick = function () {
+    scrollTo(document.body, 0, 1250);
+}
+
+function scrollTo(element, to, duration) {
+    var start = element.scrollTop,
+        change = to - start,
+        currentTime = 0,
+        increment = 20;
+
+    var animateScroll = function () {
+        currentTime += increment;
+        var val = Math.easeInOutQuad(currentTime, start, change, duration);
+        element.scrollTop = val;
+        if (currentTime < duration) {
+            setTimeout(animateScroll, increment);
+        }
+    };
+    animateScroll();
+}
+
+//t = current time
+//b = start value
+//c = change in value
+//d = duration
+Math.easeInOutQuad = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t + b;
+    t--;
+    return -c / 2 * (t * (t - 2) - 1) + b;
+};
+
+
+/**
+ * Concat arrays
+ *
+ * @params {array} arrs - List of arrays
+ * @example
+ * import { concatArrays } from "path/to/array.js"
+ *
+ * let arr1 = [1, 2, 3];
+ * let arr2 = [4, 5, 6];
+ *
+ * concatArrays(arr1, arr2, [7, 8, 9, 2, 4]);
+ * // Return [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
+ */
+export let concatArrays = (...arrs) => [].concat(...arrs);
+
+/**
+ * Remove duplicates from simple arrays
+ *
+ * @params {array} arrs - List of arrays
+ * @example
+ * import { uniqueArray } from "path/to/array.js"
+ *
+ * uniqueArray([ 1, 2, 3, 4, 5, 6, 7, 8, 9, 2, 4 ]);
+ * // Return [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
+ */
+export let uniqueArray = arr => [...new Set(arr)];
+
+/**
+ * Remove duplicates objects in array base on an object key
+ *
+ * @params {string} p    - Key to look for in each object
+ * @params {array}  arr  - Array
+ * @example
+ * import { unitArrayObjects } from "path/to/array.js"
+ *
+ * let arr = [
+ *   { id: 6, username: 'lorem' },
+ *   { id: 8, username: 'ipsum' },
+ *   { id: 6, username: 'lorem' },
+ *   { id: 7, username: 'dolor' }
+ * ];
+ *
+ * uniqueArrayObjects('id', arr);
+ * //
+ *   Return :
+ *   [
+ *     { id: 6, username: 'lorem' },
+ *     { id: 8, username: 'ipsum' },
+ *     { id: 7, username: 'dolor' }
+ *   ]
+ */
+export let uniqueArrayObjects = (p, arr) => arr.reduce((a, b) => !a.filter(c => b[p] === c[p]).length ? [...a, b] : a, []);
+
+/**
+ * Remove duplicates objects in array with deep comparison
+ *
+ * @params {array}  arr  - Array
+ * @example
+ * import { unitArrayObjectsDeep } from "path/to/array.js"
+ *
+ * let arr = [
+ *   { id: 6, username: 'lorem' },
+ *   { id: 8, username: 'ipsum' },
+ *   { id: 6, username: 'dolor' },
+ *   { id: 7, username: 'sit' },
+ *   { id: 8, username: 'ipsum' },
+ * ];
+ *
+ * uniqueArrayObjectsDeep('id', arr);
+ * //
+ *   Return :
+ *   [
+ *     { id: 6, username: 'lorem' },
+ *     { id: 8, username: 'ipsum' },
+ *     { id: 6, username: 'dolor' },
+ *     { id: 7, username: 'sit' }
+ *   ]
+ */
+export let uniqueArrayObjectsDeep = arr => uniqueArray(arr.map(a => JSON.stringify(a))).map(a => JSON.parse(a));
