@@ -1450,3 +1450,193 @@ const isAppleDevice = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
  */
 const goToTop = () => window.scrollTo(0, 0);
 // goToTop();
+
+
+
+//===========================================================
+/**
+ * isString() method to check if a variable is a String
+ * @param {*} value target value
+ * @returns true/false
+ */
+function isString(value) {
+    return typeof value === 'string' || value instanceof String;
+};
+
+
+//===========================================================
+/**
+ * isNumber() method to check if a variable is a Number
+ * @param {*} value target value
+ * @returns true/false
+ */
+function isNumber(value) {
+    return typeof value === 'number' && isFinite(value);
+};
+
+
+//===========================================================
+/**
+ * isArray() method to check if a variable is a Array
+ * @param {*} value target value
+ * @returns true/false
+ */
+function isArray(value) {
+    return value && typeof value === 'object' && value.constructor === Array;
+};
+
+// ES5 actually has a method for this (ie9+)
+Array.isArray(value);
+
+
+//===========================================================
+/**
+ * isFunction() method to check if a variable is a Function
+ * @param {*} value target value
+ * @returns true/false
+ */
+function isFunction(value) {
+    return typeof value === 'function';
+};
+
+
+
+//===========================================================
+/**
+ * isObject() method to check if a variable is an Object
+ * @param {*} value target value
+ * @returns true/false
+ */
+function isObject(value) {
+    return value && typeof value === 'object' && value.constructor === Object;
+};
+
+
+
+//===========================================================
+/**
+ * isNull() method to check if a variable is a Null
+ * @param {*} value target value
+ * @returns true/false
+ */
+function isNull(value) {
+    return value === null;
+};
+
+
+//===========================================================
+/**
+ * isUndefined () method to check if a variable is a Undefined
+ * @param {*} value target value
+ * @returns true/false
+ */
+function isUndefined(value) {
+    return typeof value === 'undefined';
+};
+
+
+
+//===========================================================
+/**
+ * isBoolean () method to check if a variable is a Boolean
+ * @param {*} value target value
+ * @returns true/false
+ */
+function isBoolean(value) {
+    return typeof value === 'boolean';
+};
+
+
+
+//===========================================================
+/**
+ * isRegExp () method to check if a variable is a RegExp
+ * @param {*} value target value
+ * @returns true/false
+ */
+function isRegExp(value) {
+    return value && typeof value === 'object' && value.constructor === RegExp;
+};
+
+
+
+//===========================================================
+/**
+ * isError () method to check if a variable is a Error
+ * @param {*} value target value
+ * @returns true/false
+ */
+function isError(value) {
+    return value instanceof Error && typeof value.message !== 'undefined';
+};
+
+
+
+//===========================================================
+/**
+ * isDate () method to check if a variable is a Date
+ * @param {*} value target value
+ * @returns true/false
+ */
+function isDate(value) {
+    return value instanceof Date;
+};
+
+
+
+//===========================================================
+/**
+ * isSymbol () method to check if a variable is a Symbol
+ * @param {*} value target value
+ * @returns true/false
+ */
+function isSymbol(value) {
+    return typeof value === 'symbol';
+};
+
+
+
+//===========================================================
+/**
+ * loadScript() method to load a script asynchronously to 3rd-party for performance
+ * @param {*} src - 3rd-party as Google Analytics, Facebook Login
+ * @param {*} async - load with async
+ * @param {*} type - MIME
+ * @returns promise as result
+ */
+const loadScript = (src, async = true, type = "text/javascript") => {
+    return new Promise((resolve, reject) => {
+        try {
+            const el = document.createElement("script");
+            const container = document.head || document.body;
+
+            el.type = type;
+            el.async = async;
+            el.src = src;
+
+            el.addEventListener("load", () => {
+                resolve({ status: true });
+            });
+
+            el.addEventListener("error", () => {
+                reject({
+                    status: false,
+                    message: `Failed to load the script ${src}`
+                });
+            });
+
+            container.appendChild(el);
+        } catch (err) {
+            reject(err);
+        };
+    });
+};
+
+// invoke
+loadScript("https://connect.facebook.net/en_US/sdk.js")
+    .then((data) => {
+        console.log("Facebook script loaded successfully", data);
+    })
+    .catch((err) => {
+        console.error(err);
+    });

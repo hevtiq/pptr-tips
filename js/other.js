@@ -2024,3 +2024,103 @@ function chkOcultaPassagem() {
         s.display = s.display === 'none' ? 'block' : 'none';
     };
 }
+
+
+// random password generator
+/*
+<div id="random-password">
+    <input type="text" id="password" /> <button id="copy">Copy</button>
+    <div id="settings">
+        <label for="length">Length</label>
+        <input type="number" id="length" value="16" min="8" max="64" />    
+        <label for="numbers">Include Numbers</label>
+        <input type="checkbox" id="numbers" checked />
+        <label for="symbols">Include Symbols</label>
+        <input type="checkbox" id="symbols" checked />
+    </div>
+    <button id="generate">Generate Password</button>
+</div>
+*/
+const alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const numbers = "0123456789";
+const symbols = "!@#$%^&*_-+=";
+
+const passwordTxt = document.getElementById("password");
+const length = document.getElementById("length");
+const incNumbers = document.getElementById("numbers");
+const incSymbols = document.getElementById("symbols");
+const generateBtn = document.getElementById("generate");
+
+generateBtn.addEventListener("click", () => {
+    let characters = alpha;
+    incNumbers.checked ? (characters += numbers) : "";
+    incSymbols.checked ? (characters += symbols) : "";
+    passwordTxt.value = generatePassword(length.value, characters);
+});
+
+const generatePassword = (length, characters) => {
+    let password = "";
+    for (let i = 0; i < length; i++) {
+        password += characters.charAt(
+            Math.floor(Math.random() * characters.length)
+        );
+    }
+    return password;
+};
+
+// https://w3collective.com/preview-selected-img-file-input-js/
+
+
+// Object
+// NOT should limit change objects
+// bad
+const a = {};
+a.x = 3;
+
+// if reshape unavoidable
+const a = {};
+Object.assign(a, { x: 3 });
+
+// good
+const a = { x: null };
+a.x = 3;
+
+// can use dynamic Object
+// bad
+const obj = {
+    id: 5,
+    name: 'San Francisco',
+};
+obj[getKey('enabled')] = true;
+
+// good
+const obj = {
+    id: 5,
+    name: 'San Francisco',
+    [getKey('enabled')]: true,
+};
+
+// should use short syntax for maintenance
+var ref = 'some value';
+
+// bad
+const atom = {
+    ref: ref,
+
+    value: 1,
+
+    addValue: function (value) {
+        return atom.value + value;
+    },
+};
+
+// good
+const atom = {
+    ref,
+
+    value: 1,
+
+    addValue(value) {
+        return atom.value + value;
+    },
+};

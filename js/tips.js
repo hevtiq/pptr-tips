@@ -7894,8 +7894,134 @@ greaterThan2; // [3,4,5]
 */
 function isString(value) {
     return typeof value === 'string' || value instanceof String;
+};
+
+
+/*
+    How do you check if a variable is a Number in Javascript
+
+    From type-of more things than just an ordinary number will return “number”
+    like NaN and Infinity. To know if a value really is a number the function
+    isFinite is also required.
+*/
+function isNumber(value) {
+    return typeof value === 'number' && isFinite(value);
+};
+
+
+/*
+    How do you check if a variable is a Array in Javascript
+
+    In JavaScript arrays are not true arrays In javascript arrays are not true
+    arrays like in java and in other languages. They’re actually objects so
+    typeof will return “object” for them. To know if something’s really an array
+    its constructor can be compared to Array.
+*/
+function isArray(value) {
+    return value && typeof value === 'object' && value.constructor === Array;
+};
+// ES5 actually has a method for this (ie9+)
+Array.isArray(value);
+
+
+/*
+    How do you check if a variable is a Function in Javascript
+
+    Functions are functions so here just typeof is enough.
+*/
+function isFunction(value) {
+    return typeof value === 'function';
+};
+
+
+/*
+    How do you check if a variable is an Object in Javascript
+
+    Many things are objects in javascript. To know if a value is an object that
+    can have properties and be looped through, its constructor can be compared
+    to Object. It doesn’t work for objects created from classes, then the
+    instance of the operator can be used instead.
+*/
+function isObject(value) {
+    return value && typeof value === 'object' && value.constructor === Object;
+};
+
+/*
+    How do you check if a variable is a Null & undefined in Javascript
+
+    Most times you don’t need to check explicitly for null and undefined since
+    they’re both falsy values. However to do it below functions does the trick.
+*/
+// Returns if a value is null
+function isNull(value) {
+    return value === null;
+};
+// Returns if a value is undefined
+function isUndefined(value) {
+    return typeof value === 'undefined';
+};
+
+
+/*
+    How do you check if a variable is a Boolean in Javascript
+
+    For booleans typeof is enough since it returns “boolean” for both true and
+    false.
+*/
+// Returns if a value is a boolean
+function isBoolean(value) {
+    return typeof value === 'boolean';
+};
+
+
+/*
+    How do you check if a variable is a RegExp in Javascript
+
+    Regexps are objects so the only thing needed to check is if the constructor
+    is Regexp.
+*/
+// Returns if a value is a regexp
+function isRegExp(value) {
+    return value && typeof value === 'object' && value.constructor === RegExp;
+};
+
+
+/*
+    How do you check if a variable is an Error in Javascript
+
+    Errors in javascript are the same as “exceptions” in many other programming
+    languages. They come in a couple of different forms like for instance Error,
+    TypeError, and RangeError. An instanceof statement is enough for them all,
+    but just to be extra sure we also check for the “message” property that
+    errors have.
+*/
+// Returns if value is an error object
+function isError(value) {
+    return value instanceof Error && typeof value.message !== 'undefined';
+};
+
+/*
+    How do you check if a variable is a Date in Javascript
+
+    Date isn’t really a data type in Javascript. But to know if something’s a
+    Date object it can be checked with instanceof.
+*/
+// Returns if value is a date object
+function isDate(value) {
+    return value instanceof Date;
 }
 
+/*
+    How do you check if a variable is a Symbol in Javascript
+
+    In ES6 the new datatype Symbol was added. Nicely enough typeof returns
+    “symbol” for it so no more logic is required.
+*/
+// Returns if value is an error object
+// Returns if a Symbol
+function isSymbol(value) {
+    return typeof value === 'symbol';
+};
 
 
 /*
@@ -13517,3 +13643,120 @@ export let uniqueArrayObjects = (p, arr) => arr.reduce((a, b) => !a.filter(c => 
  *   ]
  */
 export let uniqueArrayObjectsDeep = arr => uniqueArray(arr.map(a => JSON.stringify(a))).map(a => JSON.parse(a));
+
+
+// Check value exist in array
+const characters = [
+    'ironman',
+    'black_widow',
+    'hulk',
+    'captain_america',
+    'hulk',
+    'thor',
+];
+
+// NOT GOOD
+console.log(characters.indexOf('hulk'));  // 2
+console.log(characters.indexOf('batman')); // -1
+
+// GOOD
+console.log(characters.includes('hulk'));  // true
+console.log(characters.includes('batman'));  // false
+
+
+// It's good for testing and unit testing
+const array = [NaN, undefined];
+if (array.indexOf(NaN) === -1) {
+    console.log("NaN not found in the array");
+    //NaN not found in the array
+};
+
+if (!array.indexOf(undefined) === -1) {
+    console.log("true. array elements are undefined");
+} else {
+    console.log("Sorry can't find undefined");
+    // Sorry can't find undefined
+};
+
+if (array.includes(NaN)) {
+    console.log("NaN was found in the array");
+    //NaN not found in the array
+};
+
+if (array.includes(undefined)) {
+    console.log("undefined was found in the array");
+    //NaN not found in the array
+};
+
+
+/*
+    instead of Array.filter, use Array.find for performance
+
+    - filter will loop all array, and get all match
+    - find will get first match and stop
+*/
+'use strict';
+
+const characters = [
+    { id: 1, name: 'ironman' },
+    { id: 2, name: 'black_widow' },
+    { id: 3, name: 'captain_america' },
+    { id: 4, name: 'captain_america' },
+];
+
+function getCharacter(name) {
+    return character => character.name === name;
+}
+
+console.log(characters.filter(getCharacter('captain_america')));
+// [
+//   { id: 3, name: 'captain_america' },
+//   { id: 4, name: 'captain_america' },
+// ]
+
+console.log(characters.find(getCharacter('captain_america')));
+// { id: 3, name: 'captain_america' }
+
+
+/*
+    instead of Array.filter + Array.map, use Array.reduce for performance
+
+    - if filter + map
+    100.000 items => loop 100.000 items => 50000 items => loop 50000 items
+
+    - if reduce
+    100.000 items
+*/
+const users = [{
+    name: 'Ronaldo',
+    age: 23
+}, {
+    name: 'Messi',
+    age: 14
+}, {
+    name: 'Anoystick',
+    age: 22
+}];
+
+// NOT GOOD
+const valid = users.filter(({ age }) => age >= 18).map(({ name }) => name);
+
+// GOOD
+const valid = users.reduce((acc, { age, name }) => {
+    return (age >= 18) ? [...acc, name] : acc;
+}, []);
+
+// OR - single loop
+const names = [];
+users.forEach(({ age, name }) => {
+    age >= 18 && names.push(name);
+});
+
+
+
+// Copy not change origin array
+const copyArray = (arr) => arr.slice(0);
+const arr = [1 , 2 , 3 , "hello" , "world"];
+const newArr = copyArray(arr);
+JSON.stringify(arr) === JSON.stringify(newArr);
+
