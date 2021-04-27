@@ -13756,7 +13756,322 @@ users.forEach(({ age, name }) => {
 
 // Copy not change origin array
 const copyArray = (arr) => arr.slice(0);
-const arr = [1 , 2 , 3 , "hello" , "world"];
+const arr = [1, 2, 3, "hello", "world"];
 const newArr = copyArray(arr);
 JSON.stringify(arr) === JSON.stringify(newArr);
 
+
+// 1 - javascript loop in an array
+let myArray = ["blog javascripts", "anonystick"];
+for (let i = 0; i < myArray.length; i++) {
+    console.log(myArray[i]);
+}
+/* Outputs:
+blog javascripts
+anonystick
+*/
+
+// 2 - Javascript foreach object
+const obj = {
+    id: 1,
+    name: "blog javascript",
+    site: 'anonystick.com'
+}
+
+for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+        console.log(`${key} : ${obj[key]}`)
+    }
+}
+
+/*
+Output:
+id : 1
+name : blog javascript
+site : anonystick.com
+*/
+
+// 3 - Javascript foreach object key
+const obj = {
+    id: 1,
+    name: "blog javascript",
+    site: 'anonystick.com'
+}
+
+console.log(Object.keys(obj));
+
+/*
+Output:
+["id", "name", "site"]
+*/
+
+
+// 4 - Javascript foreach object value
+const obj = {
+    id: 1,
+    name: "blog javascript",
+    site: 'anonystick.com'
+}
+
+console.log(Object.values(obj));
+
+/*
+Output:
+[1, "blog javascript", "anonystick.com"]
+*/
+
+
+// 5 - Javascript foreach object entries
+const obj = {
+    id: 1,
+    name: "blog javascript",
+    site: 'anonystick.com'
+}
+
+console.log(Object.entries(obj)) // return array [key, value]
+
+Object.entries(obj).forEach(([key, value]) => {
+    console.log(`${key}:${value}`)
+})
+
+/*
+Output:
+id:1
+name:blog javascript
+site:anonystick.com
+*/
+
+
+// 6 - javascript loop through array of objects
+var countries = {
+    China: 1371980000,
+    India: 1276860000,
+    'United States': 321786000,
+    Indonesia: 255461700,
+    Brazil: 204873000,
+    Pakistan: 190860000
+};
+countries = Object.keys(countries).filter(function (key) {
+    // Countries under 1000000000
+    return countries[key] <= 1000000000;
+});
+console.log(countries);
+// Results in:
+// ["UnitedStates", "Indonesia", "Brazil", "Pakistan"]
+
+
+// Object into query string parameters in JavaScript
+let obj = {
+    id: 1234,
+    search: 'query string parameters in JavaScript',
+    token: '123412341341',
+};
+/*
+Output: https://anonystick.com?id=1234&search=query%20string%20parameters%20in%20JavaScript&token=123412341341
+*/
+
+// 1. map + join in javascript
+// ES6
+var queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+
+// ES5
+var queryString = Object.keys(params).map(function (key) {
+    return key + '=' + params[key]
+}).join('&');
+
+
+// 2. jquery
+var queryString = $.param(params);
+
+// 3. node javascript
+const querystring = require('querystring');
+let queryString = querystring.stringify(params);
+
+
+// 4 - encodeURIComponent javascript
+var queryString = Object.keys(params).map((key) => {
+    return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
+}).join('&');
+
+
+//  AJAX - PROMISES in jquery
+$.ajax({
+    data: someData,
+    dataType: 'json',
+    url: '/path/to/script',
+    success: function (data, textStatus, jqXHR) {
+        // When AJAX call is successfuly
+        console.log('AJAX call successful.');
+        console.log(data);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+        // When AJAX call has failed
+        console.log('AJAX call failed.');
+        console.log(textStatus + ': ' + errorThrown);
+    },
+    complete: function () {
+        // When AJAX call is complete, will fire upon success or when error is thrown
+        console.log('AJAX call completed');
+    },
+});
+
+// #Promises and deferred objects
+// .done() => .success() 
+// .fail() => .error() 
+// .always() => .complete()
+$.ajax({
+    data: someData,
+    dataType: 'json',
+    url: '/path/to/script'
+}).done(function (data) {
+    // If successful
+    console.log(data);
+}).fail(function (jqXHR, textStatus, errorThrown) {
+    // If fail
+    console.log(textStatus + ': ' + errorThrown);
+});
+
+
+var ajaxCall = $.ajax({
+    context: $(element),
+    data: someData,
+    dataType: 'json',
+    url: '/path/to/script'
+});
+
+ajaxCall.done(function (data) {
+    console.log(data);
+});
+
+
+// Multiple Ajax
+var a1 = $.ajax({ /*...*/ }),
+    a2 = $.ajax({ /*...*/ });
+
+$.when(a1, a2).done(function (r1, r2) {
+    // Each returned resolve has the following structure:
+    // [data, textStatus, jqXHR]
+    // e.g. To access returned data, access the array at index 0
+    console.log(r1[0]);
+    console.log(r2[0]);
+});
+
+
+// Incase a2 depend on a1 results
+var a1 = $.ajax({
+    url: '/path/to/file',
+    dataType: 'json'
+}),
+    a2 = a1.then(function (data) {
+        // .then() returns a new promise
+        return $.ajax({
+            url: '/path/to/another/file',
+            dataType: 'json',
+            data: data.sessionID
+        });
+    });
+
+a2.done(function (data) {
+    console.log(data);
+});
+
+
+// FOR...OF
+// use to loop arrays, array-like-objects, maps, sets, DOM collections
+/*
+    Array-Like Objects, appear in below cases
+    is Objects, like an Array but not an Array
+    - arguments
+    - HTMLCollection
+    - NodeList
+    - document.getElementsByTagName
+    - document.querySelectorAll
+*/
+function testArgumentsKeyword() {
+    console.log(arguments.length, arguments[0])
+}
+
+testArgumentsKeyword('arg1', 'arg2', 'arg3', 'arg4', 'arg5');
+
+// Incase array
+console.log(['arg1', 'arg2', 'arg3', 'arg4', 'arg5'].filter(el => el === 'arg2'));  // ["arg2"]
+
+// Incase array-like-objects
+function testArgumentsKeyword() {
+    console.log(arguments.filter(el => el === 'arg2'))
+}
+
+testArgumentsKeyword('arg1', 'arg2', 'arg3', 'arg4', 'arg5');
+// "Uncaught TypeError: arguments.filter is not a function"
+
+
+// Convert Array-like Objects to Arrays in ES6
+function testArgumentsKeyword() {
+    const arr = Array.from(arguments);
+    console.log(arr.filter(el => el === 'arg2'))
+};
+
+testArgumentsKeyword('arg1', 'arg2', 'arg3', 'arg4', 'arg5');
+
+
+// Convert Array-like Objects to Arrays in ≤ ES5
+function testArgumentsKeyword() {
+    const arr = Array.prototype.slice.call(arguments);
+    console.log(arr.filter(el => el === 'arg2'))
+}
+
+testArgumentsKeyword('arg1', 'arg2', 'arg3', 'arg4', 'arg5');
+
+
+
+// call(), apply() và bind() in javascript
+
+
+var user = {
+    students: {
+        name: "Anonystick blog's javascript",
+        website: "https://anonystick.com"
+    },
+    showInfo: function (event) {
+        preventDefault(event);
+        console.log(this.students.name);  // this: user
+    }
+}
+
+// Gán hàm thực thi lên sự kiện click chuột vào button
+$("button").click(user.showInfo);  // this => button
+
+// Error: Cannot read property 'name' of undefined
+// => call(), apply(), bind() used to change this from button => user
+$("button").click(user.showInfo.call(user));  // this => user
+// OR
+$("button").click(user.showInfo.bind(user));  // this => user
+// OR
+
+
+// javascript object map
+var myObject = { 'a': 1, 'b': 2, 'c': 3 }
+//convert to Array
+myObject = Object.keys(myObject);
+
+//Sau đó sử map như một Array.
+
+Object.keys(myObject).map(function (key, index) {
+    myObject[key] *= 2;
+});
+
+console.log(myObject);
+// => { 'a': 2, 'b': 4, 'c': 6 }
+
+
+// javascript for in object
+var myObject = { 'a': 1, 'b': 2, 'c': 3 };
+
+for (var key in myObject) {
+    if (myObject.hasOwnProperty(key)) {
+        myObject[key] *= 2;
+    }
+}
+
+console.log(myObject);
+// { 'a': 2, 'b': 4, 'c': 6 }

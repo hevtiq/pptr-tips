@@ -1640,3 +1640,45 @@ loadScript("https://connect.facebook.net/en_US/sdk.js")
     .catch((err) => {
         console.error(err);
     });
+
+
+
+//===========================================================
+/**
+ * cloneArray() method to clone an array
+ * @param {*} arr - target array
+ * @returns new array
+ */
+const cloneArray = (arr) => arr.slice(0);
+// const arr = [1 , 2 , 3 , "hello" , "world"];
+// const newArr = copyArray(arr);
+// JSON.stringify(arr) === JSON.stringify(newArr);
+
+
+
+//===========================================================
+/**
+ * jsonFormat() method to format JSON
+ * @param {*} obj - target object
+ * @returns formatted JSON
+ */
+const jsonFormat = (obj) => {
+    return JSON.stringify({ obj }, null, '\t');
+};
+// const obj = { alpha: 'A', beta: 'B' };
+// jsonFormat(obj)
+
+
+//===========================================================
+/**
+ * 
+ * @param {*} arr - target array
+ * @param {*} items 
+ * @returns 
+ */
+const truncateOnArray = (arr = [], items = 0) => {
+    arr.length = items;
+    return arr;
+};
+// let array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+// truncateOnArray(array, 4);

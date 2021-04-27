@@ -2637,7 +2637,102 @@ mongoose.connect(dbConfig.dbs, {
 const person_model = require('person');
 
 // # NOT GOOD: callback
-person_model.find({ name:  'anonystick' }, 'name age', { skip: 10 }, function (err, docs) {});
+person_model.find({ name: 'anonystick' }, 'name age', { skip: 10 }, function (err, docs) { });
 
 // # GOOD: async/await
-const obj = await person_model.find({ name:  'anonystick' }, 'name age', {skip: 10});
+const obj = await person_model.find({ name: 'anonystick' }, 'name age', { skip: 10 });
+
+
+
+// Get Metadata from url with nodejs
+// npm i url-metadata --save
+const urlMetadata = require('url-metadata');
+
+//get metadata với https://fb.com
+
+urlMetadata('https://fb.com').then(async (metadata) => {
+    console.log(JSON.stringify(metadata, '*****', 8));
+});
+
+/*
+    {
+        "url": "https://www.facebook.com/",
+        "canonical": "https://www.facebook.com/",
+        "title": "Facebook - Đăng nhập hoặc đăng ký",
+        "image": "https://www.facebook.com/images/fb_icon_325x325.png",
+        "author": "",
+        "description": "Tạo một tài khoản để đăng nhập Facebook. Kết nối với bạn bè,
+        gia đình và những người mà bạn biết. Chia sẻ ảnh và video, gửi tin nhắn và nhận cập nhật.",
+        "keywords": "",
+        "source": "www.facebook.com",
+        "og:url": "https://www.facebook.com/",
+        "og:locale": "vi_VN",
+        "og:locale:alternate": "",
+        "og:title": "",
+        "og:type": "",
+        "og:description": "",
+        "og:determiner": "",
+        "og:site_name": "Facebook",
+        "og:image": "https://www.facebook.com/images/fb_icon_325x325.png",
+        "og:image:secure_url": "",
+        "og:image:type": "",
+        "og:image:width": "",
+        "og:image:height": "",
+        "price": "",
+        "priceCurrency": "",
+        "availability": ""
+    }
+*/
+
+
+// npm i html-metadata-parser --save
+const Meta = require('html-metadata-parser');
+
+(async () => {
+    var result = await Meta.parser('https://fb.com');
+    console.log(JSON.stringify(result, null, 3));
+})();
+
+
+/*
+{
+    "meta": {
+        "title": "Facebook - Đăng nhập hoặc đăng ký",
+        "description": "Tạo một tài khoản để đăng nhập Facebook. Kết nối với bạn bè,
+        gia đình và những người mà bạn biết. Chia sẻ ảnh và video, gửi tin nhắn và nhận cập nhật."
+    },
+    "og": {
+        "images": [
+            {
+                "url": "https://www.facebook.com/images/fb_icon_325x325.png"
+            }
+        ],
+        "videos": [],
+        "site_name": "Facebook",
+        "url": "https://www.facebook.com/",
+        "image": "https://www.facebook.com/images/fb_icon_325x325.png"
+    },
+    "images": [
+        {
+            "url": "https://static.xx.fbcdn.net/rsrc.php/v3/yi/r/OBaVg52wtTZ.png",
+            "width": 537,
+            "height": 195
+        },
+        {
+            "url": "https://static.xx.fbcdn.net/rsrc.php/v3/yb/r/GsNJNwuI-UM.gif",
+            "width": 16,
+            "height": 11
+        },
+        {
+            "url": "https://static.xx.fbcdn.net/rsrc.php/v3/yb/r/GsNJNwuI-UM.gif",
+            "width": 16,
+            "height": 11
+        },
+        {
+            "url": "https://facebook.com/security/hsts-pixel.gif?c=3.2.5",
+            "width": 0,
+            "height": 0
+        }
+    ]
+    }
+*/
