@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <!-- Add MENU: createMenuItem -->
+        <ul id="menu"></ul>
+
+        <script>
+            function createMenuItem(name) {
+                let li = document.createElement('li');
+                li.textContent = name;
+                return li;
+            }
+
+            // get the ul#menu
+            const menu = document.querySelector('#menu');
+
+            // add menu item
+            menu.appendChild(createMenuItem('Home'));
+            menu.appendChild(createMenuItem('Services'));
+            menu.appendChild(createMenuItem('About Us'));
+
+            // <ul id="menu">
+            //     <li>Home</li>
+            //     <li>Services</li>
+            //     <li>About Us</li>
+            // </ul>
+        </script>
+
+        <!-- Move Node: moveNode() -->
+        <ul id="first-list">
+            <li>Everest</li>
+            <li>Fuji</li>
+            <li>Kilimanjaro</li>
+        </ul>
+
+        <ul id="second-list">
+            <li>Karakoram Range</li>
+            <li>Denali</li>
+            <li>Mont Blanc</li>
+        </ul>
+
+        <script>
+            function moveNode(fromParentNode = {}, toParentNode = {}) {
+                // take the first child element
+                const node = fromParentNode.firstElementChild;
+
+                // append the everest to the second list
+                toParentNode.appendChild(node);
+            };
+
+            const fromParentNode = document.querySelector('#first-list');
+            const toParentNode = document.querySelector('#second-list');
+            moveNode(fromParentNode, toParentNode);
+        </script>
+    </body>
+</html>
+
+<!--
+https://www.javascripttutorial.net/javascript-dom/javascript-form/
+
+-->

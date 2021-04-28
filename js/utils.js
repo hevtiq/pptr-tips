@@ -1671,14 +1671,33 @@ const jsonFormat = (obj) => {
 
 //===========================================================
 /**
- * 
+ * truncateOnArray() method to truncate an array
  * @param {*} arr - target array
- * @param {*} items 
- * @returns 
+ * @param {*} items - item want to truncate
+ * @returns truncated array
  */
-const truncateOnArray = (arr = [], items = 0) => {
+const truncateItemsOnArray = (arr = [], items = 0) => {
     arr.length = items;
     return arr;
 };
-// let array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-// truncateOnArray(array, 4);
+// let arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+// truncateItemsOnArray(arr, 4);
+
+const truncateItemsOnObject = (obj = {}, items = 0) => {
+    const arr = Object.entries(obj);  // convert objet to array
+    arr.length = items;  // truncate an array
+    return Object.fromEntries(arr);  // convert truncated array to object
+};
+// const obj = {
+//     data: 'testData',
+//     text: 'testText',
+//     x: 1,
+//     y: 2,
+//     z: 4
+// };
+// truncateItemsOnObject(obj, 2);
+
+// OR
+// const truncateItemsOnObject = (obj = {}, items = 0) => {
+//     return Object.fromEntries(Object.entries(obj).filter((_, idx) => idx < items));
+// };

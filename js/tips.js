@@ -14075,3 +14075,57 @@ for (var key in myObject) {
 
 console.log(myObject);
 // { 'a': 2, 'b': 4, 'c': 6 }
+
+
+// for...of (good to use)
+// works with arrays, array-like-objects, maps, set, DOM collections
+// Array iteration - with value
+const products = ['dmitripavlutin', 'anonystick'];
+
+for (const product of products) {
+    console.log(product);
+};
+// 'dmitripavlutin'
+// 'anonystick'
+
+
+// Array iteration - with index, value
+const products = ['dmitripavlutin', 'anonystick'];
+
+// LeftHandSideExpression: array
+for (const [index, product] of products.entries()) {
+    console.log(index, product);
+};
+
+// products.entries() => Array Iterator
+// 0, 'dmitripavlutin'
+// 1, 'anonystick'
+
+
+// In-place destructuring
+for (LeftHandSideExpression of Expression) {
+    // statements
+};
+
+const persons = [
+    { name: 'dmitripavlutin' },
+    { name: 'anonystick' }
+];
+
+// LeftHandSideExpression: destructuring
+for (const { name } of persons) {
+    console.log(name);
+};
+// 'dmitripavlutin'
+// 'anonystick'
+
+
+// Add a DOM
+const arr = ['a', 'b', 'c'];
+const eArr = arr[Symbol.iterator]();
+const letterResult = document.getElementById('letterResult');
+for (let letter of eArr) {
+    const li = document.createElement('LI');
+    li.textContent = letter;
+    letterResult.appendChild(li);
+};
