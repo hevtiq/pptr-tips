@@ -14120,6 +14120,68 @@ for (const { name } of persons) {
 // 'anonystick'
 
 
+// Array-like iteration
+function sum() {
+    let sum = 0;
+    for (const number of arguments) {
+        sum += number;
+    }
+    return sum;
+};
+
+sum(1, 2, 3); // => 6
+
+// String characters iteration
+const message = 'hello';
+
+for (const character of message) {
+    console.log(character);
+};
+// 'h'
+// 'e'
+// 'l'
+// 'l'
+// 'o'
+
+// Maps and Sets iteration
+// Map is a special object that allows you to link keys with a value.Map has
+// greatly appointed key-value data storage.
+// Map
+const names = new Map();
+names.set(1, 'one');
+names.set(2, 'two');
+
+for (const [number, name] of names) {
+    console.log(number, name);
+};
+// logs 1, 'one'
+// logs 2, 'two'
+
+
+// Set
+const colors = new Set(['white', 'blue', 'red', 'white']);
+
+for (color of colors) {
+    console.log(color);
+};
+// 'white'
+// 'blue'
+// 'red'
+
+
+// Iterate plain JavaScript objects
+const person = {
+    name: 'John Smith',
+    job: 'agent'
+};
+
+for (const [prop, value] of Object.entries(person)) {
+    console.log(prop, value);
+};
+// Object.entries() : [['name', 'John Smith'], ['job', 'agent']]
+// 'name', 'John Smith'
+// 'job', 'agent'
+
 // Add a DOM
 const arr = ['a', 'b', 'c'];
 const eArr = arr[Symbol.iterator]();
@@ -14129,3 +14191,373 @@ for (let letter of eArr) {
     li.textContent = letter;
     letterResult.appendChild(li);
 };
+
+
+// Reuse and Testable Code
+function isBigEnough(element, index, array) {
+    return element >= 10;
+}
+
+// var newArray = arr.filter(callback(element[, index[, array]])[, thisArg])
+let filtered = [12, 5, 8, 130, 35].filter(isBigEnough);
+// filtered is [12, 130, 35]
+
+// arr.every(callback(element[, index[, array]])[, thisArg])
+[12, 5, 8, 130, 44].every(isBigEnough);   // false
+[12, 54, 18, 130, 44].every(isBigEnough); // true
+
+// arr.some(callback(element[, index[, array]])[, thisArg])
+[2, 5, 8, 1, 4].some(isBiggerThan10);  // false
+[12, 5, 8, 1, 4].some(isBiggerThan10); // true
+// OR
+[2, 5, 8, 1, 4].some(x => x > 10);  // false
+[12, 5, 8, 1, 4].some(x => x > 10); // true
+
+
+var inventory = [
+    { name: 'apples', quantity: 2 },
+    { name: 'bananas', quantity: 0 },
+    { name: 'orange', quantity: 5 }
+];
+
+function findOranges(fruit) {
+    return fruit.name === 'orange';
+};
+
+// arr.find(callback(element[, index[, array]])[, thisArg])
+console.log(inventory.find(findOrange));
+// { name: 'orange', quantity: 5 }
+
+
+// 1. Format JSON Code
+// converts a value to JSON notation
+// JSON.stringify(value[, replacer[, space]])
+// JSON.stringify(value, replacer, space)
+// replacer or space => null means not provided
+console.log(JSON.stringify({ alpha: 'A', beta: 'B' }, null, '\t'));
+// Result:
+// '{
+//     "alpha": A,
+//     "beta": B
+// }'
+
+// replacer, as a function
+function replacer(key, value) {
+    if (typeof value === 'string') {
+        return undefined;
+    }
+    return value;
+};
+
+var foo = { foundation: 'Mozilla', model: 'box', week: 45, transport: 'car', month: 7 };
+JSON.stringify(foo, replacer);  // '{"week":45,"month":7}'
+
+
+// replacer, as an array
+JSON.stringify(foo, ['week', 'month']);
+// '{"week":45,"month":7}', only keep "week" and "month" properties
+
+
+// JSON.stringify() with localStorage
+// Creating an example of JSON
+var session = {
+    'screens': [],
+    'state': true
+};
+session.screens.push({ 'name': 'screenA', 'width': 450, 'height': 250 });
+session.screens.push({ 'name': 'screenB', 'width': 650, 'height': 350 });
+session.screens.push({ 'name': 'screenC', 'width': 750, 'height': 120 });
+session.screens.push({ 'name': 'screenD', 'width': 250, 'height': 60 });
+session.screens.push({ 'name': 'screenE', 'width': 390, 'height': 120 });
+session.screens.push({ 'name': 'screenF', 'width': 1240, 'height': 650 });
+
+// Converting the JSON string with JSON.stringify()
+// then saving with localStorage in the name of session
+localStorage.setItem('session', JSON.stringify(session));
+
+// Example of how to transform the String generated through
+// JSON.stringify() and saved in localStorage in JSON object again
+var restoredSession = JSON.parse(localStorage.getItem('session'));
+
+// Now restoredSession variable contains the object that was saved
+// in localStorage
+console.log(restoredSession);
+
+console.log(JSON.stringify({ x: 5, y: 6 }));
+// expected output: "{"x":5,"y":6}"
+
+console.log(JSON.stringify([new Number(3), new String('false'), new Boolean(false)]));
+// expected output: "[3,"false",false]"
+
+console.log(JSON.stringify({ x: [10, undefined, function () { }, Symbol('')] }));
+// expected output: "{"x":[10,null,null,null]}"
+
+console.log(JSON.stringify(new Date(2006, 0, 2, 15, 4, 5)));
+// expected output: ""2006-01-02T15:04:05.000Z""
+
+
+
+// JSON.parse()
+const json = '{"result":true, "count":42}';
+const obj = JSON.parse(json);
+
+console.log(obj.count);
+// expected output: 42
+
+console.log(obj.result);
+// expected output: true
+
+JSON.parse('{}');              // {}
+JSON.parse('true');            // true
+JSON.parse('"foo"');           // "foo"
+JSON.parse('[1, 5, "false"]'); // [1, 5, "false"]
+JSON.parse('null');            // null
+
+// 2. Get the Last Item(s) in an Array - not change original array
+let array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+console.log(array.slice(-1)); // Result: [9]
+console.log(array.slice(-2)); // Result: [8, 9]
+console.log(array.slice(-3)); // Result: [7, 8, 9]
+
+// 3. Truncate an Array - change original array
+let array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+array.length = 4;
+console.log(array); // Result: [0, 1, 2, 3]
+
+// 4. Quick Rounding
+// Far
+console.log(23.9 | 0);  // Result: 23
+console.log(-23.9 | 0); // Result: -23
+
+// rounds down
+Math.floor(23.9);  // 23
+Math.floor(-23.9);  // -24
+
+// rounds up
+Math.ceil(23.9);  // 24
+Math.ceil(-23.9);  // -23
+
+// rounds to the nearest integer
+Math.round(23.9);  // 24
+Math.round(-23.9);  // -24
+
+const number = 3.14159;
+number.toFixed(2);  // returns a string: '3.14'
+parseFloat(3.14159.toFixed(2));  // returns a number: 3.14
+
+// removes all the fractional digits NOT support IE
+// Math.trunc() - rounds up or down towards zero (bad browsers support)
+Math.trunc(3.14159);   //  3
+Math.trunc(-3.14159);  // -3
+
+// removes all the fractional digits support IE
+3.14159 | 0;   //  3
+-3.14159 | 0;  // -3
+3000000000.1 | 0  // -1294967296 Ups :(
+
+console.log(1553 / 10 | 0)  // Result: 155
+console.log(1553 / 100 | 0)  // Result: 15
+console.log(1553 / 1000 | 0)  // Result: 1
+
+
+// 5. Convert to Number
+let int = "15";
+int = +int;
+console.log(int); // Result: 15
+console.log(typeof int); Result: "number"
+
+
+// boolean to number
+console.log(+true);  // Return: 1
+console.log(+false); // Return: 0
+
+// number to boolean
+console.log(!0);  // Return: true
+console.log(!!0);  // Return: false
+console.log(!1);  // Return: false
+
+const int = ~~"15"
+console.log(int); // Result: 15
+console.log(typeof int); Result: "number"
+
+
+// 6. Convert to String
+const val = 1 + "";
+console.log(val); // Result: "1"
+console.log(typeof val); // Result: "string"
+
+
+// 7. Filter Unique Values
+const array = [1, 1, 2, 3, 5, 5, 1]
+const uniqueArray = [...new Set(array)];
+console.log(uniqueArray); // Result: [1, 2, 3, 5]
+
+
+// 8. Short-Circuit Evaluation
+// NOT GOOD
+if (this.state.data) {
+    return this.state.data;
+} else {
+    return 'Fetching Data';
+}
+
+// GOOD
+return (this.state.data || 'Fetching Data');
+
+x > 100 ? 'Above 100' : 'Below 100';
+x > 100 ? (x > 200 ? 'Above 200' : 'Between 100-200') : 'Below 100';
+
+let one = 1, two = 2, three = 3;
+console.log(one && two && three); // Result: 3
+console.log(0 && null); // Result: 0
+
+let one = 1, two = 2, three = 3;
+console.log(one || two || three); // Result: 1
+console.log(0 || null); // Result: nulls
+
+
+
+// Fetch javascript
+// let promise = fetch(url, [options])
+// * url – the URL to access. * options – optional parameters: method, headers etc.
+
+// GET Requests with Fetch API
+fetch('https://api.github.com/orgs/nodejs')
+    .then(response => response.json())
+    .then(data => {
+        console.log(data) // Prints result from `response.json()` in getRequest
+    })
+    .catch(error => console.error(error));
+
+
+// Custom headers
+fetch('https://api.github.com/orgs/nodejs', {
+    headers: new Headers({
+        'Content-Type': 'application/json'
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+    })
+})
+    .then(response => response.json())
+    .then(data => {
+        console.log(data)
+    })
+    .catch(error => console.error(error));
+
+// Send authoziration with Fetch
+fetch('https://api.github.com/orgs/nodejs', {
+    credentials: 'include',  // useful for including session ID (and, IIRC, authorization headers)
+    // credentials: "same-origin",  // use if error "blocked by CORS"
+})
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);  // prints result from `response.json()`
+    })
+    .catch(error => console.error(error));
+
+
+// POST/PUT Requests
+postRequest('http://example.com/api/v1/users', { user: 'Dan' })
+    .then(data => console.log(data)) // Result from the `response.json()` call
+    .catch(error => console.error(error))
+
+function postRequest(url, data) {
+    return fetch(url, {
+        credentials: 'same-origin', // 'include', default: 'omit'
+        method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
+        body: JSON.stringify(data), // Coordinate the body type with 'Content-Type'
+        headers: new Headers({
+            'Content-Type': 'application/json'
+        }),
+    })
+        .then(response => response.json())
+};
+
+
+// Posting an HTML
+postForm('http://example.com/api/v1/users')
+    .then(data => console.log(data))
+    .catch(error => console.error(error))
+
+function postForm(url) {
+    const formData = new FormData(document.querySelector('form.edit-user'))
+
+    return fetch(url, {
+        method: 'POST', // or 'PUT'
+        body: formData  // a FormData will automatically set the 'Content-Type'
+    })
+        .then(response => response.json())
+};
+
+
+// Form encoded data
+postFormData('http://example.com/api/v1/users', { user: 'Mary' })
+    .then(data => console.log(data))
+    .catch(error => console.error(error))
+
+function postFormData(url, data) {
+    return fetch(url, {
+        method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
+        body: new URLSearchParams(data),
+        headers: new Headers({
+            'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        })
+    })
+        .then(response => response.json())
+};
+
+
+// Uploading files
+postFile('http://example.com/api/v1/users', 'input[type="file"].avatar')
+    .then(data => console.log(data))
+    .catch(error => console.error(error))
+
+function postFile(url, fileSelector) {
+    const formData = new FormData()
+    const fileField = document.querySelector(fileSelector)
+
+    formData.append('username', 'abc123')
+    formData.append('avatar', fileField.files[0])
+
+    return fetch(url, {
+        method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
+        body: formData  // Coordinate the body type with 'Content-Type'
+    })
+        .then(response => response.json())
+};
+
+// Uploading multiple files
+// input type="file" multiple="" class="files" name="files"
+postFile('http://example.com/api/v1/users', 'input[type="file"].files')
+    .then(data => console.log(data))
+    .catch(error => console.error(error))
+
+function postFile(url, fileSelector) {
+    const formData = new FormData()
+    const fileFields = document.querySelectorAll(fileSelector)
+
+    // Add all files to formData
+    Array.prototype.forEach.call(fileFields.files, f => formData.append('files', f))
+    // Alternatively for PHP peeps, use `files[]` for the name to support arrays
+    // Array.prototype.forEach.call(fileFields.files, f => formData.append('files[]', f))
+
+    return fetch(url, {
+        method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
+        body: formData  // Coordinate the body type with 'Content-Type'
+    })
+        .then(response => response.json())
+};
+
+// https://medium.com/@giangcoffee/event-loop-l%C3%A0-g%C3%AC-v%C3%A0-ho%E1%BA%A1t-%C4%91%E1%BB%99ng-th%E1%BA%BF-n%C3%A0o-d52caa908090
+// https://dmitripavlutin.com/javascript-queue/
+// https://dmitripavlutin.com/javascript-promises-settimeout/
+// SDET
+// https://devqa.io/sdet-hiring-software-developers-in-test/
+// https://viblo.asia/p/event-loop-trong-nodejs-naQZRL1A5vx
+// https://blog.logrocket.com/node-js-express-js-mysql-rest-api-example/
+// https://usefulangle.com/post/246/html-call-phone-number
+// https://www.samanthaming.com/tidbits/83-4-ways-to-convert-string-to-character-array/
+// https://www.samanthaming.com/tidbits/50-how-to-deep-clone-an-array/
+// https://www.thatsanegg.com/blog/5-ways-you%E2%80%99re-not-making-your-website-accessible/
+// https://www.thatsanegg.com/blog/animating-text-like-sketch-does-using-only-css/
+// https://1loc.dev/
+

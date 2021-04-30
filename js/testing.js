@@ -202,3 +202,16 @@ function add(num1, num2) {
 var add = function (num1, num2) {
 	return num1 + num2;
 };
+
+
+// https://developer.mozilla.org/vi/docs/Web/JavaScript/Reference/Global_Objects
+// https://developer.mozilla.org/vi/search?q=error
+
+// JSON.parse() does not allow trailing commas
+// both will throw a SyntaxError
+JSON.parse('[1, 2, 3, 4, ]');
+JSON.parse('{"foo" : 1, }');
+
+// JSON.parse() does not allow single quotes
+// will throw a SyntaxError
+JSON.parse("{'foo': 1}");
