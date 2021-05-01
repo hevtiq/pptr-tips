@@ -4,7 +4,11 @@
   "description": "Puppeteer Tips and Tricks",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "//test": "node ./node_modules/mocha/bin/mocha --timeout=30000 ./build/**.js",
+    "mocha": "node ./node_modules/mocha/bin/mocha --timeout=30000 ./build/mocha.test.js",
+    "mocha-steps": "node ./node_modules/mocha/bin/mocha --timeout=30000 --require mocha-steps ./build/mocha-steps.test.js",
+    "//clean": "rm -rf build",
+    "build": "babel --presets es2015 -d build/ tests/"
   },
   "keywords": [
     "Puppeteer",
@@ -15,6 +19,13 @@
   "license": "ISC",
   "dependencies": {
     "axe-puppeteer": "^1.1.1",
+    "chai": "^4.3.4",
+    "mocha": "^8.3.2",
+    "mocha-steps": "^1.3.0",
     "puppeteer": "^8.0.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1"
   }
 }
